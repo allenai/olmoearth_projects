@@ -1,0 +1,347 @@
+trainer:
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: epoch
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val_class/accuracy
+      save_last: true
+      save_top_k: 1
+      mode: max
+  - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+    init_args:
+      module_selector:
+      - model
+      - encoder
+      - 0
+      unfreeze_at_epoch: 20
+      unfreeze_lr_factor: 10.0
+  - class_path: rslearn.train.prediction_writer.RslearnWriter
+    init_args:
+      path: placeholder
+      output_layer: ${PREDICTION_OUTPUT_LAYER}
+      selector: ["class"]
+  max_epochs: 500
+  default_root_dir: ${TRAINER_DATA_PATH}
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: ${WANDB_PROJECT}
+      name: ${WANDB_NAME}
+      entity: ${WANDB_ENTITY}
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.multitask.MultiTaskModel
+      init_args:
+        encoder:
+        - class_path: olmoearth_projects.olmoearth_pretrain.model.OlmoEarth
+          init_args:
+            checkpoint_path: ${EXTRA_FILES_PATH}/yawenzzzz/latent_mim_cross_random_per_modality_patchdisc_add_contrastive_0.1_1/step400000
+            selector:
+            - encoder
+            forward_kwargs:
+              patch_size: 8
+        decoders:
+          class:
+          - class_path: rslearn.models.unet.UNetDecoder
+            init_args:
+              in_channels:
+              - - 8
+                - 768
+              out_channels: 2
+              conv_layers_per_resolution: 2
+              kernel_size: 3
+              num_channels:
+                '1': 128
+                '2': 256
+                '4': 512
+                '8': 512
+          - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+    scheduler:
+      class_path: rslearn.train.scheduler.PlateauScheduler
+      init_args:
+        factor: 0.2
+        patience: 2
+        cooldown: 20
+        min_lr: 0.0
+    lr: 0.0001
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    inputs:
+      mask:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - mask
+          bands:
+          - mask
+          required: true
+          passthrough: true
+          is_target: true
+          dtype: FLOAT32
+      s21:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - sentinel2
+          bands:
+          - B02
+          - B03
+          - B04
+          - B08
+          - B05
+          - B06
+          - B07
+          - B8A
+          - B11
+          - B12
+          - B01
+          - B09
+          required: true
+          passthrough: true
+          dtype: FLOAT32
+      s22:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - sentinel2.1
+          bands:
+          - B02
+          - B03
+          - B04
+          - B08
+          - B05
+          - B06
+          - B07
+          - B8A
+          - B11
+          - B12
+          - B01
+          - B09
+          required: true
+          passthrough: true
+          dtype: FLOAT32
+      s23:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - sentinel2.2
+          bands:
+          - B02
+          - B03
+          - B04
+          - B08
+          - B05
+          - B06
+          - B07
+          - B8A
+          - B11
+          - B12
+          - B01
+          - B09
+          required: true
+          passthrough: true
+          dtype: FLOAT32
+      s24:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - sentinel2.3
+          bands:
+          - B02
+          - B03
+          - B04
+          - B08
+          - B05
+          - B06
+          - B07
+          - B8A
+          - B11
+          - B12
+          - B01
+          - B09
+          required: true
+          passthrough: true
+          dtype: FLOAT32
+      targets:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - label_raster
+          bands:
+          - label
+          required: true
+          is_target: true
+          dtype: INT32
+    task:
+      class_path: rslearn.train.tasks.multi_task.MultiTask
+      init_args:
+        tasks:
+          class:
+            class_path: rslearn.train.tasks.segmentation.SegmentationTask
+            init_args:
+              num_classes: 2
+              enable_accuracy_metric: true
+              enable_f1_metric: true
+              f1_metric_thresholds:
+              - - 0.05
+                - 0.1
+                - 0.2
+                - 0.3
+                - 0.4
+                - 0.5
+                - 0.6
+                - 0.7
+                - 0.8
+                - 0.9
+              - - 0.1
+              - - 0.2
+              - - 0.3
+              - - 0.4
+              - - 0.5
+              - - 0.6
+              - - 0.7
+              - - 0.8
+              - - 0.9
+              metric_kwargs:
+                average: micro
+              image_bands:
+              - 0
+              - 1
+              - 2
+              remap_values:
+              - - 0.0
+                - 1.0
+              - - 0
+                - 255
+        input_mapping:
+          class:
+            targets: targets
+    path: ${DATASET_PATH}
+    batch_size: 8
+    num_workers: ${NUM_WORKERS}
+    default_config:
+      transforms:
+      - class_path: rslearn.train.transforms.concatenate.Concatenate
+        init_args:
+          selections:
+            s21: []
+            s22: []
+            s23: []
+            s24: []
+          output_selector: sentinel2_l2a
+      - class_path: olmoearth_projects.olmoearth_pretrain.norm.OlmoEarthNormalize
+        init_args:
+          band_names:
+            sentinel2_l2a:
+            - B02
+            - B03
+            - B04
+            - B08
+            - B05
+            - B06
+            - B07
+            - B8A
+            - B11
+            - B12
+            - B01
+            - B09
+      - class_path: rslearn.train.transforms.mask.Mask
+        init_args:
+          selectors:
+          - sentinel2_l2a
+    train_config:
+      tags:
+        split: train
+      transforms:
+      - class_path: rslearn.train.transforms.concatenate.Concatenate
+        init_args:
+          selections:
+            s21: []
+            s22: []
+            s23: []
+            s24: []
+          output_selector: sentinel2_l2a
+      - class_path: olmoearth_projects.olmoearth_pretrain.norm.OlmoEarthNormalize
+        init_args:
+          band_names:
+            sentinel2_l2a:
+            - B02
+            - B03
+            - B04
+            - B08
+            - B05
+            - B06
+            - B07
+            - B8A
+            - B11
+            - B12
+            - B01
+            - B09
+      - class_path: rslearn.train.transforms.mask.Mask
+        init_args:
+          selectors:
+          - sentinel2_l2a
+      - class_path: rslearn.train.transforms.flip.Flip
+        init_args:
+          image_selectors:
+          - sentinel2_l2a
+          - target/class/classes
+          - target/class/valid
+      sampler:
+        class_path: rslearn.train.dataset.RandomSamplerFactory
+        init_args:
+          replacement: true
+          num_samples: 16384
+      patch_size: 128
+    val_config:
+      tags:
+        split: val
+      patch_size: 128
+      load_all_patches: true
+    test_config:
+      tags:
+        split: val
+      patch_size: 128
+      load_all_patches: true
+    predict_config:
+      patch_size: 128
+      load_all_patches: true
+      skip_targets: true
+      transforms:
+      - class_path: rslearn.train.transforms.concatenate.Concatenate
+        init_args:
+          selections:
+            s21: []
+            s22: []
+            s23: []
+            s24: []
+          output_selector: sentinel2_l2a
+      - class_path: olmoearth_projects.olmoearth_pretrain.norm.OlmoEarthNormalize
+        init_args:
+          band_names:
+            sentinel2_l2a:
+            - B02
+            - B03
+            - B04
+            - B08
+            - B05
+            - B06
+            - B07
+            - B8A
+            - B11
+            - B12
+            - B01
+            - B09
+# rslp_project: 2025_06_06_helios_finetuning
+# rslp_experiment: v2_satlas_solar_farm_128_ts_helios_per_mod_patchdisc_contrastive_fix

@@ -1,0 +1,93 @@
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.multitask.MultiTaskModel
+      init_args:
+        encoder:
+          - class_path: olmoearth_projects.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+              checkpoint_path: "{CHECKPOINT_PATH}"
+              selector: ["encoder"]
+              forward_kwargs:
+                patch_size: {PATCH_SIZE}
+        decoders:
+          crop_type_mapping:
+            - class_path: rslearn.models.pooling_decoder.PoolingDecoder
+              init_args:
+                in_channels: {ENCODER_EMBEDDING_SIZE}
+                out_channels: 6
+            - class_path: rslearn.train.tasks.classification.ClassificationHead
+    lr: 0.0001
+    plateau: true
+    plateau_factor: 0.2
+    plateau_patience: 2
+    plateau_min_lr: 0
+    plateau_cooldown: 10
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    path: /weka/dfive-default/rslearn-eai/datasets/crop/kenya_nandi/20250409
+    inputs:
+      sentinel2_l2a:
+        data_type: "raster"
+        layers: ["sentinel2_l2a_mo08"]
+        bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+        passthrough: true
+        dtype: FLOAT32
+      label:
+        data_type: "vector"
+        layers: ["label"]
+        is_target: true
+    task:
+      class_path: rslearn.train.tasks.multi_task.MultiTask
+      init_args:
+        tasks:
+          crop_type_mapping:
+            class_path: rslearn.train.tasks.classification.ClassificationTask
+            init_args:
+              property_name: "category"
+              classes: ["Coffee", "Trees", "Grassland", "Maize", "Sugarcane", "Tea"]
+              enable_f1_metric: true
+              metric_kwargs:
+                average: "micro"
+        input_mapping:
+          crop_type_mapping:
+            label: "targets"
+    batch_size: 32
+    num_workers: 64
+    default_config:
+      transforms:
+        - class_path: olmoearth_projects.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+    train_config:
+      groups: ["post_random_split"]
+      tags:
+        split: "train"
+    val_config:
+      groups: ["post_random_split"]
+      tags:
+        split: "val"
+    test_config:
+      groups: ["post_random_split"]
+      tags:
+        split: "val"
+trainer:
+  max_epochs: 300
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "epoch"
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: ${TRAINER_DATA_PATH}  # this is where intermediate checkpoinst will end up
+        save_top_k: 1
+        save_last: true
+        monitor: val_loss
+        mode: min
+    - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+      init_args:
+        module_selector: ["model", "encoder", 0]
+        unfreeze_at_epoch: 2

@@ -1,0 +1,51 @@
+[project]
+name = "olmoearth_projects"
+version = "0.0.7"
+description = "OlmoEarth projects"
+authors = [
+    { name = "OlmoEarth Team" },
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+
+[tool.setuptools.dynamic.dependencies]
+file = ["requirements.txt"]
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = { file = ["requirements-dev.txt"] }
+extra = { file = ["requirements-extra.txt"] }
+olmoearth_pretrain = { file = ["requirements-olmoearth_pretrain.txt"] }
+olmoearth_run = { file = ["requirements-olmoearth_run.txt"] }
+
+[project.urls]
+homepage = "https://github.com/allenai/olmoearth_projects"
+issues = "https://github.com/allenai/olmoearth_projects/issues"
+repository = "https://github.com/allenai/olmoearth_projects"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["olmoearth_projects*"]
+
+[tool.ruff]
+fix = true
+
+[tool.ruff.lint]
+extend-select = ["D", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+addopts = [
+    "--import-mode=importlib",
+]

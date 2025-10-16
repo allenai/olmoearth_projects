@@ -1,0 +1,120 @@
+{
+  "bbox": null,
+  "features": [
+    {
+      "bbox": null,
+      "geometry": {
+        "bbox": null,
+        "coordinates": [
+          -118.15229910783472,
+          33.7362279043863
+        ],
+        "type": "Point"
+      },
+      "id": null,
+      "properties": {
+        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "es_end_time": "2024-02-24 05:57:00+00:00",
+        "es_label": 1,
+        "es_start_time": "2024-02-24 05:57:00+00:00"
+      },
+      "type": "Feature"
+    },
+    {
+      "bbox": null,
+      "geometry": {
+        "bbox": null,
+        "coordinates": [
+          -118.16075404958488,
+          33.73583415874556
+        ],
+        "type": "Point"
+      },
+      "id": null,
+      "properties": {
+        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "es_end_time": "2024-02-24 05:57:00+00:00",
+        "es_label": 3,
+        "es_start_time": "2024-02-24 05:57:00+00:00"
+      },
+      "type": "Feature"
+    },
+    {
+      "bbox": null,
+      "geometry": {
+        "bbox": null,
+        "coordinates": [
+          -118.15642511940884,
+          33.72936522166563
+        ],
+        "type": "Point"
+      },
+      "id": null,
+      "properties": {
+        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "es_end_time": "2024-02-24 05:57:00+00:00",
+        "es_label": 1,
+        "es_start_time": "2024-02-24 05:57:00+00:00"
+      },
+      "type": "Feature"
+    },
+    {
+      "bbox": null,
+      "geometry": {
+        "bbox": null,
+        "coordinates": [
+          -118.16548881696505,
+          33.72936522166563
+        ],
+        "type": "Point"
+      },
+      "id": null,
+      "properties": {
+        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "es_end_time": "2024-02-24 05:57:00+00:00",
+        "es_label": 4,
+        "es_start_time": "2024-02-24 05:57:00+00:00"
+      },
+      "type": "Feature"
+    },
+    {
+      "bbox": null,
+      "geometry": {
+        "bbox": null,
+        "coordinates": [
+          -118.17495835172541,
+          33.72919646025821
+        ],
+        "type": "Point"
+      },
+      "id": null,
+      "properties": {
+        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "es_end_time": "2024-02-24 05:57:00+00:00",
+        "es_label": 3,
+        "es_start_time": "2024-02-24 05:57:00+00:00"
+      },
+      "type": "Feature"
+    },
+    {
+      "bbox": null,
+      "geometry": {
+        "bbox": null,
+        "coordinates": [
+          -118.15933361937081,
+          33.70708584678741
+        ],
+        "type": "Point"
+      },
+      "id": null,
+      "properties": {
+        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "es_end_time": "2024-02-24 05:57:00+00:00",
+        "es_label": 4,
+        "es_start_time": "2024-02-24 05:57:00+00:00"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

@@ -1,0 +1,37 @@
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 0.15
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 2048
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+postprocessing_strategies:
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.noop_raster.NoopRaster
+
+inference_results_config:
+  data_type: RASTER

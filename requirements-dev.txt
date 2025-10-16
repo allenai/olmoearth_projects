@@ -1,0 +1,8 @@
+interrogate>=1.7.0
+mypy>=1.17.1,<2
+pre-commit>=4.3.0
+pytest>=8.2
+pytest-dotenv
+pytest-forked
+pytest-xdist
+ruff>=0.7

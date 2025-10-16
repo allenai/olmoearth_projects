@@ -1,0 +1,64 @@
+inference_results_config:
+  data_type: RASTER
+  classification_fields:
+    - property_name: crop_type_classification
+      band_index: 1
+      allowed_values:
+        - value: 1
+          label: coffee
+          color: [124, 67, 18]
+        - value: 2
+          label: trees
+          color: [51, 160, 44]
+        - value: 3
+          label: grassland
+          color: [169, 214, 146]
+        - value: 4
+          label: maize
+          color: [240, 159, 28]
+        - value: 5
+          label: sugarcane
+          color: [251, 154, 153]
+        - value: 6
+          label: tea
+          color: [31, 234, 146]
+        - value: 7
+          label: vegetables
+          color: [166, 206, 227]
+        - value: 8
+          label: legumes
+          color: [227, 26, 28]
+        - value: 9
+          label: water
+          color: [31, 120, 180]
+        - value: 10
+          label: builtup
+          color: [136, 33, 233]
+
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 0.25
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 64
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+postprocessing_strategies:
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.noop_raster.NoopRaster

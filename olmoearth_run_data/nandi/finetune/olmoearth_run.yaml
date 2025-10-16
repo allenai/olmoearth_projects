@@ -1,0 +1,17 @@
+window_prep:
+  sampler:
+    class_path: olmoearth_run.runner.tools.samplers.noop_sampler.NoopSampler
+  labeled_window_preparer:
+    class_path: olmoearth_run.runner.tools.labeled_window_preparers.point_to_pixel_window_preparer.PointToPixelWindowPreparer
+    init_args:
+      window_resolution: 10.0
+  data_splitter:
+    class_path: olmoearth_run.runner.tools.data_splitters.random_data_splitter.RandomDataSplitter
+    init_args:
+      train_prop: 0.8
+      val_prop: 0.2
+      test_prop: 0.0
+      seed: 42
+  label_layer: "labels"
+  group_name: "random_split"
+  split_property: "split"
