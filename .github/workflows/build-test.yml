@@ -53,22 +53,18 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-      # Add deploy key and clone Helios repository.
-      - name: Start ssh-agent and add helios deploy key
+      # Add deploy key and clone olmoearth_pretrain and olmoearth_run.
+      - name: Start ssh-agent and add deploy key
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY_FOR_HELIOS_CLONE }}
-      - name: Clone helios and update requirements-extra.txt.
+          ssh-private-key: ${{ secrets.DEPLOY_KEY_FOR_OLMOEARTH_CLONES }}
+
+      - name: Clone olmoearth_pretrain and update requirements-extra.txt.
         run: |
           mkdir docker_build
-          git clone git@github.com:allenai/helios.git docker_build/helios
-          echo "helios @ /opt/rslearn_projects/docker_build/helios/" >> requirements-extra.txt
+          git clone git@github.com:allenai/olmoearth_pretrain.git docker_build/olmoearth_pretrain
+          echo "olmoearth_pretrain @ /opt/rslearn_projects/docker_build/olmoearth_pretrain/" >> requirements-extra.txt
 
-      # Add deploy key and clone olmoearth_run repository.
-      - name: Start ssh-agent and add olmoearth_run deploy key
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY_FOR_OLMOEARTH_RUN_CLONE }}
       - name: Clone olmoearth_run and update requirements-extra.txt.
         run: |
           git clone git@github.com:allenai/olmoearth_run.git docker_build/olmoearth_run
@@ -123,15 +119,10 @@ jobs:
           echo "Executing integration tests"
           docker run --rm \
             -e CI="true" \
-            -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
-            -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
             -v ${{env.GOOGLE_GHA_CREDS_PATH}}:/tmp/gcp-credentials.json:ro \
             -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json \
             ${{ needs.build.outputs.ghcr_docker_image }} \
             pytest tests/integration -vv --forked
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # Add Job to clean up test bucket
       - name: Clean up
