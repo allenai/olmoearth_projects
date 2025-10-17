@@ -53,36 +53,32 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-      # Add deploy keys and clone olmoearth_pretrain and olmoearth_run.
+      # Add deploy keys.
       - name: Start ssh-agent and add olmoearth_pretrain deploy key
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_KEY_FOR_OLMOEARTH_PRETRAIN_CLONE }}
-
-      - name: Clone olmoearth_pretrain and update requirements-extra.txt.
-        run: |
-          mkdir docker_build
-          git clone git@github.com:allenai/olmoearth_pretrain.git docker_build/olmoearth_pretrain
-          echo "olmoearth_pretrain @ /opt/rslearn_projects/docker_build/olmoearth_pretrain/" >> requirements-extra.txt
 
       - name: Start ssh-agent and add olmoearth_run deploy key
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_KEY_FOR_OLMOEARTH_RUN_CLONE }}
 
-      - name: Clone olmoearth_run and update requirements-extra.txt.
+      - name: Collect Git and SSH config files in a directory that is part of the Docker build context
         run: |
-          git clone git@github.com:allenai/olmoearth_run.git docker_build/olmoearth_run
-          echo "earth-system-run @ /opt/rslearn_projects/docker_build/olmoearth_run/" >> requirements-extra.txt
+          mkdir root-config
+          cp -r ~/.gitconfig  ~/.ssh root-config/
 
       - name: Build and push Docker image
         id: build-push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v2
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          ssh: |
+            default=${{ env.SSH_AUTH_SOCK }}
 
       - name: Store Image Names
         # We need the docker image name downstream in test & deploy. This saves the full docker image names to outputs

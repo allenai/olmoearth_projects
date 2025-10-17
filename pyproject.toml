@@ -1,6 +1,6 @@
 [project]
 name = "olmoearth_projects"
-version = "0.0.7"
+version = "0.0.1"
 description = "OlmoEarth projects"
 authors = [
     { name = "OlmoEarth Team" },
@@ -8,6 +8,35 @@ authors = [
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.11"
+
+dependencies = [
+    "python-dotenv>=1.0",
+    "PyYAML>=6",
+    "rslearn[extra]>=0.0.8",
+    "wandb>=0.21",
+]
+
+[project.optional-dependencies]
+dev = [
+    "interrogate>=1.7.0",
+    "mypy>=1.17.1,<2",
+    "pre-commit>=4.3.0",
+    "pytest>=8.2",
+    "pytest-dotenv",
+    "pytest-forked",
+    "pytest-xdist",
+    "ruff>=0.7",
+]
+
+# olmoearth_pretrain needs github token.
+olmoearth_pretrain = [
+    "olmoearth_pretrain @ git+https://github.com/allenai/olmoearth_pretrain.git@main",
+]
+
+# olmoearth_run needs github token.
+olmoearth_run = [
+    "olmoearth_run @ git+https://github.com/allenai/olmoearth_run.git@develop",
+]
 
 [tool.setuptools.dynamic.dependencies]
 file = ["requirements.txt"]

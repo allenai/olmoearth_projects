@@ -1,1 +1,0 @@
-earth-system-run @ git+https://github.com/allenai/olmoearth_run.git@develop

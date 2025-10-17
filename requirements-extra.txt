@@ -1,3 +1,0 @@
-beaker-py>=2.0
-pydantic>=2.8
-typing-extensions>=4.11

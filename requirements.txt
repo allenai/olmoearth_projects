@@ -1,4 +1,0 @@
-python-dotenv>=1.0
-PyYAML>=6
-rslearn[extra]>=0.0.8
-wandb>=0.21
