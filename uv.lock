@@ -3229,7 +3229,7 @@ requires-dist = [
     { name = "pytest-xdist", marker = "extra == 'dev'" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "pyyaml", specifier = ">=6" },
-    { name = "rslearn", extras = ["extra"], specifier = ">=0.0.8" },
+    { name = "rslearn", extras = ["extra"], specifier = ">=0.0.11" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.7" },
     { name = "wandb", specifier = ">=0.21" },
 ]
@@ -4968,7 +4968,7 @@ wheels = [
 
 [[package]]
 name = "rslearn"
-version = "0.0.9"
+version = "0.0.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "boto3" },
@@ -4987,9 +4987,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "universal-pathlib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/34/c614d0cc23bed8d631e36f5585c5a6db96da39a93eb5e3826edfbc84fee9/rslearn-0.0.9.tar.gz", hash = "sha256:0ce4aaf2d90c58e06ab2d27491af72706653e3b998f13d3e630f79ceb02a7fa4", size = 319535, upload-time = "2025-10-16T16:49:11.227Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/5a/ba5fa4cd23ca3193b2e099c09ed45c2d650066b97f0f507eeaac7a7380b8/rslearn-0.0.11.tar.gz", hash = "sha256:371f0124245c32a812549563e5023fba7eb5183bf9e1483982da5d064312285d", size = 323265, upload-time = "2025-10-20T18:35:29.907Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/23/f0/2563d627aea705fc3aff56873e778f150148393ec812d64b1cb52e43c95b/rslearn-0.0.9-py3-none-any.whl", hash = "sha256:754cb40dd0a1430fbc843ad8256040b0f5245b55dd597c45ebd3ba032af4e811", size = 395176, upload-time = "2025-10-16T16:49:09.497Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/e7/3ed5c3fd65e405014fd9d0ff557bea86785638b69378bbadf609b1063597/rslearn-0.0.11-py3-none-any.whl", hash = "sha256:157ca7992f1807b6399efedcdccb7170d2941059891d8904266265de23629b3f", size = 400371, upload-time = "2025-10-20T18:35:28.275Z" },
 ]
 
 [package.optional-dependencies]
@@ -5012,6 +5012,7 @@ extra = [
     { name = "rtree" },
     { name = "satlaspretrain-models" },
     { name = "scipy" },
+    { name = "termcolor" },
     { name = "terratorch" },
     { name = "timm" },
     { name = "transformers" },
