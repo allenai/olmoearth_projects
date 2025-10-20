@@ -91,6 +91,11 @@ jobs:
         run: |
           docker pull ${{ needs.build.outputs.ghcr_docker_image }}
 
+      - name: Authenticate into gcp
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
       #- name: Run unit tests
       #  run: |
       #    echo "Executing unit tests"
