@@ -33,9 +33,8 @@ olmoearth_pretrain = [
     "olmoearth_pretrain @ git+https://github.com/allenai/olmoearth_pretrain.git@main",
 ]
 
-# olmoearth_run needs github token.
 olmoearth_run = [
-    "olmoearth_run @ git+https://github.com/allenai/olmoearth_run.git@develop",
+    "olmoearth-runner==0.1.0"
 ]
 
 [tool.setuptools.dynamic.dependencies]
