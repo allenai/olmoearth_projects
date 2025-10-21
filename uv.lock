@@ -3230,7 +3230,7 @@ requires-dist = [
     { name = "interrogate", marker = "extra == 'dev'", specifier = ">=1.7.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.17.1,<2" },
     { name = "olmoearth-pretrain", marker = "extra == 'olmoearth-pretrain'", git = "https://github.com/allenai/olmoearth_pretrain.git?rev=main" },
-    { name = "olmoearth-runner", marker = "extra == 'olmoearth-run'", specifier = "==0.1.1" },
+    { name = "olmoearth-runner", marker = "extra == 'olmoearth-run'", specifier = "==0.1.2" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.3.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.2" },
     { name = "pytest-dotenv", marker = "extra == 'dev'" },
@@ -3246,7 +3246,7 @@ provides-extras = ["dev", "olmoearth-pretrain", "olmoearth-run"]
 
 [[package]]
 name = "olmoearth-runner"
-version = "0.1.1"
+version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec", extra = ["gcs", "s3"] },
@@ -3284,9 +3284,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "universal-pathlib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/65/9c/0da924d0d3058b0d9b654838bbe8b40dc4951cdb9edf92e6c55a23fdeb95/olmoearth_runner-0.1.1.tar.gz", hash = "sha256:ffacbdd73765c822d5e2759f03b92d83d464d7d7b42b555652e730f5447992de", size = 6373, upload-time = "2025-10-21T16:40:06.927Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/ad/d933ec6eca2e214705df561865eb9950b688cca9bf4d4c7a423cb204612f/olmoearth_runner-0.1.2.tar.gz", hash = "sha256:3f3d865261919f57322d8e2096f295bde721986f63556d8726cb5404e7ca241d", size = 6378, upload-time = "2025-10-21T19:22:40.942Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/35/dd/f3af1bc1188691f908d4df3689a981e01d7bb7a7a251d4fcc5ced927ea7b/olmoearth_runner-0.1.1-py3-none-any.whl", hash = "sha256:58c110cdd9aa35bba8caf4ad5998e04142398dab695288799af8d87252a8c93a", size = 6400, upload-time = "2025-10-21T16:40:05.835Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/63/655d813b69a4046a6f8b9e17d00061728714a8a6264e315fb716343f32c8/olmoearth_runner-0.1.2-py3-none-any.whl", hash = "sha256:f23adbdead6453e4da773b85465833666d5b97ae4e5124c1a1f760ed09381968", size = 6403, upload-time = "2025-10-21T19:22:39.942Z" },
 ]
 
 [[package]]
