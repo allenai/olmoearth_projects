@@ -23,8 +23,8 @@ depends on:
 Run with:
 
 ```
-python -m olmoearth_projects.main olmoearth_run prepare_labeled_windows \
-    --project_path olmoearth_run_data/sample \
+uv run python -m olmoearth_projects.main olmoearth_run prepare_labeled_windows \
+    --project_path $(pwd)/olmoearth_run_data/sample \
     --scratch_path /tmp/scratch
 ```
 
