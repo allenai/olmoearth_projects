@@ -1,0 +1,131 @@
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.multitask.MultiTaskModel
+      init_args:
+        encoder:
+          - class_path: rslp.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+              checkpoint_path: ${EXTRA_FILES_PATH}/henryh/base_v6.1_add_chm_cdl_worldcereal/step500000
+              selector: ["encoder"]
+              forward_kwargs:
+                patch_size: 4
+        decoders:
+          value:
+            - class_path: rslearn.models.unet.UNetDecoder
+              init_args:
+                in_channels: [[4, 768]]
+                out_channels: 1
+                conv_layers_per_resolution: 2
+                num_channels: {8: 512, 4: 512, 2: 256, 1: 128}
+            - class_path: rslearn.train.tasks.per_pixel_regression.PerPixelRegressionHead
+    lr: 0.00002
+    plateau: true
+    plateau_factor: 0.2
+    plateau_patience: 2
+    plateau_min_lr: 0
+    plateau_cooldown: 10
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    path: ${DATASET_PATH}
+    inputs:
+      sentinel1:
+        data_type: "raster"
+        layers: ["sentinel1", "sentinel1.1", "sentinel1.2", "sentinel1.3", "sentinel1.4", "sentinel1.5", "sentinel1.6", "sentinel1.7", "sentinel1.8", "sentinel1.9", "sentinel1.10", "sentinel1.11"]
+        bands: ["vv", "vh"]
+        passthrough: true
+        dtype: FLOAT32
+        load_all_item_groups: false
+        load_all_layers: true
+      sentinel2_l2a:
+        data_type: "raster"
+        layers: ["sentinel2", "sentinel2.1", "sentinel2.2", "sentinel2.3", "sentinel2.4", "sentinel2.5", "sentinel2.6", "sentinel2.7", "sentinel2.8", "sentinel2.9", "sentinel2.10", "sentinel2.11"]
+        bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+        passthrough: true
+        dtype: FLOAT32
+        load_all_item_groups: false
+        load_all_layers: true
+      label:
+        data_type: "raster"
+        layers: ["labels"]
+        bands: ["value"]
+        dtype: FLOAT32
+        is_target: true
+    task:
+      class_path: rslearn.train.tasks.multi_task.MultiTask
+      init_args:
+        tasks:
+          value:
+            class_path: rslearn.train.tasks.per_pixel_regression.PerPixelRegressionTask
+            init_args:
+              nodata_value: -1
+        input_mapping:
+          value:
+            label: "targets"
+    batch_size: 32
+    num_workers: ${NUM_WORKERS}
+    default_config:
+      transforms:
+        - class_path: rslp.olmoearth_prertain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel1: ["vv", "vh"]
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+    train_config:
+      patch_size: 32
+      groups: ["spatial_split"]
+      tags:
+        split: "train"
+    val_config:
+      load_all_patches: true
+      patch_size: 63
+      groups: ["spatial_split"]
+      tags:
+        split: "val"
+    test_config:
+      load_all_patches: true
+      patch_size: 63
+      groups: ["spatial_split"]
+      tags:
+        split: "val"
+    predict_config:
+      load_all_patches: true
+      skip_targets: true
+      patch_size: 32
+      transforms:
+        - class_path: rslp.olmoearth_prertain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel1: ["vv", "vh"]
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+trainer:
+  max_epochs: 100
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: ${WANDB_PROJECT}
+      name: ${WANDB_NAME}
+      entity: ${WANDB_ENTITY}
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "epoch"
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: ${TRAINER_DATA_PATH}
+        save_top_k: 1
+        save_last: true
+        monitor: val_loss
+        mode: min
+    - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+      init_args:
+        module_selector: ["model", "encoder", 0]
+        unfreeze_at_epoch: 20
+        unfreeze_lr_factor: 10
+    - class_path: rslearn.train.prediction_writer.RslearnWriter
+      init_args:
+        path: ${DATASET_PATH}
+        output_layer: ${PREDICTION_OUTPUT_LAYER}
+        selector: ["value"]

@@ -1,0 +1,57 @@
+window_prep:
+  sampler:
+    class_path: olmoearth_run.runner.tools.samplers.noop_sampler.NoopSampler
+  labeled_window_preparer:
+    class_path: olmoearth_run.runner.tools.labeled_window_preparers.point_to_raster_window_preparer.PointToRasterWindowPreparer
+    init_args:
+      window_buffer: 31  # in pixels
+      window_resolution: 10.0
+      dtype: FLOAT32
+      nodata_value: -1
+  data_splitter:
+    class_path: olmoearth_run.runner.tools.data_splitters.spatial_data_splitter.SpatialDataSplitter
+    init_args:
+      train_prop: 0.8
+      val_prop: 0.2
+      test_prop: 0.0
+      grid_size: 128  # in pixels
+  label_layer: "labels"
+  group_name: "spatial_split"
+  split_property: "split"
+
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 0.25
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 64
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+postprocessing_strategies:
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.noop_raster.NoopRaster
+
+inference_results_config:
+  data_type: RASTER
+  regression_fields:
+    - property_name: value
+      band_index: 1
+      min_value: 30
+      max_value: 200
+      colormap_name: "rdylgn"
