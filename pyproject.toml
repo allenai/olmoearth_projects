@@ -37,15 +37,6 @@ olmoearth_run = [
     "olmoearth-runner==0.1.1"
 ]
 
-[tool.setuptools.dynamic.dependencies]
-file = ["requirements.txt"]
-
-[tool.setuptools.dynamic.optional-dependencies]
-dev = { file = ["requirements-dev.txt"] }
-extra = { file = ["requirements-extra.txt"] }
-olmoearth_pretrain = { file = ["requirements-olmoearth_pretrain.txt"] }
-olmoearth_run = { file = ["requirements-olmoearth_run.txt"] }
-
 [project.urls]
 homepage = "https://github.com/allenai/olmoearth_projects"
 issues = "https://github.com/allenai/olmoearth_projects/issues"
