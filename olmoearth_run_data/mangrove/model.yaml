@@ -1,0 +1,393 @@
+# lightning.pytorch==2.5.1.post0
+seed_everything: 0
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.multitask.MultiTaskModel
+      init_args:
+        encoder:
+        - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
+          init_args:
+              model_id: OLMOEARTH_V1_BASE
+              patch_size: 2
+        decoders:
+          mangrove_classification:
+          - class_path: rslearn.models.pooling_decoder.SegmentationPoolingDecoder
+            init_args:
+              in_channels: 768
+              out_channels: 4
+              num_conv_layers: 0
+              num_fc_layers: 0
+              conv_channels: 128
+              fc_channels: 512
+              image_key: "sentinel2_l2a"
+          - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+        lazy_decode: false
+        loss_weights: null
+    optimizer: null
+    scheduler: null
+    visualize_dir: null
+    metrics_file: null
+    restore_config: null
+    print_parameters: false
+    print_model: false
+    lr: 0.0001
+    plateau: true
+    plateau_factor: 0.2
+    plateau_patience: 2
+    plateau_min_lr: 0.0
+    plateau_cooldown: 10
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    inputs:
+      label:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - label_raster
+          bands:
+          - label
+          required: true
+          passthrough: false
+          is_target: true
+          dtype: INT32
+          load_all_layers: false
+          load_all_item_groups: false
+      sentinel2_l2a:
+        class_path: rslearn.train.dataset.DataInput
+        init_args:
+          data_type: raster
+          layers:
+          - sentinel2
+          bands:
+          - B02
+          - B03
+          - B04
+          - B08
+          - B05
+          - B06
+          - B07
+          - B8A
+          - B11
+          - B12
+          - B01
+          - B09
+          required: true
+          passthrough: true
+          is_target: false
+          dtype: FLOAT32
+          load_all_layers: true
+          load_all_item_groups: true
+    task:
+      class_path: rslearn.train.tasks.multi_task.MultiTask
+      init_args:
+        tasks:
+          mangrove_classification:
+            class_path: rslearn.train.tasks.segmentation.SegmentationTask
+            init_args:
+              num_classes: 4
+              colors: # what is this?
+              - - 255
+                - 0
+                - 0
+              - - 0
+                - 255
+                - 0
+              - - 0
+                - 0
+                - 255
+              - - 255
+                - 255
+                - 0
+              - - 0
+                - 255
+                - 255
+              - - 255
+                - 0
+                - 255
+              - - 0
+                - 128
+                - 0
+              - - 255
+                - 160
+                - 122
+              - - 139
+                - 69
+                - 19
+              - - 128
+                - 128
+                - 128
+              - - 255
+                - 255
+                - 255
+              - - 143
+                - 188
+                - 143
+              - - 95
+                - 158
+                - 160
+              - - 255
+                - 200
+                - 0
+              - - 128
+                - 0
+                - 0
+              zero_is_invalid: true
+              enable_accuracy_metric: true
+              enable_miou_metric: false
+              enable_f1_metric: false
+              f1_metric_thresholds:
+              - - 0.5
+              metric_kwargs:
+                average: micro
+              miou_metric_kwargs: {}
+              prob_scales: null
+              other_metrics:
+                mangrove_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 4
+                        top_k: 1
+                        average: null
+                        multidim_average: global
+                        ignore_index: null
+                        validate_args: true
+                        zero_division: 0
+                    pass_probabilities: true
+                    class_idx: 1
+                mangrove_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 4
+                        top_k: 1
+                        average: null
+                        multidim_average: global
+                        ignore_index: null
+                        validate_args: true
+                        zero_division: 0
+                    pass_probabilities: true
+                    class_idx: 1
+                other_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 4
+                        top_k: 1
+                        average: null
+                        multidim_average: global
+                        ignore_index: null
+                        validate_args: true
+                        zero_division: 0
+                    pass_probabilities: true
+                    class_idx: 3
+                other_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 4
+                        top_k: 1
+                        average: null
+                        multidim_average: global
+                        ignore_index: null
+                        validate_args: true
+                        zero_division: 0
+                    pass_probabilities: true
+                    class_idx: 3
+                water_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 4
+                        top_k: 1
+                        average: null
+                        multidim_average: global
+                        ignore_index: null
+                        validate_args: true
+                        zero_division: 0
+                    pass_probabilities: true
+                    class_idx: 2
+                water_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 4
+                        top_k: 1
+                        average: null
+                        multidim_average: global
+                        ignore_index: null
+                        validate_args: true
+                        zero_division: 0
+                    pass_probabilities: true
+                    class_idx: 2
+              image_bands:
+              - 0
+              - 1
+              - 2
+              remap_values: null
+        input_mapping:
+          mangrove_classification:
+            label: targets
+    path: ${DATASET_PATH}
+    path_options: {}
+    batch_size: 128 # Modified for testing
+    num_workers: ${NUM_WORKERS}
+    init_workers: 0
+    default_config:
+      class_path: rslearn.train.dataset.SplitConfig
+      init_args:
+        groups: null
+        names: null
+        tags: null
+        num_samples: null
+        num_patches: null
+        transforms:
+        - class_path: rslearn.train.transforms.pad.Pad
+          init_args:
+            size: 2
+            mode: center
+            image_selectors:
+            - sentinel2_l2a
+            - target/mangrove_classification/classes
+            - target/mangrove_classification/valid
+            box_selectors: []
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a:
+              - B02
+              - B03
+              - B04
+              - B08
+              - B05
+              - B06
+              - B07
+              - B8A
+              - B11
+              - B12
+              - B01
+              - B09
+            std_multiplier: 2.0
+    train_config:
+      class_path: rslearn.train.dataset.SplitConfig
+      init_args:
+        groups:
+        - sample_100K
+        names: null
+        tags:
+          split: train
+        num_samples: 10000
+    val_config:
+      class_path: rslearn.train.dataset.SplitConfig
+      init_args:
+        groups:
+        - sample_100K
+        names: null
+        tags:
+          split: val
+    test_config:
+      class_path: rslearn.train.dataset.SplitConfig
+      init_args:
+        groups:
+        - sample_100K
+        names: null
+        tags:
+          split: val
+    predict_config:
+      patch_size: 2 #I think this is actually the window size for inference processing
+      overlap_ratio: null
+      load_all_patches: true
+      skip_targets: true
+      transforms:
+      - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+        init_args:
+          band_names:
+            sentinel2_l2a:
+            - B02
+            - B03
+            - B04
+            - B08
+            - B05
+            - B06
+            - B07
+            - B8A
+            - B11
+            - B12
+            - B01
+            - B09
+      - class_path: rslearn.train.transforms.pad.Pad
+        init_args:
+          size: 2
+          mode: "center"
+          image_selectors: ["sentinel2_l2a"]
+    name: null
+    retries: 0
+trainer:
+  accelerator: auto
+  strategy:
+    class_path: lightning.pytorch.strategies.DDPStrategy
+    init_args:
+      find_unused_parameters: true
+  devices: auto
+  num_nodes: 1
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: ${WANDB_PROJECT}
+      name: ${WANDB_NAME}
+      entity: ${WANDB_ENTITY}
+  callbacks:
+  - class_path: rslearn.train.prediction_writer.RslearnWriter
+    init_args:
+      path: ${DATASET_PATH}
+      output_layer: ${PREDICTION_OUTPUT_LAYER}
+      selector: ["mangrove_classification"]
+      merger: null
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      dirpath: gs://rslearn-eai/projects/2025_09_15_mangrove_classification/mangrove_classification_segment_helios_base_S2_ts_ws2_ps2/checkpoints
+      filename: null
+      monitor: val_loss
+      verbose: false
+      save_last: true
+      save_top_k: 1
+      save_weights_only: false
+      mode: min
+      auto_insert_metric_name: true
+      every_n_train_steps: null
+      train_time_interval: null
+      every_n_epochs: null
+      save_on_train_epoch_end: null
+      enable_version_counter: true
+# lighning wants these other
+  - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+    init_args:
+      module_selector:
+      - model
+      - encoder
+      - 0
+      unfreeze_at_epoch: 20
+      unfreeze_lr_factor: 10.0
+  max_epochs: 100
+  max_steps: -1
+  overfit_batches: 0.0
+  check_val_every_n_epoch: 1
+  accumulate_grad_batches: 1
+# ${EXTRA_FILES_PATH}: Path to the extra pretrained model/data preprocessing config files
+# ${TRAINER_DATA_PATH}: Path to the rslearn trainer data directory. For intermediate checkpoints, trainer state, etc.

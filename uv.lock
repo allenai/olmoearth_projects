@@ -3175,7 +3175,7 @@ wheels = [
 [[package]]
 name = "olmoearth-pretrain"
 version = "0.0.1"
-source = { git = "https://github.com/allenai/olmoearth_pretrain.git?rev=main#cd2e2f35ec232f826a93f1df7b3a6819df044da6" }
+source = { git = "https://github.com/allenai/olmoearth_pretrain.git?branch=main#02b18178283a5666e5f7fda72d26bb7c9294f5d4" }
 dependencies = [
     { name = "ai2-olmo-core" },
     { name = "albumentations" },
@@ -3202,6 +3202,8 @@ version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "geopandas" },
+    { name = "olmoearth-pretrain" },
+    { name = "olmoearth-run" },
     { name = "openpyxl" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
@@ -3220,20 +3222,14 @@ dev = [
     { name = "pytest-xdist" },
     { name = "ruff" },
 ]
-olmoearth-pretrain = [
-    { name = "olmoearth-pretrain" },
-]
-olmoearth-run = [
-    { name = "olmoearth-run" },
-]
 
 [package.metadata]
 requires-dist = [
     { name = "geopandas", specifier = ">=1.1.1" },
     { name = "interrogate", marker = "extra == 'dev'", specifier = ">=1.7.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.17.1,<2" },
-    { name = "olmoearth-pretrain", marker = "extra == 'olmoearth-pretrain'", git = "https://github.com/allenai/olmoearth_pretrain.git?rev=main" },
-    { name = "olmoearth-run", marker = "extra == 'olmoearth-run'", git = "https://github.com/allenai/olmoearth_run.git?rev=develop" },
+    { name = "olmoearth-pretrain", git = "https://github.com/allenai/olmoearth_pretrain.git?branch=main" },
+    { name = "olmoearth-run", git = "https://github.com/allenai/olmoearth_run.git?branch=develop" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.3.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.2" },
@@ -3246,12 +3242,12 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.7" },
     { name = "wandb", specifier = ">=0.21" },
 ]
-provides-extras = ["dev", "olmoearth-pretrain", "olmoearth-run"]
+provides-extras = ["dev"]
 
 [[package]]
 name = "olmoearth-run"
-version = "0.1.0"
-source = { git = "https://github.com/allenai/olmoearth_run.git?rev=develop#13011ee203bc7c6bba058192071ac98ea4b3f79d" }
+version = "0.1.2"
+source = { git = "https://github.com/allenai/olmoearth_run.git?branch=develop#d9dc710189f6bf4d885012f9830ce8de5670b0bd" }
 dependencies = [
     { name = "fsspec", extra = ["gcs", "s3"] },
     { name = "geojson-pydantic" },

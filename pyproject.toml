@@ -16,7 +16,10 @@ dependencies = [
     "PyYAML>=6",
     "rslearn[extra]>=0.0.11",
     "wandb>=0.21",
+    "olmoearth_run",
+    "olmoearth_pretrain",
 ]
+
 
 [project.optional-dependencies]
 dev = [
@@ -30,25 +33,6 @@ dev = [
     "ruff>=0.7",
 ]
 
-# olmoearth_pretrain needs github token.
-olmoearth_pretrain = [
-    "olmoearth_pretrain @ git+https://github.com/allenai/olmoearth_pretrain.git@main",
-]
-
-# olmoearth_run needs github token.
-olmoearth_run = [
-    "olmoearth_run @ git+https://github.com/allenai/olmoearth_run.git@develop",
-]
-
-[tool.setuptools.dynamic.dependencies]
-file = ["requirements.txt"]
-
-[tool.setuptools.dynamic.optional-dependencies]
-dev = { file = ["requirements-dev.txt"] }
-extra = { file = ["requirements-extra.txt"] }
-olmoearth_pretrain = { file = ["requirements-olmoearth_pretrain.txt"] }
-olmoearth_run = { file = ["requirements-olmoearth_run.txt"] }
-
 [project.urls]
 homepage = "https://github.com/allenai/olmoearth_projects"
 issues = "https://github.com/allenai/olmoearth_projects/issues"
@@ -60,6 +44,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["olmoearth_projects*"]
+
+[tool.uv.sources]
+olmoearth_pretrain = { git = "https://github.com/allenai/olmoearth_pretrain.git", branch = "main" }
+olmoearth_run = { git = "https://github.com/allenai/olmoearth_run.git", branch = "develop"}
 
 [tool.ruff]
 fix = true
