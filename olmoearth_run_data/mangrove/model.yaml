@@ -346,6 +346,12 @@ trainer:
       find_unused_parameters: true
   devices: auto
   num_nodes: 1
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: ${WANDB_PROJECT}
+      name: ${WANDB_NAME}
+      entity: ${WANDB_ENTITY}
   callbacks:
   - class_path: rslearn.train.prediction_writer.RslearnWriter
     init_args:
@@ -385,8 +391,3 @@ trainer:
   accumulate_grad_batches: 1
 # ${EXTRA_FILES_PATH}: Path to the extra pretrained model/data preprocessing config files
 # ${TRAINER_DATA_PATH}: Path to the rslearn trainer data directory. For intermediate checkpoints, trainer state, etc.
-# ${WANDB_ENTITY}: wandb entity for the trainer to log metrics to
-# Template variables not needed for inference that should be removed
-# ValueError: YAML file was missing required template variables
-# ${WANDB_PROJECT}: wandb project for the trainer to log metrics to
-# ${WANDB_NAME}: wandb name for the trainer to log metrics to
