@@ -7,7 +7,7 @@ satellite images.
 Here are relevant links for fine-tuning and applying the model per the documentation in
 [the main README](../README.md):
 
-- Model checkpoint: https://huggingface.co/allenai/OlmoEarth-v1-FT-LFMC-Base/blob/main/model.ckpt
+- Model checkpoint: https://huggingface.co/allenai/OlmoEarth-v1-FT-LFMC-Base/resolve/main/model.ckpt
 - Annotation GeoJSONs: [[annotation_features.geojson](https://storage.googleapis.com/ai2-olmoearth-projects-public-data/projects/lfmc/20251029/annotation_features.geojson) [annotation_task_features.geojson](https://storage.googleapis.com/ai2-olmoearth-projects-public-data/projects/lfmc/20251029/annotation_task_features.geojson)]
 - rslearn dataset: https://storage.googleapis.com/ai2-olmoearth-projects-public-data/projects/lfmc/20251029/dataset.tar
 

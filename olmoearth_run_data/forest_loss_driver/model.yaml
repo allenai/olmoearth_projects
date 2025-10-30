@@ -1,5 +1,6 @@
 model:
-  class_path: olmoearth_projects.train.classification_confusion_matrix.CMLightningModule
+#  class_path: olmoearth_projects.train.classification_confusion_matrix.CMLightningModule
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
   init_args:
     model:
       class_path: rslearn.models.singletask.SingleTaskModel
@@ -52,7 +53,7 @@ data:
         layers: ["label"]
         is_target: true
     task:
-      class_path: olmoearth_projects.projects.forest_loss_driver.train.ForestLossTask
+      class_path: rslearn.train.tasks.classification.ClassificationTask
       init_args:
         property_name: "new_label"
         classes: ["agriculture", "mining", "airstrip", "road", "logging", "burned", "landslide", "hurricane", "river", "none"]
@@ -60,6 +61,7 @@ data:
         metric_kwargs:
           average: "micro"
         prob_property: "probs"
+        skip_unknown_categories: true
     batch_size: 8
     num_workers: ${NUM_WORKERS}
     default_config:

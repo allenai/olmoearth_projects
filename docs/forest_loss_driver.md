@@ -24,7 +24,7 @@ The driver categories are:
 Here are relevant links for fine-tuning and applying the model per the documentation in
 [the main README](../README.md):
 
-- Model checkpoint: https://huggingface.co/allenai/OlmoEarth-v1-FT-ForestLossDriver-Base/blob/main/model.ckpt
+- Model checkpoint: https://huggingface.co/allenai/OlmoEarth-v1-FT-ForestLossDriver-Base/resolve/main/model.ckpt
 - rslearn dataset: https://storage.googleapis.com/ai2-olmoearth-projects-public-data/projects/forest_loss_driver/20251029/dataset.tar
 
 ## Model Details
@@ -36,20 +36,20 @@ captured before the forest loss, while the second time series consists of four
 Sentinel-2 L2A images captured after the forest loss.
 
 The model classifies the forest loss driver, with 10 classes (see above). It achieves
-an accuracy of X. Here is the confusion matrix:
+an accuracy of 76.1% on our validation set. Here is the confusion matrix:
 
-| Category  | Ag  | Mining | Airstrip | Road | Logging | Burned | Landslide | Hurricane | River | None |
-| --------  | --  | ------ | -------- | ---- | ------- | ------ | --------- | --------- | ----- | ---- |
-| Ag        |
-| Mining    |
-| Airstrip  |
-| Road      |
-| Logging   |
-| Burned    |
-| Landslide |
-| Hurricane |
-| River     |
-| None      |
+| Category  | Ag | Airstrip | Burned | Hurricane | Landslide | Logging | Mining | None | River | Road |
+| --------  | -- | -------- | ------ | --------- | --------- | ------- | ------ | ---- | ----- | ---- |
+| Ag        | 37 |      0   |      2 |         0 |         0 |       0 |      0 |    2 |     0 |    3 |
+| Airstrip  |  0 |      0   |      0 |         0 |         0 |       0 |      0 |    0 |     0 |    0 |
+| Burned    |  2 |      0   |     21 |         3 |         0 |       0 |      0 |    4 |     0 |    0 |
+| Hurricane |  0 |      0   |      0 |         6 |         0 |       0 |      0 |    0 |     0 |    0 |
+| Landslide |  0 |      0   |      0 |         0 |         1 |       0 |      0 |    0 |     0 |    0 |
+| Logging   |  0 |      0   |      0 |         2 |         0 |       2 |      0 |    0 |     0 |    0 |
+| Minning   |  0 |      0   |      0 |         0 |         0 |       0 |      1 |    0 |     0 |    0 |
+| None      |  2 |      0   |      1 |         1 |         0 |       2 |      0 |   11 |     0 |    1 |
+| River     |  0 |      0   |      0 |         0 |         0 |       0 |      0 |    1 |     0 |    0 |
+| Road      |  0 |      0   |      0 |         0 |         0 |       0 |      0 |    0 |     0 |    4 |
 
 ## Training Data
 
@@ -58,7 +58,7 @@ Association. Each annotation specifies a polygon and timestamp that originate fr
 GLAD-S2 alert, along with the driver category. We use rslearn to obtain the four
 pre-forest-loss Sentinel-2 L2A images and four post-forest-loss images.
 
-We split the dataset into 75% train and 25% val/test.
+We split the dataset into 75% train and 25% val.
 
 ## Inference
 
