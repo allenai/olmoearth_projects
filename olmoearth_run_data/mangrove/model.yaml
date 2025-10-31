@@ -45,19 +45,9 @@ data:
   init_args:
     inputs:
       label:
-        class_path: rslearn.train.dataset.DataInput
-        init_args:
-          data_type: raster
-          layers:
-          - label_raster
-          bands:
-          - label
-          required: true
-          passthrough: false
-          is_target: true
-          dtype: INT32
-          load_all_layers: false
-          load_all_item_groups: false
+        data_type: "vector"
+        layers: ["label"]
+        is_target: true
       sentinel2_l2a:
         class_path: rslearn.train.dataset.DataInput
         init_args:

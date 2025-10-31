@@ -4,15 +4,7 @@
       "type": "vector"
     },
     "output": {
-      "band_sets": [
-        {
-          "bands": [
-            "output"
-          ],
-          "dtype": "uint8"
-        }
-      ],
-      "type": "raster"
+      "type": "vector"
     },
     "sentinel2": {
       "band_sets": [
