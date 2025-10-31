@@ -112,5 +112,4 @@ trainer:
       init_args:
         path: ${DATASET_PATH}
         output_layer: ${PREDICTION_OUTPUT_LAYER}
-        selector: ["class"]
 # unused: ${EXTRA_FILES_PATH}
