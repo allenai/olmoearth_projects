@@ -20,7 +20,7 @@ It achieves an overall accuracy of 87.3% on our validation set. The table below 
 | Window Size | Patch Size | Modalities | Accuracy (%) |
 |--------------|-------------|-------------|---------------|
 | 16×16 | 1 | Sentinel-2 | 87.3 |
-| 16×16 | 1 | Sentinel-2 + Sentinel-1 | 87.2 |
+| 16×16 | 1 | Sentinel-2 + Sentinel-1 | TBD |
 | 16×16 | 2 | Sentinel-2 | 86.5 |
 | 16×16 | 2 | Sentinel-2 + Sentinel-1 | 86.7 |
 | 16×16 | 4 | Sentinel-2 | 81.9 |
