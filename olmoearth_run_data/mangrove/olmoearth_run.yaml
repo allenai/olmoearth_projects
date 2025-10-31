@@ -35,7 +35,7 @@ postprocessing_strategies:
 
 
 inference_results_config:
-  data_type: RASTER
+  data_type: vector
   classification_fields:
     - property_name: classification
       band_index: 1
