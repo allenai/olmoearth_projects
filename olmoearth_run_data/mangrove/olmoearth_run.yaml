@@ -40,12 +40,12 @@ inference_results_config:
     - property_name: classification
       band_index: 1
       allowed_values:
-        - value: 1
+        - value: 0
           label: mangrove
           color: [148,235,99]
-        - value: 2
+        - value: 1
           label: water
           color: [99,216,235]
-        - value: 3
+        - value: 2
           label: other
           color: [235,169,99,200]
