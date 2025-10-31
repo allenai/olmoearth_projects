@@ -24,14 +24,14 @@ partition_strategies:
       use_utm: true
 
 postprocessing_strategies:
-  process_dataset:
-    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
 
   process_partition:
-    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
 
-  process_window:
-    class_path: olmoearth_run.runner.tools.postprocessors.noop_raster.NoopRaster
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
 
 
 inference_results_config:
