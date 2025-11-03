@@ -19,7 +19,7 @@ each model.
 Here are tutorials for applying OlmoEarth for new tasks:
 
 - [Fine-tuning OlmoEarth for Segmentation](docs/tutorials/FinetuneOlmoEarthSegmentation.md)
-  [Computing Embeddings using OlmoEarth](https://github.com/allenai/rslearn/blob/master/docs/examples/OlmoEarthEmbeddings.md)
+- [Computing Embeddings using OlmoEarth](https://github.com/allenai/rslearn/blob/master/docs/examples/OlmoEarthEmbeddings.md)
 - [Fine-tuning OlmoEarth in rslearn](https://github.com/allenai/rslearn/blob/master/docs/examples/FinetuneOlmoEarth.md).
 
 These tutorials use all or a subset of the components of OlmoEarth:
@@ -139,7 +139,7 @@ like qgis:
 qgis project_data/lfmc/results/results_raster/*.tif
 ```
 
-## Fine-tuning
+## Reproducing Fine-tuning for Existing Models
 
 We have released model checkpoints for each of the fine-tuned models in this
 repository, but you can reproduce the model by fine-tuning the pre-trained OlmoEarth
