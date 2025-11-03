@@ -16,21 +16,6 @@ The models available here are:
 The links above provide more details about the training data and intended use case for
 each model.
 
-## Installation
-
-We recommend installing using uv. See
-[Installing uv](https://docs.astral.sh/uv/getting-started/installation/) for
-instructions to install uv. Once uv is installed:
-
-```
-git clone https://github.com/allenai/olmoearth_projects.git
-cd olmoearth_projects
-uv sync
-source .venv/bin/activate
-```
-
-## Developing New Models
-
 Here are tutorials for applying OlmoEarth for new tasks:
 
 - [Fine-tuning OlmoEarth for Segmentation](docs/tutorials/FinetuneOlmoEarthSegmentation.md)
@@ -47,6 +32,19 @@ These tutorials use all or a subset of the components of OlmoEarth:
 - [olmoearth_run](https://pypi.org/project/olmoearth-runner/), our higher-level
   infrastructure that automates various steps on top of rslearn such as window creation
   and inference post-processing.
+
+## Installation
+
+We recommend installing using uv. See
+[Installing uv](https://docs.astral.sh/uv/getting-started/installation/) for
+instructions to install uv. Once uv is installed:
+
+```
+git clone https://github.com/allenai/olmoearth_projects.git
+cd olmoearth_projects
+uv sync
+source .venv/bin/activate
+```
 
 ## Applying Existing Models
 
