@@ -22,8 +22,8 @@ The model achieves strong performance on the validation set with an overall accu
 
 ## Training Data
 
-The model is trained on data provided by Global Mangrove Watch available at https://zenodo.org/records/17394267 .
-
+The model is trained on data provided by [Global Mangrove Watch](https://www.mangrovealliance.org/global-mangrove-watch) available at https://zenodo.org/records/17394267.
+The dataset is released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 Each sample in the dataset specifies a longitude, latitude, a start and end time (1 year apart), and a class label. For each sample we create a 12 month time series of Sentinel 2 data within the time bounds.
 

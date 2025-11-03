@@ -11,14 +11,27 @@ The models available here are:
 - [Forest Loss Driver Classification](docs/forest_loss_driver.md)
 - [Mangrove Mapping](docs/mangrove.md)
 - [Ecosystem Type Mapping](docs/ecosystem_type_mapping.md)
-
-TODO: models we are not sure if we can release:
-
-- [Crop Type Mapping in Nandi County, Kenya](docs/nandi.md)
 - [Land Use / Land Cover Mapping in Southern Kenya](docs/awf.md)
 
 The links above provide more details about the training data and intended use case for
 each model.
+
+Here are tutorials for applying OlmoEarth for new tasks:
+
+- [Fine-tuning OlmoEarth for Segmentation](docs/tutorials/FinetuneOlmoEarthSegmentation.md)
+- [Computing Embeddings using OlmoEarth](https://github.com/allenai/rslearn/blob/master/docs/examples/OlmoEarthEmbeddings.md)
+- [Fine-tuning OlmoEarth in rslearn](https://github.com/allenai/rslearn/blob/master/docs/examples/FinetuneOlmoEarth.md)
+
+These tutorials use all or a subset of the components of OlmoEarth:
+
+- [olmoearth_pretrain](https://github.com/allenai/olmoearth_pretrain/), the OlmoEarth
+  pre-trained model.
+- [rslearn](https://github.com/alleani/rslearn/), our tool for obtaining satellite
+  images and other geospatial data from online data sources, and for fine-tuning
+  remote sensing foundation models.
+- [olmoearth_run](https://pypi.org/project/olmoearth-runner/), our higher-level
+  infrastructure that automates various steps on top of rslearn such as window creation
+  and inference post-processing.
 
 ## Installation
 
@@ -33,32 +46,6 @@ uv sync
 source .venv/bin/activate
 ```
 
-## Developing New Models
-
-The components of OlmoEarth include:
-
-- [olmoearth_pretrain](https://github.com/allenai/olmoearth_pretrain/), the OlmoEarth
-  pre-trained model.
-- [rslearn](https://github.com/alleani/rslearn/), our tool for obtaining satellite
-  images and other geospatial data from online data sources, and for fine-tuning
-  remote sensing foundation models.
-- [olmoearth_run](https://github.com/allenai/olmoearth_run/), our higher-level
-  infrastructure that automates various steps on top of rslearn such as window creation
-  and inference post-processing.
-
-Here are tutorials that use all of the OlmoEarth components:
-
-- [Fine-tuning OlmoEarth for Segmentation](docs/tutorials/FinetuneOlmoEarthSegmentation.md)
-
-We also have the following lighter-weight tutorials that use a subset of the OlmoEarth
-components:
-
-- For extracting embeddings from OlmoEarth, see the
-  [OlmoEarth embedding guide](https://github.com/allenai/rslearn/blob/master/docs/examples/OlmoEarthEmbeddings.md)
-  in rslearn.
-- For fine-tuning OlmoEarth using rslearn, see the rslearn
-  [OlmoEarth fine-tuning guide](https://github.com/allenai/rslearn/blob/master/docs/examples/FinetuneOlmoEarth.md).
-
 ## Applying Existing Models
 
 There are three steps to applying the models in this repository:
@@ -72,10 +59,8 @@ There are three steps to applying the models in this repository:
 ### Customizing the Prediction Request Geometry
 
 The configuration files for each project are stored under
-`olmoearth_run_data/PROJECT_NAME/`. There are four configuration files:
+`olmoearth_run_data/PROJECT_NAME/`. There are three configuration files:
 
-- `prediction_request_geometry.geojson`: this is a GeoJSON that specifies the spatial
-  and temporal extent for inference.
 - `dataset.json`: this is an rslearn dataset configuration file that specifies the
   types of satellite images that need to be downloaded to run the model, and how to
   obtain them. Most models rely on some combination of Sentinel-1 and Sentinel-2
@@ -87,11 +72,11 @@ The configuration files for each project are stored under
   the prediction request geometry should be translated into rslearn windows, and how
   the inference outputs should be combined together.
 
-The `prediction_request_geometry.geojson` is an example and should be modified to
-specify your target region. The spatial extent is specified with standard GeoJSON
-features; you can use [geojson.io](https://geojson.io/) to draw polygons on a map and
-get the corresponding GeoJSON. The temporal extent is specified using properties on
-each feature:
+Some projects also include an example `prediction_request_geometry.geojson`, but this
+will need to be modified to specify your target region. The spatial extent is specified
+with standard GeoJSON features; you can use [geojson.io](https://geojson.io/) to draw
+polygons on a map and get the corresponding GeoJSON. The temporal extent is specified
+using properties on each feature:
 
 ```jsonc
 {
@@ -154,7 +139,7 @@ like qgis:
 qgis project_data/lfmc/results/results_raster/*.tif
 ```
 
-## Fine-tuning
+## Reproducing Fine-tuning for Existing Models
 
 We have released model checkpoints for each of the fine-tuned models in this
 repository, but you can reproduce the model by fine-tuning the pre-trained OlmoEarth

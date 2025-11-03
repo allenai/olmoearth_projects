@@ -1,8 +1,8 @@
 ## Ecosystem Type Mapping
 
 OlmoEarth-v1-FT-EcosystemTypeMapping-Base is a model fine-tuned from OlmoEarth-v1-Base
-on expert-annotated ecosystem type data provided by the Global Ecosystem Atlas. It is
-trained specifically for the north Africa region. The categories correspond to those in
+on expert-annotated ecosystem type data provided by [Global Ecosystem Atlas](https://globalecosystemsatlas.org/).
+It is trained specifically for the north Africa region. The categories correspond to those in
 the [IUCN Gloabl Ecosystem Typology](https://global-ecosystems.org/page/typology).
 
 Here are relevant links for fine-tuning and applying the model per the documentation in
@@ -23,8 +23,8 @@ It achieves 64.8% accuracy on our test set.
 
 ## Training Data
 
-The model is trained on ecosystem type data from the Global Ecosystem Atlas. They will
-release the dataset in 2026.
+The model is trained on ecosystem type data from [Global Ecosystem Atlas](https://globalecosystemsatlas.org/).
+They will release the dataset in 2026.
 
 ## Inference
 

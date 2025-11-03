@@ -60,6 +60,8 @@ pre-forest-loss Sentinel-2 L2A images and four post-forest-loss images.
 
 We split the dataset into 75% train and 25% val.
 
+The training data is released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en).
+
 ## Inference
 
 Inference is documented in [the main README](../README.md). The prediction request
