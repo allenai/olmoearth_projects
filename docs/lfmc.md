@@ -25,8 +25,8 @@ It achieves a mean squared error of 580.6 on our test set.
 
 ## Training Data
 
-The model is trained on the Globe-LFMC 2.0 dataset. We use the subset of the data in
-the continental US.
+The model is trained on the [Globe-LFMC 2.0 dataset](https://springernature.figshare.com/articles/dataset/Globe-LFMC-2_0/25413790?backTo=%2Fcollections%2FGlobe-LFMC_2_0_An_enhanced_and_updated_database_for_Live_Fuel_Moisture_Content_research_%2F6980418&file=45049786)
+by Marta Yebra et al. We use the subset of the data in the continental US.
 
 Each sample in the dataset specifies a longitude, latitude, timestamp, fuel type, and
 LFMC value. We only use the woody fuel type subset for this model. For each sample, we
@@ -36,6 +36,8 @@ twelve Sentinel-2 and Sentinel-1 images during that time range, with one per 14-
 
 We split the dataset into train, val, and test splits spatially, where 128x128 pixel
 grid cells are assigned via hash to train (70%), val (20%), or test (10%).
+
+The training data is released under [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## Inference
 
