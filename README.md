@@ -183,3 +183,7 @@ If training fails halfway, you can resume it from `last.ckpt`:
 ```
 rslearn model fit --config olmoearth_run_data/lfmc/model.yaml --ckpt_path $TRAINER_DATA_PATH/last.ckpt
 ```
+
+## License
+
+This code is licensed under the [OlmoEarth Artifact License](LICENSE).
