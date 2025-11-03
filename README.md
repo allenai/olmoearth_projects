@@ -187,5 +187,3 @@ rslearn model fit --config olmoearth_run_data/lfmc/model.yaml --ckpt_path $TRAIN
 ## License
 
 This code is licensed under the [OlmoEarth Artifact License](LICENSE).
-It is intended for research and educational use in accordance with Ai2's
-[Responsible Use Guidelines](https://allenai.org/responsible-use).
