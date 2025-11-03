@@ -47,7 +47,7 @@ The components of OlmoEarth include:
 
 Here are tutorials that use all of the OlmoEarth components:
 
-- [Fine-tuning OlmoEarth for Classification](docs/tutorials/FinetuneOlmoEarthClassification.md)
+- [Fine-tuning OlmoEarth for Segmentation](docs/tutorials/FinetuneOlmoEarthSegmentation.md)
 
 We also have the following lighter-weight tutorials that use a subset of the OlmoEarth
 components:

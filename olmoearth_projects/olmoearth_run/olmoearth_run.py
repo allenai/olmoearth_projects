@@ -63,6 +63,18 @@ def prepare_labeled_windows(project_path: Path, scratch_path: Path) -> None:
     runner.prepare_labeled_windows()
 
 
+def build_dataset_from_windows(project_path: Path, scratch_path: Path) -> None:
+    """Run OlmoEarthRunFineTuneRunner's build_dataset_from_windows pipeline."""
+    configure_logging(log_level=logging.INFO)
+    logger.info("Loading OlmoEarthRunFineTuneRunner")
+    runner = OlmoEarthRunFineTuneRunner(
+        project_path=project_path,
+        scratch_path=scratch_path,
+    )
+    logger.info("Running build_dataset_from_windows")
+    runner.build_dataset_from_windows()
+
+
 def finetune(project_path: Path, scratch_path: Path) -> None:
     """Run EsFineTuneRunner finetune pipeline."""
     configure_logging(log_level=logging.INFO)

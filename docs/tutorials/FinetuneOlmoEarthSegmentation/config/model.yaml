@@ -1,0 +1,136 @@
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.multitask.MultiTaskModel
+      init_args:
+        encoder:
+          - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+                model_id: "OLMOEARTH_V1_BASE"
+                #checkpoint_path: your_pretrained_checkpoint_path_if_not_using_model_id
+                patch_size: 4
+                selector: ["encoder"]
+        decoders:
+          burnscar_segmentation:
+          - class_path: rslearn.models.unet.UNetDecoder
+            init_args:
+              in_channels:
+                - [4, 768]
+              out_channels: 2
+              conv_layers_per_resolution: 2
+              kernel_size: 3
+              num_channels:
+                '1': 128
+                '2': 256
+                '4': 512
+          - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+    lr: 0.0001
+    plateau: true
+    plateau_factor: 0.2
+    plateau_patience: 2
+    plateau_min_lr: 0
+    plateau_cooldown: 10
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    path: ${DATASET_PATH}
+    inputs:
+      sentinel2_l2a:
+        data_type: "raster"
+        layers: ["sentinel2_l2a"]
+        bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+        passthrough: true
+        dtype: FLOAT32
+      label:
+        data_type: "raster"
+        layers: ["label"]
+        bands: ["label"]
+        dtype: INT32
+        is_target: true
+    task:
+      class_path: rslearn.train.tasks.multi_task.MultiTask
+      init_args:
+        tasks:
+          burnscar_segmentation:
+            class_path: rslearn.train.tasks.segmentation.SegmentationTask
+            init_args:
+              num_classes: 2
+              zero_is_invalid: false
+              nodata_value: 255
+              enable_f1_metric: true
+              f1_metric_thresholds: [[0.5]]
+              metric_kwargs:
+                average: "micro"
+        input_mapping:
+          burnscar_segmentation:
+            label: "targets"
+    batch_size: 32
+    num_workers: ${NUM_WORKERS}
+    default_config:
+      transforms:
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+      patch_size: 128
+    train_config:
+      groups: ["spatial_split_10km"]
+      tags:
+        split: "train"
+    val_config:
+      groups: ["spatial_split_10km"]
+      patch_size: 128
+      load_all_patches: true
+      tags:
+        split: "val"
+    test_config:
+      groups: ["spatial_split_10km"]
+      patch_size: 128
+      load_all_patches: true
+      tags:
+        split: "test"
+    predict_config:
+      groups: ["group_partition_0"]
+      patch_size: 128
+      load_all_patches: true
+      overlap_ratio: 0.125  # 16 / 128
+      skip_targets: true
+
+trainer:
+  max_epochs: 100
+  check_val_every_n_epoch: 5
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "epoch"
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        # Save both the latest checkpoint (last.ckpt) and the best one (epoch=....ckpt).
+        dirpath: ${TRAINER_DATA_PATH}
+        save_top_k: 1
+        save_last: true
+        monitor: val_loss
+        mode: min
+        # It is recommended to freeze the OlmoEarth encoder for the first few epochs.
+    - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+      init_args:
+        module_selector: ["model", "encoder", 0]
+        unfreeze_at_epoch: 10
+        unfreeze_lr_factor: 10
+    - class_path: rslearn.train.prediction_writer.RslearnWriter
+      init_args:
+        path: ${DATASET_PATH}
+        output_layer: ${PREDICTION_OUTPUT_LAYER}
+        selector: ["burnscar_segmentation"]
+        merger:
+          class_path: rslearn.train.prediction_writer.RasterMerger
+          init_args:
+            padding: 8
+  # Optional section to save charts to W&B.
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: ${WANDB_PROJECT}
+      name: ${WANDB_NAME}
+      entity: ${WANDB_ENTITY}
