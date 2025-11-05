@@ -10,7 +10,7 @@ from pathlib import Path
 import fsspec
 from olmoearth_run.runner.local.fine_tune_runner import OlmoEarthRunFineTuneRunner
 from olmoearth_run.runner.local.predict_runner import OlmoEarthRunPredictRunner
-from olmoearth_run.shared.tools.logger import configure_logging
+from olmoearth_run.shared.telemetry.logging import configure_logging
 from upath import UPath
 
 from olmoearth_projects.utils.logging import get_logger
