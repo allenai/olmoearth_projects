@@ -336,3 +336,4 @@ trainer:
           class_path: rslearn.train.prediction_writer.RasterMerger
           init_args:
             padding: 2
+# unused: ${EXTRA_FILES_PATH}

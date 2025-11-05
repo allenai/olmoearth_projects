@@ -80,8 +80,5 @@ inference_results_config:
         - value: 8
           label: urban_dense_development
           color: [178, 34, 34]
-        - value: 9
-          label: unknown
-          color: [192, 192, 192]
   detection_objects: null
   regression_fields: null
