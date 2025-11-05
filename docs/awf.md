@@ -15,7 +15,7 @@ The model inputs twelve timesteps of satellite image data, one [Sentinel-2 L2A](
 
 The model is trained to predict land use and land cover type for every pixel within each 16x16 input patches.
 
-The model achieves 90.4% overall accuracy on the validation set. The table below summarizes our experiments with different window sizes, patch sizes, and input modalities. Overall, models using Sentinel-2 only perform better.
+The model (window size: 16x16, patch size: 4) achieves 89.5% overall accuracy on the validation set. The table below summarizes our experiments with different window sizes, patch sizes, and input modalities. Overall, models using Sentinel-2 only perform better.
 
 | Window Size | Patch Size | Modalities | Accuracy (%) |
 |--------------|-------------|-------------|---------------|
