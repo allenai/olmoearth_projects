@@ -40,7 +40,7 @@ The dataset is split spatially into training (75%) and validation (25%) sets, ba
 
 Inference is documented in [the main README](../README.md). The prediction request geometry should have start and end timestamps that covers one year, ideally from 2022-09-01 to 2023-09-01 to match the training data. However, you can also run inference for other one-year periods, such as 2018-09-01 to 2019-09-01. Inference runs on all 1024×1024 grid cells intersecting the geometry, using satellite images from the specified time range.
 
-Here's the [inference output](https://olmoearth.allenai.org/prediction/cbb54999-7059-4d8d-96b5-40062f0396e8#9.67/0.2218/35.1037) for the whole Nandi county.
+Here's the [inference output](https://olmoearth.allenai.org/viewer/6b1e4537-ea68-47f3-9a11-61ca2d468fd0#9.55/0.2218/35.1037) for the whole Nandi county.
 
 ## Fine-tuning
 
