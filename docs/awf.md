@@ -15,7 +15,7 @@ The model inputs twelve timesteps of satellite image data, one [Sentinel-2 L2A](
 
 The model is trained to predict land use and land cover type for every pixel within each 16x16 input patches.
 
-The model achieves 90.4% overall accuracy on the validation set. The table below summarizes our experiments with different window sizes, patch sizes, and input modalities. Overall, models using Sentinel-2 only perform better.
+The model (window size: 16x16, patch size: 4) achieves 89.5% overall accuracy on the validation set. The table below summarizes our experiments with different window sizes, patch sizes, and input modalities. Overall, models using Sentinel-2 only perform better.
 
 | Window Size | Patch Size | Modalities | Accuracy (%) |
 |--------------|-------------|-------------|---------------|
@@ -37,6 +37,8 @@ The dataset is split spatially into training (75%) and validation (25%) sets, ba
 ## Inference
 
 Inference is documented in [the main README](../README.md). The prediction request geometry should have start and end timestamps that covers one year, ideally from 2023-01-01 to 2023-12-31 to match the training data. Inference runs on all 1024×1024 grid cells intersecting the geometry, using satellite images from the specified time range.
+
+Here's the [inference output](https://olmoearth.allenai.org/viewer/d591a8ce-c97d-4a23-a520-a1aa1363ce22#8.76/-2.9277/37.3573) for the Amboseli national park region.
 
 ## Fine-tuning
 

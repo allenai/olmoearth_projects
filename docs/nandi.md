@@ -15,7 +15,7 @@ The model inputs twelve timesteps of satellite image data, one [Sentinel-2 L2A](
 
 The model is trained to predict crop and land-cover type for every pixel within each 16×16 input patches.
 
-It achieves an overall accuracy of 87.3% on our validation set. The table below summarizes our experiments with different patch sizes and input modalities. Overall, mnodels using patch size 1 perform the best.
+The model (window size: 16x16, patch size: 1) achieves an overall accuracy of 87.3% on our validation set. The table below summarizes our experiments with different patch sizes and input modalities. Overall, mnodels using patch size 1 perform the best.
 
 | Window Size | Patch Size | Modalities | Accuracy (%) |
 |--------------|-------------|-------------|---------------|
@@ -39,6 +39,8 @@ The dataset is split spatially into training (75%) and validation (25%) sets, ba
 ## Inference
 
 Inference is documented in [the main README](../README.md). The prediction request geometry should have start and end timestamps that covers one year, ideally from 2022-09-01 to 2023-09-01 to match the training data. However, you can also run inference for other one-year periods, such as 2018-09-01 to 2019-09-01. Inference runs on all 1024×1024 grid cells intersecting the geometry, using satellite images from the specified time range.
+
+Here's the [inference output](https://olmoearth.allenai.org/viewer/6b1e4537-ea68-47f3-9a11-61ca2d468fd0#9.55/0.2218/35.1037) for the whole Nandi county.
 
 ## Fine-tuning
 
