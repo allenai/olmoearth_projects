@@ -76,6 +76,7 @@
         "name": "rslearn.data_sources.planetary_computer.Sentinel2",
         "query_config": {
           "max_matches": 4,
+          "min_matches": 4,
           "space_mode": "CONTAINS"
         },
         "sort_by": "eo:cloud_cover",
@@ -112,6 +113,7 @@
         "name": "rslearn.data_sources.planetary_computer.Sentinel2",
         "query_config": {
           "max_matches": 4,
+          "min_matches": 4,
           "space_mode": "CONTAINS"
         },
         "sort_by": "eo:cloud_cover",
