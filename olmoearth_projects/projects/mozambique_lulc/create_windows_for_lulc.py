@@ -9,6 +9,9 @@ from pathlib import Path
 import geopandas as gpd
 import shapely
 import tqdm
+from olmoearth_run.runner.tools.data_splitters.spatial_data_splitter import (
+    SpatialDataSplitter,
+)
 from rslearn.const import WGS84_PROJECTION
 from rslearn.dataset import Window
 from rslearn.utils import Projection, STGeometry, get_utm_ups_crs
@@ -121,6 +124,15 @@ def create_window(
             "source": "gpkg",
         },
     )
+
+    if split == "train":
+        # split into a train and val set using the spatial data
+        # splitter, keep the test set as it was originally
+        splitter = SpatialDataSplitter(
+            train_prop=0.8, val_prop=0.2, test_prop=0.0, grid_size=32
+        )
+        split = splitter.choose_split_for_window(window)
+        window.options["split"] = split
     window.save()
 
     # Label layer (same as before, using window geometry)
