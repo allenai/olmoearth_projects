@@ -17,14 +17,14 @@ python /weka/dfive-default/gabrielt/olmoearth_projects/olmoearth_projects/projec
 ```
 You will then need to copy a `config.json` into the dataset path, `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251113`.
 
-The config being used is available in [config.json](config.json).
+The config being used is available in [config.json](config.json). This config requires [rslearn_projects](https://github.com/allenai/rslearn_projects) in your environment.
 
 Once the config is copied into the dataset root, the following commands can be run:
 
 ```
 rslearn dataset prepare --root /weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251113 --workers 64 --no-use-initial-job --retry-max-attempts 8 --retry-backoff-seconds 60
 
-python -m rslp.main common launch_data_materialization_jobs --image favyen/rslp_image --ds_path /weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251113 --clusters+=ai2/neptune-cirrascale --num_jobs 5
+python -m rslp.main common launch_data_materialization_jobs --image yawenzzzz/rslp20251112h --ds_path /weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251113 --clusters+=ai2/neptune-cirrascale --num_jobs 5
 ```
 
 Within `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc` there are two versions of the data:
