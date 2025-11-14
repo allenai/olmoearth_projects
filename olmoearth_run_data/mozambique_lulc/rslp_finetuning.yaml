@@ -80,16 +80,6 @@ data:
               metric_kwargs:
                 average: "micro"
               other_metrics:
-                confusion_matrix:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.ConfusionMatrix
-                      init_args:
-                        num_classes: 8
-                        ignore_index: 0
-                        task: "multiclass"
-                    class_idx: null
                 water_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:

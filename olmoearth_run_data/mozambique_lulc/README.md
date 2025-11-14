@@ -48,6 +48,36 @@ Currently, we use [rslearn_projects](github.com/allenai/rslearn_projects) for fi
 python -m rslp.main olmoearth_pretrain launch_finetune --image_name gabrielt/rslpomp_20251027b --config_paths+=olmoearth_run_data/mozambique_lulc/rslp_finetuning.yaml --cluster+=ai2/saturn --rslp_project <MY_RSLP_PROJECT_NAME> --experiment_id <MY_EXPERIMENT_ID>
 ```
 
+### Testing
+
+Obtaining test results consisted of the following:
+1. Spin up an interactive beaker session with a GPU: `beaker session create --remote --bare --budget ai2/es-platform --cluster ai2/saturn --mount src=weka,ref=dfive-default,dst=/weka/dfive-default --image beaker://gabrielt/rslpomp_20251027b --gpus 1`
+2. Go to the olmoearth projects folder on weka (to easily `git pull`) changes: `cd /weka/dfive-default/gabrielt/olmoearth_projects`
+3. Run testing: `python -m rslp.rslearn_main model test --config olmoearth_run_data/mozambique_lulc/rslp_finetuning.yaml --rslp_experiment gaza_with_val_20251114_ps1 --rslp_project 2025_09_18_mozambique_lulc --force_log=true --load_best=true --verbose true`
+
+I used confusion matrices to combine the results for each province into a single set of matrices. Getting these from pytorch lightning proved quite messy.
+
+I added the following to the config:
+```
+                confusion_matrix:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.ConfusionMatrix
+                      init_args:
+                        num_classes: 8
+                        ignore_index: 0
+                        task: "multiclass"
+                    class_idx: null
+```
+
+But pytorch lightning only wants to return scalar metrics, so the following error gets thrown:
+```
+pytorch/trainer/connectors/logger_connector/logger_connector.py", line 106, in log_metrics
+    scalar_metrics = convert_tensors_to_scalars(metrics)
+```
+If you just add `print (metrics)` before `convert_tensors_to_scalars` in `logger_connector.py`, you can get the confusion matrix! (Alternatively the error also prints out the full confusion matrix, so you don't even need to add the print statement, just let it error).
+
 ### Inference
 
 All inference is done on [OlmoEarth Studio](https://olmoearth.allenai.org/). Polygons around the provinces were manually drawn (within Studio).
