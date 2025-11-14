@@ -11,7 +11,7 @@ model:
             selector:
             - encoder
             forward_kwargs:
-              patch_size: 4
+              patch_size: 1
             random_initialization: false
             embedding_size: null
             patch_size: null
