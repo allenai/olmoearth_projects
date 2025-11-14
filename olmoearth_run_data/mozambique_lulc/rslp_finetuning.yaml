@@ -86,7 +86,7 @@ data:
                     metric:
                       class_path: torchmetrics.ConfusionMatrix
                       init_args:
-                        num_classes: 8
+                        num_classes: 9
                         task: "multiclass"
                     class_idx: null
                 water_precision:
