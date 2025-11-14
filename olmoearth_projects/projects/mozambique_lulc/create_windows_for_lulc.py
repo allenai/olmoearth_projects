@@ -33,6 +33,16 @@ CLASS_MAP = {
     6: "Buildings",
 }
 
+CROP_TYPE_MAP = {
+    0: "corn",
+    1: "cassava",
+    2: "rice",
+    3: "sesame",
+    4: "beans",
+    5: "millet",
+    6: "sorghum",
+}
+
 # Per-province temporal coverage (UTC)
 GROUP_TIME = {
     "gaza": (
@@ -90,7 +100,7 @@ def calculate_bounds(
     return bounds
 
 
-def process_gpkg(gpkg_path: UPath) -> gpd.GeoDataFrame:
+def process_gpkg(gpkg_path: UPath, crop_type: bool) -> gpd.GeoDataFrame:
     """Load a GPKG and ensure lon/lat in WGS84; expect 'fid' and 'class' columns."""
     gdf = gpd.read_file(str(gpkg_path))
 
@@ -100,7 +110,7 @@ def process_gpkg(gpkg_path: UPath) -> gpd.GeoDataFrame:
     else:
         gdf = gdf.to_crs("EPSG:4326")
 
-    required_cols = {"class", "geometry"}
+    required_cols = {"crop1" if crop_type else "class", "geometry"}
     missing = [c for c in required_cols if c not in gdf.columns]
     if missing:
         raise ValueError(f"{gpkg_path}: missing required column(s): {missing}")
@@ -108,7 +118,9 @@ def process_gpkg(gpkg_path: UPath) -> gpd.GeoDataFrame:
     return gdf
 
 
-def iter_points(gdf: gpd.GeoDataFrame) -> Iterable[tuple[int, float, float, int]]:
+def iter_points(
+    gdf: gpd.GeoDataFrame, crop_type: bool
+) -> Iterable[tuple[int, float, float, int]]:
     """Yield (fid, latitude, longitude, category) per feature using centroid for polygons."""
     for fid, row in gdf.iterrows():
         geom = row.geometry
@@ -119,7 +131,7 @@ def iter_points(gdf: gpd.GeoDataFrame) -> Iterable[tuple[int, float, float, int]
         else:
             pt = geom.centroid
         lon, lat = float(pt.x), float(pt.y)
-        category = int(row["class"])
+        category = int(row["crop1"]) if crop_type else int(row["class"])
         yield fid, lat, lon, category
 
 
@@ -131,10 +143,14 @@ def create_window(
     window_size: int,
     start_time: datetime,
     end_time: datetime,
+    crop_type: bool,
 ) -> None:
     """Create a single window and write label layer."""
     fid, latitude, longitude, category_id = rec
-    category_label = CLASS_MAP.get(category_id, f"Unknown_{category_id}")
+    if crop_type:
+        category_label = CROP_TYPE_MAP.get(category_id, f"Unknown_{category_id}")
+    else:
+        category_label = CLASS_MAP.get(category_id, f"Unknown_{category_id}")
 
     # Geometry/projection
     src_point = shapely.Point(longitude, latitude)
@@ -198,10 +214,11 @@ def create_windows_from_gpkg(
     max_workers: int,
     start_time: datetime,
     end_time: datetime,
+    crop_type: bool,
 ) -> None:
     """Create windows from a single GPKG file."""
-    gdf = process_gpkg(gpkg_path)
-    records = list(iter_points(gdf))
+    gdf = process_gpkg(gpkg_path, crop_type)
+    records = list(iter_points(gdf, crop_type))
 
     jobs = [
         dict(
@@ -212,6 +229,7 @@ def create_windows_from_gpkg(
             window_size=window_size,
             start_time=start_time,
             end_time=end_time,
+            crop_type=crop_type,
         )
         for rec in records
     ]
@@ -299,6 +317,7 @@ if __name__ == "__main__":
             max_workers=args.max_workers,
             start_time=start_time,
             end_time=end_time,
+            crop_type=args.crop_type,
         )
 
     print("Done.")
