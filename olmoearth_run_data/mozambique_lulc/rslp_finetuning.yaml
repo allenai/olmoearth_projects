@@ -87,7 +87,7 @@ data:
                       class_path: torchmetrics.ConfusionMatrix
                       init_args:
                         num_classes: 8
-                        task: "null"
+                        task: "multiclass"
                     class_idx: 1
                 water_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
