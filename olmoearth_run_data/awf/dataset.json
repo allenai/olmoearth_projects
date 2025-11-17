@@ -1,5 +1,23 @@
 {
   "layers": {
+    "era5": {
+      "band_sets": [
+        {
+          "bands": [
+            "2m-temperature",
+            "total-precipitation"
+          ],
+          "dtype": "float32"
+        }
+      ],
+      "data_source": {
+        "name": "rslearn.data_sources.climate_data_store.ERA5LandMonthlyMeans",
+        "query_config": {
+          "max_matches": 12
+        }
+      },
+      "type": "raster"
+    },
     "label": {
       "band_sets": [
         {
