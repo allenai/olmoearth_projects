@@ -40,7 +40,7 @@ model:
         loss_weights: null
         trunk: null
     restore_config:
-      restore_path: /weka/dfive-default/rslearn-eai/projects/2025_09_18_mozambique_lulc/combined_with_val_20251115_new_data/checkpoints/epoch=24-step=26975.ckpt
+      restore_path: /weka/dfive-default/rslearn-eai/projects/2025_09_18_mozambique_lulc/lulc_combined_20251118_monitoracc/checkpoints/
       remap_prefixes:
         - ["model.", ""]
       ignore_prefixes: ["model.decoders"]
@@ -263,7 +263,7 @@ trainer:
         save_top_k: 1
         save_last: true
         monitor: val_segment/accuracy
-        mode: min
+        mode: max
     - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
       init_args:
         module_selector: ["model", "encoder", 0]

@@ -257,7 +257,7 @@ trainer:
         save_top_k: 1
         save_last: true
         monitor: val_segment/accuracy
-        mode: min
+        mode: max
     - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
       init_args:
         module_selector: ["model", "encoder", 0]
