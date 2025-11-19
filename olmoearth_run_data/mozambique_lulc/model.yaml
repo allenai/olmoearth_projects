@@ -64,7 +64,7 @@ data:
               metric_kwargs:
                 average: "micro"
               other_metrics:
-                coffee_precision:
+                water_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -73,7 +73,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 1
-                coffee_recall:
+                water_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -82,6 +82,60 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 1
+                bareground_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 8
+                        average: null
+                    class_idx: 2
+                bareground_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 8
+                        average: null
+                    class_idx: 2
+                rangeland_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 8
+                        average: null
+                    class_idx: 3
+                rangeland_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 8
+                        average: null
+                    class_idx: 3
+                floodedvegetation_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 8
+                        average: null
+                    class_idx: 4
+                floodedvegetation_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 8
+                        average: null
+                    class_idx: 4
                 trees_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
@@ -90,7 +144,7 @@ data:
                       init_args:
                         num_classes: 8
                         average: null
-                    class_idx: 2
+                    class_idx: 5
                 trees_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
@@ -99,62 +153,8 @@ data:
                       init_args:
                         num_classes: 8
                         average: null
-                    class_idx: 2
-                grassland_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 8
-                        average: null
-                    class_idx: 3
-                grassland_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 8
-                        average: null
-                    class_idx: 3
-                maize_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 8
-                        average: null
-                    class_idx: 4
-                maize_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 8
-                        average: null
-                    class_idx: 4
-                sugarcane_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 8
-                        average: null
                     class_idx: 5
-                sugarcane_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 8
-                        average: null
-                    class_idx: 5
-                tea_precision:
+                cropland_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -163,7 +163,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 6
-                tea_recall:
+                cropland_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -172,7 +172,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 6
-                vegetables_precision:
+                buildings_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -181,7 +181,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 7
-                vegetables_recall:
+                buildings_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -224,17 +224,17 @@ data:
           init_args:
             band_names:
               sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
-      groups: ["gaza"]
+      groups: ["gaza", "manica", "zambezia"]
       tags:
         split: "train"
     val_config:
       patch_size: 16
-      groups: ["gaza"]
+      groups: ["gaza", "manica", "zambezia"]
       tags:
         split: "test"
     test_config:
       patch_size: 16
-      groups: ["gaza"]
+      groups: ["gaza", "manica", "zambezia"]
       tags:
         split: "test"
     predict_config:
