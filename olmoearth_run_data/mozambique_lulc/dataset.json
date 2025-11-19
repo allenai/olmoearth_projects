@@ -61,7 +61,6 @@
         "name": "rslearn.data_sources.planetary_computer.Sentinel2",
         "query_config": {
           "max_matches": 12,
-          "min_matches": 12,
           "period_duration": "30d",
           "space_mode": "PER_PERIOD_MOSAIC"
         },
