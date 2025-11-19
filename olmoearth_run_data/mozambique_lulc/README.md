@@ -37,6 +37,8 @@ Within `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc` there are
     - Gaza: 1,802 / 460 / 970
 	- Manica: 1,564 / 353 / 822
 	- Zambezia: 949 / 276 / 525
+	- For crop type mapping, the following train / val / test splits, per class: `'corn': {'train': 917, 'val': 191, 'test': 3709}, 'sesame': {'train': 384, 'val': 0, 'test': 383}, 'beans': {'train': 932, 'val': 224, 'test': 417}, 'rice': {'train': 648, 'val': 512, 'test': 863}, 'millet': {'train': 36, 'val': 0, 'test': 57}, 'cassava': {'train': 685, 'val': 133, 'test': 201}, 'sorghum': {'train': 52, 'val': 0, 'test': 41},`
+- `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251114` which aligns the dates for all provinces (as in [this commit](https://github.com/allenai/olmoearth_projects/pull/28/commits/07ee7ef22a383b2c71ef6acab3171df8387924bd)).
 
 Finally - we treat this as a segmentation task, not as a classification task (this makes inference faster, without hurting performance). This means the point labels need to be transformed into rasters:
 
@@ -46,18 +48,19 @@ python olmoearth_projects/projects/mozambique_lulc/create_label_raster.py --ds_p
 
 ### Finetuning
 
-Currently, we use [rslearn_projects](github.com/allenai/rslearn_projects) for finetuning, using the [rslp_finetuning.yaml](rslp_finetuning.yaml). To run finetune for a specific province, update the yaml's `groups` (lines 238-250) from `"gaza"` to one of `["gaza", "manica", "zambezia"]`. With `rslean_projects` installed (and access to Beaker), finetuning can then be run with the following command:
+Currently, we use [rslearn_projects](github.com/allenai/rslearn_projects) for finetuning, using [rslp_finetuning.yaml](rslp_finetuning.yaml) and [rslp_finetuning_croptype.yaml](rslp_finetuning_croptype.yaml).  With `rslean_projects` installed (and access to Beaker), finetuning can then be run with the following command:
 
 ```
-python -m rslp.main olmoearth_pretrain launch_finetune --image_name gabrielt/rslpomp_20251027b --config_paths+=olmoearth_run_data/mozambique_lulc/rslp_finetuning.yaml --cluster+=ai2/saturn --rslp_project <MY_RSLP_PROJECT_NAME> --experiment_id <MY_EXPERIMENT_ID>
+python -m rslp.main olmoearth_pretrain launch_finetune --image_name yawenzzzz/rslp20251112h --config_paths+=olmoearth_run_data/mozambique_lulc/rslp_finetuning.yaml --cluster+=ai2/saturn --rslp_project <MY_RSLP_PROJECT_NAME> --experiment_id <MY_EXPERIMENT_ID>
 ```
 
 ### Testing
 
 Obtaining test results consisted of the following:
-1. Spin up an interactive beaker session with a GPU: `beaker session create --remote --bare --budget ai2/es-platform --cluster ai2/saturn --mount src=weka,ref=dfive-default,dst=/weka/dfive-default --image beaker://gabrielt/rslpomp_20251027b --gpus 1`
+1. Spin up an interactive beaker session with a GPU: `beaker session create --remote --bare --budget ai2/es-platform --cluster ai2/saturn --mount src=weka,ref=dfive-default,dst=/weka/dfive-default --image beaker://yawenzzzz/rslp20251112h --gpus 1`
 2. Go to the olmoearth projects folder on weka (to easily `git pull`) changes: `cd /weka/dfive-default/gabrielt/olmoearth_projects`
-3. Run testing: `python -m rslp.rslearn_main model test --config olmoearth_run_data/mozambique_lulc/rslp_finetuning.yaml --rslp_experiment gaza_with_val_20251114_ps1 --rslp_project 2025_09_18_mozambique_lulc --force_log=true --load_best=true --verbose true`
+3. Add the `RSLP_PREFIX` to the environment, `export RSLP_PREFIX=/weka/dfive-default/rslearn-eai`
+4. Run testing: `python -m rslp.rslearn_main model test --config olmoearth_run_data/mozambique_lulc/rslp_finetuning.yaml --rslp_experiment <MY_EXPERIMENT_ID> --rslp_project <MY_RSLP_PROJECT_NAME> --force_log=true --load_best=true --verbose true`
 
 ### Inference
 
