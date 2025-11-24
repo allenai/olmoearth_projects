@@ -34,8 +34,10 @@
           ],
           "dtype": "uint8",
           "format": {
-            "format": "png",
-            "name": "single_image"
+            "class_path": "rslearn.utils.raster_format.SingleImageRasterFormat",
+            "init_args": {
+              "format": "png"
+            }
           }
         }
       ],
@@ -69,17 +71,19 @@
         }
       ],
       "data_source": {
-        "cache_dir": "cache/planetary_computer",
+        "class_path": "rslearn.data_sources.planetary_computer.Sentinel2",
         "duration": "180d",
-        "harmonize": true,
         "ingest": false,
-        "name": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "init_args": {
+          "cache_dir": "cache/planetary_computer",
+          "harmonize": true,
+          "sort_by": "eo:cloud_cover"
+        },
         "query_config": {
           "max_matches": 4,
           "min_matches": 4,
           "space_mode": "CONTAINS"
         },
-        "sort_by": "eo:cloud_cover",
         "time_offset": "7d"
       },
       "type": "raster"
@@ -106,17 +110,19 @@
         }
       ],
       "data_source": {
-        "cache_dir": "cache/planetary_computer",
+        "class_path": "rslearn.data_sources.planetary_computer.Sentinel2",
         "duration": "180d",
-        "harmonize": true,
         "ingest": false,
-        "name": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "init_args": {
+          "cache_dir": "cache/planetary_computer",
+          "harmonize": true,
+          "sort_by": "eo:cloud_cover"
+        },
         "query_config": {
           "max_matches": 4,
           "min_matches": 4,
           "space_mode": "CONTAINS"
         },
-        "sort_by": "eo:cloud_cover",
         "time_offset": "-300d"
       },
       "type": "raster"

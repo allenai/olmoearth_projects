@@ -33,19 +33,21 @@
         }
       ],
       "data_source": {
-        "cache_dir": "cache/planetary_computer",
+        "class_path": "rslearn.data_sources.planetary_computer.Sentinel1",
         "duration": "168d",
         "ingest": false,
-        "name": "rslearn.data_sources.planetary_computer.Sentinel1",
-        "query": {
-          "sar:instrument_mode": {
-            "eq": "IW"
-          },
-          "sar:polarizations": {
-            "eq": [
-              "VV",
-              "VH"
-            ]
+        "init_args": {
+          "cache_dir": "cache/planetary_computer",
+          "query": {
+            "sar:instrument_mode": {
+              "eq": "IW"
+            },
+            "sar:polarizations": {
+              "eq": [
+                "VV",
+                "VH"
+              ]
+            }
           }
         },
         "query_config": {
@@ -62,48 +64,37 @@
       "band_sets": [
         {
           "bands": [
+            "B01",
             "B02",
             "B03",
             "B04",
-            "B08"
-          ],
-          "dtype": "uint16"
-        },
-        {
-          "bands": [
             "B05",
             "B06",
             "B07",
+            "B08",
             "B8A",
+            "B09",
             "B11",
             "B12"
           ],
-          "dtype": "uint16",
-          "zoom_offset": -1
-        },
-        {
-          "bands": [
-            "B01",
-            "B09"
-          ],
-          "dtype": "uint16",
-          "zoom_offset": -2
+          "dtype": "uint16"
         }
       ],
       "data_source": {
-        "cache_dir": "cache/planetary_computer",
+        "class_path": "rslearn.data_sources.planetary_computer.Sentinel2",
         "duration": "168d",
-        "harmonize": true,
         "ingest": false,
-        "max_cloud_cover": 50,
-        "name": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "init_args": {
+          "cache_dir": "cache/planetary_computer",
+          "harmonize": true,
+          "sort_by": "eo:cloud_cover"
+        },
         "query_config": {
           "max_matches": 12,
           "min_matches": 12,
           "period_duration": "14d",
           "space_mode": "PER_PERIOD_MOSAIC"
         },
-        "sort_by": "eo:cloud_cover",
         "time_offset": "-168d"
       },
       "type": "raster"
