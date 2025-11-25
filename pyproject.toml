@@ -68,3 +68,9 @@ testpaths = [
 addopts = [
     "--import-mode=importlib",
 ]
+
+[[tool.uv.index]]
+name = "hum-code-artifact"
+url = "https://hum-984625687489.d.codeartifact.us-east-1.amazonaws.com/pypi/hum-python/simple"
+publish-url = "https://hum-984625687489.d.codeartifact.us-east-1.amazonaws.com/pypi/hum-python"
+default = true
