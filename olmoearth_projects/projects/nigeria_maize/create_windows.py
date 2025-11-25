@@ -31,7 +31,10 @@ CLASS2INT = {
 
 # day, month
 START_MONTH, START_DAY = 6, 1  # june 1
-END_MONTH, END_DAY = 12, 15  # dec 15
+# strictly speaking the end date should be
+# 15th Dec but extending it to the 30th
+# gives us 7 30 day periods (instead of 6.56)
+END_MONTH, END_DAY = 12, 30  # dec 15
 
 
 def calculate_bounds(
