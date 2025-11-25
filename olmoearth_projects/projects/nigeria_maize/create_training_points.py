@@ -14,7 +14,8 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     # which sampling_ewoc_code classes are negatives (basically just excluding maize)
     df = gpd.read_parquet(parquet_filepath)
     df = df[df.sampling_ewoc_code != "maize"]
-    df["year"] = pd.to_datetime(df.valid_time).dt.year
+    df.valid_time = pd.to_datetime(df.valid_time)
+    df["year"] = df.valid_time.dt.year
 
     return df[["sampling_ewoc_code", "valid_time", "year", "geometry"]]
 
@@ -36,10 +37,41 @@ def collate_negatives(parquet_folder: Path) -> gpd.GeoDataFrame:
         "2021_gha_ctsurveygeoglam_poly_110_dataset.parquet",
         "2019_af_dewatrain1_poly_100_dataset.parquet",
     ]:
-        dfs.append(rdm_parquet_to_geojson(parquet_folder / filename))
+        f_df = rdm_parquet_to_geojson(parquet_folder / filename)
+        f_df["filename"] = filename
+        f_df["unique_field_id"] = "n/a"
+        dfs.append(f_df)
     df = pd.concat(dfs)
-    df.to_file("concatenated_negatives.geojson", driver="GeoJSON")
+    df["crop"] = "not_maize"
+    return df
+
+
+def load_positives(geojson_file: Path) -> gpd.GeoDataFrame:
+    """Load positive points, ensure the keys match the negative points."""
+    df = gpd.read_file(geojson_file)
+    df["valid_time"] = pd.to_datetime(df.end_time)
+    df["year"] = df["valid_time"].dt.year
+    df["sampling_ewoc_code"] = df["crop"]  # should all be maize
+    df["filename"] = geojson_file.name
+    return df[
+        [
+            "sampling_ewoc_code",
+            "valid_time",
+            "year",
+            "geometry",
+            "crop",
+            "unique_field_id",
+            "filename",
+        ]
+    ]
 
 
 if __name__ == "__main__":
-    collate_negatives(parquet_folder=Path("nigeria_maize_negative_sampling"))
+    negatives = collate_negatives(
+        parquet_folder=Path("nigeria_maize_negative_sampling")
+    )
+    positives = load_positives(
+        geojson_file=Path("Clean maize data in Nigeria_buffered.geojson")
+    )
+    combined = pd.concat([positives, negatives])
+    combined.to_file("combined.geojson", driver="GeoJSON")
