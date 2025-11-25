@@ -137,7 +137,11 @@ def create_window(
     dst_geometry = src_geometry.to_projection(dst_projection)
     bounds = calculate_bounds(dst_geometry, window_size)
 
-    window_name = f"{latitude:.6f}_{longitude:.6f}_{fid}"
+    # this is to handle the n/a, which creates some funky windows.
+    fid_for_window_name = fid
+    if fid == "n/a":
+        fid_for_window_name = source_filename.split(".")[0]
+    window_name = f"{latitude:.6f}_{longitude:.6f}_{fid_for_window_name}"
 
     window = Window(
         path=Window.get_window_root(ds_path, GROUP, window_name),
