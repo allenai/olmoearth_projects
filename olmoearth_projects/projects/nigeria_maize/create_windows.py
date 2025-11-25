@@ -3,7 +3,7 @@
 import argparse
 import multiprocessing
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -150,8 +150,8 @@ def create_window(
         projection=dst_projection,
         bounds=bounds,
         time_range=(
-            datetime(year, START_MONTH, START_DAY),
-            datetime(year, END_MONTH, END_DAY),
+            datetime(year, START_MONTH, START_DAY, tzinfo=UTC),
+            datetime(year, END_MONTH, END_DAY, tzinfo=UTC),
         ),
         options={
             "category_id": category_id,
