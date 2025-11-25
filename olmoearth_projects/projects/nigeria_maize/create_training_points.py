@@ -3,6 +3,7 @@
 We need to figure out where the maize is not growing.
 """
 
+import argparse
 from pathlib import Path
 
 import geopandas as gpd
@@ -67,11 +68,20 @@ def load_positives(geojson_file: Path) -> gpd.GeoDataFrame:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--label_dir",
+        type=str,
+        required=True,
+        help="Path to the labels",
+    )
+    args = parser.parse_args()
+    label_dir = Path(args.label_dir)
     negatives = collate_negatives(
-        parquet_folder=Path("nigeria_maize_negative_sampling")
+        parquet_folder=label_dir / "nigeria_maize_negative_sampling"
     )
     positives = load_positives(
-        geojson_file=Path("Clean maize data in Nigeria_buffered.geojson")
+        geojson_file=label_dir / "Clean maize data in Nigeria_buffered.geojson"
     )
     combined = pd.concat([positives, negatives])
-    combined.to_file("combined.geojson", driver="GeoJSON")
+    combined.to_file(label_dir / "combined_labels.geojson", driver="GeoJSON")
