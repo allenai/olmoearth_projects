@@ -1,3 +1,8 @@
+"""
+Converts metadata JSON files into window definition files for rslearn.
+Extracts bounding boxes, timestamps, and label paths for each chip.
+"""
+
 import json
 from pathlib import Path
 from shapely import wkb

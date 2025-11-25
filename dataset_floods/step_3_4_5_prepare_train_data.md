@@ -1,11 +1,16 @@
 ### Step 3: Prepare (fetch STAC items)
 
+Queries Planetary Computer for Sentinel-1 and Sentinel-2 imagery matching your time windows.
+
 ```bash
 rslearn dataset prepare --root ./dataset_floods --workers 32 --retry-max-attempts 5 --retry-backoff-seconds 5
 
 ```
 
+
 ### Step 4: Ingest
+
+Ingests local label files into the rslearn dataset structure.
 
 ```bash
 rslearn dataset ingest --root ./dataset_floods --workers 32
@@ -13,6 +18,7 @@ rslearn dataset ingest --root ./dataset_floods --workers 32
 ```
 
 ### Step 5: Materialize (final raster stacks)
+Creates final georeferenced raster files for all layers.
 
 ```bash
 rslearn dataset materialize --root ./dataset_floods --workers 32 \

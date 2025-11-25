@@ -1,10 +1,12 @@
 ### Step 7: Train the Model
 
+Fine-tunes OlmoEarth encoder with UNet decoder for flood segmentation.
+
 ```bash
 rslearn model fit --config dataset_floods/model.yaml
 ```
 
-Note: make sure to have dataset_floods/model.yaml
+Note: make sure to have dataset_floods/model.yamlRetry
 
 ```bash
 model:

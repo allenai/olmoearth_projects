@@ -1,3 +1,8 @@
+"""
+Visualizes model predictions alongside ground truth and input imagery.
+Creates 2x2 plots showing RGB, SAR, ground truth, and predicted flood masks.
+"""
+
 import json
 from pathlib import Path
 
@@ -8,9 +13,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 
 
-# -------------------------------------------------------------
 # Chips to visualize
-# -------------------------------------------------------------
 CHIPS = [
     "Cambodia_333434_chip0",
     "Ghana_97059_chip0",
@@ -19,9 +22,7 @@ CHIPS = [
 ]
 
 
-# -------------------------------------------------------------
 # Base directories
-# -------------------------------------------------------------
 PREDICT_BASE = Path(
     "dataset_floods/windows/predict"
 )
@@ -31,9 +32,7 @@ GT_BASE = Path(
 )
 
 
-# -------------------------------------------------------------
 # Utility functions
-# -------------------------------------------------------------
 def normalize_band(band: np.ndarray) -> np.ndarray:
     lo = np.percentile(band, 2)
     hi = np.percentile(band, 98)
@@ -49,9 +48,7 @@ MASK_COLORS = ["gray", "blue", "red"]
 MASK_CMAP = ListedColormap(MASK_COLORS)
 
 
-# -------------------------------------------------------------
 # Process a single chip
-# -------------------------------------------------------------
 def process_chip(chip_id: str) -> None:
     chip_dir = PREDICT_BASE / chip_id / "layers"
 
@@ -70,9 +67,7 @@ def process_chip(chip_id: str) -> None:
             print(f"[SKIP] Missing file: {p}")
             return
 
-    # ---------------------------------------------------------
     # Load data
-    # ---------------------------------------------------------
     with rasterio.open(label_tif) as src:
         label = src.read(1)
 
@@ -90,18 +85,14 @@ def process_chip(chip_id: str) -> None:
             normalize_band(s2[1]),  # B02
         ])
 
-    # ---------------------------------------------------------
     # Flood percentages
-    # ---------------------------------------------------------
     valid_gt = label != -1
     valid_pred = pred != -1
 
     flood_pct_gt = (np.sum(label == 1) / np.sum(valid_gt)) * 100
     flood_pct_pr = (np.sum(pred == 1) / np.sum(valid_pred)) * 100
 
-    # ---------------------------------------------------------
     # Plot
-    # ---------------------------------------------------------
     fig, axes = plt.subplots(2, 2, figsize=(16, 14))
 
     # Sentinel-2 RGB
@@ -149,9 +140,7 @@ def process_chip(chip_id: str) -> None:
     plt.tight_layout()
     plt.subplots_adjust(bottom=0.06, top=0.94)
 
-    # ---------------------------------------------------------
     # Save figure
-    # ---------------------------------------------------------
     outfile = f"prediction_visual_{chip_id}.png"
     plt.savefig(outfile, dpi=150, bbox_inches="tight")
     plt.close()
@@ -159,9 +148,7 @@ def process_chip(chip_id: str) -> None:
     print(f"[OK] Saved: {outfile}")
 
 
-# -------------------------------------------------------------
 # Main loop
-# -------------------------------------------------------------
 print(f"Processing {len(CHIPS)} chips...\n")
 
 for chip in CHIPS:

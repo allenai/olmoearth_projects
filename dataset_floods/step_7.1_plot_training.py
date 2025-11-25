@@ -1,27 +1,26 @@
+"""
+Plots training metrics from PyTorch Lightning CSV logs.
+Shows loss curves, validation accuracy, and mean IoU over epochs.
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
 
-# -------------------------------------------------------------
 # Set the path to your metrics CSV file
 # Example: logs/lightning_logs/version_0/metrics.csv
-# -------------------------------------------------------------
 CSV_PATH = Path("logs/lightning_logs/version_0/metrics.csv")
 
 
-# -------------------------------------------------------------
 # Load metrics
-# -------------------------------------------------------------
 if not CSV_PATH.exists():
     raise FileNotFoundError(f"Metrics file not found: {CSV_PATH}")
 
 df = pd.read_csv(CSV_PATH)
 
 
-# -------------------------------------------------------------
 # Basic summaries
-# -------------------------------------------------------------
 print("=" * 60)
 print("TRAINING SUMMARY")
 print("=" * 60)
@@ -49,9 +48,7 @@ print(f"  Val Acc:    {acc_data['val_accuracy'].iloc[-1]:.4f}")
 print("=" * 60)
 
 
-# -------------------------------------------------------------
 # Plot metrics
-# -------------------------------------------------------------
 fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
 
@@ -88,9 +85,7 @@ axes[2].legend()
 axes[2].grid(alpha=0.3)
 
 
-# -------------------------------------------------------------
 # Save + show figure
-# -------------------------------------------------------------
 version = CSV_PATH.parent.name  # e.g., "version_0"
 
 output_file = f"training_metrics_{version}.png"

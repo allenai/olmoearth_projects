@@ -1,3 +1,8 @@
+"""
+Evaluates model predictions against ground truth labels on test set.
+Computes mIoU, F1 score, and accuracy metrics with spatial reprojection.
+"""
+
 import json
 import numpy as np
 from pathlib import Path

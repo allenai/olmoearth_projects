@@ -1,3 +1,8 @@
+"""
+Adds test windows to rslearn dataset under the 'predict' group.
+Expands each chip's timestamp by ±3 days for Sentinel imagery matching.
+"""
+
 import json
 import subprocess
 from pathlib import Path

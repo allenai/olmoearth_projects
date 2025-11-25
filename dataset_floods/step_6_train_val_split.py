@@ -1,3 +1,8 @@
+"""
+Splits windows into train/val sets using deterministic hash-based assignment.
+Roughly 12.5% of data goes to validation (hex digits 0-1 out of 0-f).
+"""
+
 from rslearn.dataset import Dataset
 from upath import UPath
 import hashlib

@@ -1,3 +1,8 @@
+"""
+Adds training windows to rslearn dataset with spatial and temporal bounds.
+Expands each chip's timestamp by ±3 days to find matching Sentinel imagery.
+"""
+
 import json
 import random
 import subprocess

@@ -1,3 +1,8 @@
+"""
+Quality assurance visualization of materialized training data.
+Plots label masks, Sentinel-1 VV, and Sentinel-2 RGB for selected chips.
+"""
+
 import json
 from pathlib import Path
 
@@ -7,9 +12,7 @@ import rasterio
 from matplotlib.colors import ListedColormap
 
 
-# -------------------------------------------------------------
 # Explicit list of chips you want to visualize
-# -------------------------------------------------------------
 CHIPS = [
     "Sri-Lanka_551926_chip0",
     "Sri-Lanka_120804_chip0",
@@ -21,26 +24,20 @@ CHIPS = [
 ]
 
 
-# -------------------------------------------------------------
 # Base directory for default windows
-# -------------------------------------------------------------
 BASE_DIR = Path(
     "dataset_floods/windows/default"
 )
 
 
-# -------------------------------------------------------------
 # Utility — normalize band to [0,1]
-# -------------------------------------------------------------
 def normalize_band(band: np.ndarray) -> np.ndarray:
     lo = np.percentile(band, 2)
     hi = np.percentile(band, 98)
     return np.clip((band - lo) / (hi - lo + 1e-6), 0, 1)
 
 
-# -------------------------------------------------------------
 # Process a single chip
-# -------------------------------------------------------------
 def plot_chip(chip_id: str) -> None:
     chip_dir = BASE_DIR / chip_id
     layers_dir = chip_dir / "layers"
@@ -60,9 +57,7 @@ def plot_chip(chip_id: str) -> None:
             print(f"[SKIP] Missing {p} for chip {chip_id}")
             return
 
-    # ---------------------------------------------------------
     # Safe timestamp extraction from items.json
-    # ---------------------------------------------------------
     with items_json.open() as f:
         items = json.load(f)
 
@@ -91,9 +86,7 @@ def plot_chip(chip_id: str) -> None:
         elif layer_name == "sentinel2_l2a":
             s2_date = date
 
-    # ---------------------------------------------------------
     # Load imagery
-    # ---------------------------------------------------------
     with rasterio.open(label_tif) as src:
         label = src.read(1)
 
@@ -103,9 +96,7 @@ def plot_chip(chip_id: str) -> None:
     with rasterio.open(s2_tif) as src:
         s2 = src.read()  # shape: (13 bands, H, W)
 
-    # ---------------------------------------------------------
     # Plotting
-    # ---------------------------------------------------------
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
     # Label
@@ -136,9 +127,7 @@ def plot_chip(chip_id: str) -> None:
 
     plt.tight_layout()
 
-    # ---------------------------------------------------------
     # Save output
-    # ---------------------------------------------------------
     outfile = f"chip_visual_{chip_id}.png"
     plt.savefig(outfile, dpi=150, bbox_inches="tight")
     plt.close()
@@ -146,9 +135,7 @@ def plot_chip(chip_id: str) -> None:
     print(f"[OK] Saved {outfile}")
 
 
-# -------------------------------------------------------------
 # Main loop
-# -------------------------------------------------------------
 print(f"Processing {len(CHIPS)} chips...\n")
 
 for chip in CHIPS:
