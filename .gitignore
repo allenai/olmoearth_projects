@@ -5,3 +5,13 @@ build
 olmoearth_projects.egg-info
 rslearn.egg-info
 project_data
+
+
+sen1floods11_data
+dataset_floods/cache
+dataset_floods/tiles
+dataset_floods/windows
+OlmoEarth-v1-Base
+logs
+checkpoints
+*.png

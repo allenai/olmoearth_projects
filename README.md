@@ -42,8 +42,28 @@ instructions to install uv. Once uv is installed:
 ```
 git clone https://github.com/allenai/olmoearth_projects.git
 cd olmoearth_projects
-uv sync
+
+# 1. Authenticate to AWS CodeArtifact (provides uv with creds)
+. tools/authenticate_code_artifact.sh
+
+# 2. Export AWS credentials (if required by your workflow)
+eval "$(aws configure export-credentials --format env)"
+
+# 3. Create a fresh uv-managed environment
+uv venv
+
+# 4. Activate it (optional, but useful for manual python use)
 source .venv/bin/activate
+
+# 5. Install project dependencies (pyproject.toml)
+uv sync
+
+# 6. Install private HUM package from CodeArtifact
+uv pip install hum-ai-data-engine
+
+# 7. Download the model weights from hugging face
+
+git clone https://huggingface.co/allenai/OlmoEarth-v1-Base.git
 ```
 
 ## Applying Existing Models
