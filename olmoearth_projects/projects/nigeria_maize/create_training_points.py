@@ -14,7 +14,9 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     """Sample negatives from WorldCereal RDM files."""
     # which sampling_ewoc_code classes are negatives (basically just excluding maize)
     df = gpd.read_parquet(parquet_filepath)
+    print(f"Original file length for {parquet_filepath}: {len(df)} instances.")
     df = df[df.sampling_ewoc_code != "maize"]
+    print(f"After filtering {parquet_filepath}: {len(df)} instances.")
     df.valid_time = pd.to_datetime(df.valid_time)
     df["year"] = df.valid_time.dt.year
 
