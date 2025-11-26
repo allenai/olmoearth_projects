@@ -45,7 +45,7 @@ model:
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
-    path: /weka/dfive-default/rslearn-eai/datasets/crop/nigeria_maize/20251125
+    path: /weka/dfive-default/rslearn-eai/datasets/crop/nigeria_maize/20251126
     inputs:
       sentinel2_l2a:
         data_type: "raster"
