@@ -29,6 +29,7 @@ def collate_negatives(parquet_folder: Path) -> gpd.GeoDataFrame:
     3. https://rdm.esa-worldcereal.org/collections/2019_af_dewatrain1_poly_100
     4. https://rdm.esa-worldcereal.org/collections/2022_glo_ewocval_poly_111
     5. https://rdm.esa-worldcereal.org/collections/2021_gha_ctsurveygeoglam_poly_110
+    6. https://rdm.esa-worldcereal.org/collections/2021_glo_ewocval_poly_111
     """
     dfs = []
     for filename in [
@@ -37,6 +38,7 @@ def collate_negatives(parquet_folder: Path) -> gpd.GeoDataFrame:
         "2019_sen_jecamcirad_poly_111_dataset.parquet",
         "2021_gha_ctsurveygeoglam_poly_110_dataset.parquet",
         "2019_af_dewatrain1_poly_100_dataset.parquet",
+        "2021_glo_ewocval_poly_111_dataset.parquet",
     ]:
         f_df = rdm_parquet_to_geojson(parquet_folder / filename)
         f_df["filename"] = filename
