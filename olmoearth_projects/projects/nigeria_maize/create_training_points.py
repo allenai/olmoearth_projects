@@ -17,7 +17,7 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     print(f"Original file length for {parquet_filepath}: {len(df)} instances.")
     df = df[
         (df.sampling_ewoc_code != "maize")
-        | (df.sampling_ewoc_code != "cropland_unspecified")
+        & (df.sampling_ewoc_code != "cropland_unspecified")
     ]
     print(f"After filtering {parquet_filepath}: {len(df)} instances.")
     df.valid_time = pd.to_datetime(df.valid_time)
