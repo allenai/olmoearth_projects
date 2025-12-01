@@ -18,6 +18,7 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     df = df[
         (df.sampling_ewoc_code != "maize")
         & (df.sampling_ewoc_code != "cropland_unspecified")
+        & (df.sampling_ewoc_code != "cereals")
     ]
     print(f"After filtering {parquet_filepath}: {len(df)} instances.")
     df.valid_time = pd.to_datetime(df.valid_time)
@@ -36,6 +37,8 @@ def collate_negatives(parquet_folder: Path) -> gpd.GeoDataFrame:
     5. https://rdm.esa-worldcereal.org/collections/2021_gha_ctsurveygeoglam_poly_110
     6. https://rdm.esa-worldcereal.org/collections/2021_glo_ewocval_poly_111
     7. https://rdm.esa-worldcereal.org/collections/2019_af_nhicropharvest_poly_100
+    8. https://rdm.esa-worldcereal.org/collections/2020_eth_ethct2020_point_110
+    9. https://rdm.esa-worldcereal.org/collections/2020_sdn_faowapor1_poly_110
     """
     dfs = []
     for filename in [
@@ -46,6 +49,8 @@ def collate_negatives(parquet_folder: Path) -> gpd.GeoDataFrame:
         "2019_af_dewatrain1_poly_100_dataset.parquet",
         "2021_glo_ewocval_poly_111_dataset.parquet",
         "2019_af_nhicropharvest_poly_100_dataset.parquet",
+        "2020_eth_ethct2020_point_110_dataset.parquet",
+        "2020_sdn_faowapor1_poly_110_dataset.parquet",
     ]:
         f_df = rdm_parquet_to_geojson(parquet_folder / filename)
         f_df["filename"] = filename
