@@ -100,7 +100,7 @@ if __name__ == "__main__":
         groups = ["gaza", "manica", "zambezia"]
     dataset = Dataset(UPath(args.ds_path))
     windows = dataset.load_windows(
-        workers=args.workers, show_progress=True, goups=groups
+        workers=args.workers, show_progress=True, groups=groups
     )
     p = multiprocessing.Pool(args.workers)
     outputs = p.imap_unordered(create_label_raster, windows)
