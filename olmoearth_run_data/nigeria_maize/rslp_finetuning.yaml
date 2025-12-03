@@ -112,7 +112,7 @@ data:
         input_mapping:
           segment:
             label: "targets"
-    batch_size: 4
+    batch_size: 64
     num_workers: 32
     default_config:
       transforms:
