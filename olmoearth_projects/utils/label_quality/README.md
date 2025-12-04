@@ -55,13 +55,13 @@ This function assesses how much of the total labelled area each class occupies.
 In general, we would like each class to occupy a large fraction of the total labelled area:
 
 ```
-xoxoxox
-oxoxoxo
-xoxoxox
+x xox x
+ox x xo
+x xox x
 ```
 is more desirable then
 ```
 x x x x
  x xoxo
-x x xox
+x xoxox
 ```
