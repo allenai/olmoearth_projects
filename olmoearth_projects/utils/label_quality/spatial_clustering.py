@@ -37,14 +37,14 @@ def spatial_clustering(df: gpd.GeoDataFrame, k: int = 5) -> float:
     We assume the geometries are in WGS84 (latitude, longitude)
     """
     labels = df["label"].values
+    # latitude , longitude = [y, x]
     features = torch.stack(
         [
-            torch.from_numpy(np.radians(df.geometry.centroid.x.values)),
             torch.from_numpy(np.radians(df.geometry.centroid.y.values)),
+            torch.from_numpy(np.radians(df.geometry.centroid.x.values)),
         ],
         dim=-1,
     )
-
     # if labels are floats, then its a regression. If labels are ints or strings,
     # its classification
     regression = True
@@ -70,7 +70,8 @@ def spatial_clustering(df: gpd.GeoDataFrame, k: int = 5) -> float:
 
     if regression:
         # MSE error
-        return (labels.values - np.array(all_preds)) ** 2
+        print((labels - np.array(all_preds)) ** 2)
+        return sum((labels - np.array(all_preds)) ** 2) / len(labels)
     else:
         # accuracy
         return sum(labels == np.array(all_preds)) / len(labels)
