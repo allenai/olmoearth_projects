@@ -37,9 +37,7 @@ if __name__ == "__main__":
         groups = ["crop_type"]
     else:
         groups = ["gaza", "manica", "zambezia"]
-    windows = dataset.load_windows(
-        workers=args.workers, show_progress=True, groups=groups
-    )
+    windows = dataset.load_windows(show_progress=True, groups=groups)
     labels, geometry = [], []
     for window in windows:
         split = window.options["split"]
