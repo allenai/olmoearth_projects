@@ -20,13 +20,13 @@ def test_spatial_clustering_classification() -> None:
     )
     output_dict = spatial_clustering(gdf[["label", "geometry"]], k=1)
     for key in gdf.label.unique():
-        assert output_dict[key] == 1
+        assert output_dict[f"{key}_f1"] == 1
 
     # now we reduce the spatial clustering
     gdf.label = ["Random", "Labels", "Totally", "Mixed", "Up"]
     output_dict = spatial_clustering(gdf[["label", "geometry"]], k=1)
     for key in gdf.label.unique():
-        assert output_dict[key] == 0
+        assert output_dict[f"{key}_f1"] == 0
 
 
 def test_spatial_clustering_regression() -> None:
@@ -43,8 +43,8 @@ def test_spatial_clustering_regression() -> None:
     gdf = gpd.GeoDataFrame(
         df, geometry=gpd.points_from_xy(df.Longitude, df.Latitude), crs="EPSG:4326"
     )
-    assert spatial_clustering(gdf[["label", "geometry"]], k=1)["regression"] == 0.0
+    assert spatial_clustering(gdf[["label", "geometry"]], k=1)["regression_mse"] == 0.0
 
     # now we reduce the spatial clustering, so MSE goes up
     gdf.label = [1.5, 0.5, 2.5, 0.5, 1.5]
-    assert spatial_clustering(gdf[["label", "geometry"]], k=1)["regression"] == 1
+    assert spatial_clustering(gdf[["label", "geometry"]], k=1)["regression_mse"] == 1

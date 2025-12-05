@@ -70,7 +70,7 @@ def spatial_clustering(df: gpd.GeoDataFrame, k: int = 5) -> dict[str | int, floa
     if regression:
         # MSE error
 
-        return {"regression": sum((labels - all_preds_np) ** 2) / len(labels)}
+        return {"regression_mse": sum((labels - all_preds_np) ** 2) / len(labels)}
     else:
         output_dict: dict[str | int, float] = {}
         # f1 score
@@ -79,11 +79,11 @@ def spatial_clustering(df: gpd.GeoDataFrame, k: int = 5) -> dict[str | int, floa
             cat_preds = all_preds_np == label_idx
             if sum(cat_preds) == 0:
                 # no instances received this value as a prediction
-                output_dict[label_value] = 0
+                output_dict[f"{label_value}_f1"] = 0
             else:
                 positives = cat_labels == 1
                 tp = sum(cat_labels[positives] == cat_preds[positives])
                 recall = tp / sum(cat_labels)
                 precision = tp / sum(cat_preds)
-                output_dict[label_value] = 2 / ((1 / recall) + (1 / precision))
+                output_dict[f"{label_value}_f1"] = 2 / ((1 / recall) + (1 / precision))
         return output_dict
