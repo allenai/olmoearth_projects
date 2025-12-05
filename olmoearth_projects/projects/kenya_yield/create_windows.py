@@ -214,7 +214,6 @@ if __name__ == "__main__":
         default=32,
         help="Worker processes (set 1 for single-process)",
     )
-    parser.add_argument("--crop_type", action="store_true", default=False)
     args = parser.parse_args()
 
     geojson_path = Path(args.geojson_path)
