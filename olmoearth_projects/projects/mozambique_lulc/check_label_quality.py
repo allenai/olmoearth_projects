@@ -4,7 +4,7 @@ import argparse
 
 import geopandas as gpd
 from rslearn.dataset.dataset import Dataset
-from shapely.geometry import box
+from rslearn.utils.geometry import WGS84_PROJECTION
 from upath import UPath
 
 from olmoearth_projects.utils.label_quality import check_label_quality
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         split = window.options["split"]
         if split in splits_to_keep:
             labels.append(window.options["category"])
-            geometry.append(box(*window.bounds))
+            geometry.append(window.get_geometry().to_projection(WGS84_PROJECTION).shp)
 
     df = gpd.GeoDataFrame({"label": labels, "geometry": geometry})
     print(f"Checking label quality for {len(df)} instances.", flush=True)
