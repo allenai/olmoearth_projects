@@ -9,6 +9,9 @@ from pathlib import Path
 import geopandas as gpd
 import shapely
 import tqdm
+from olmoearth_run.runner.tools.data_splitters.data_splitter_interface import (
+    DataSplitterInterface,
+)
 from olmoearth_run.runner.tools.data_splitters.spatial_data_splitter import (
     SpatialDataSplitter,
 )
@@ -51,22 +54,22 @@ CROP_TYPE_MAP = {
 GROUP_TIME = {
     "gaza": (
         datetime(2024, 10, 23, tzinfo=UTC),
-        datetime(2025, 6, 7, tzinfo=UTC),
+        datetime(2025, 6, 20, tzinfo=UTC),
     ),
     "manica": (
         datetime(2024, 10, 23, tzinfo=UTC),
-        datetime(2025, 6, 7, tzinfo=UTC),
+        datetime(2025, 6, 20, tzinfo=UTC),
     ),
     "zambezia": (
         datetime(2024, 10, 23, tzinfo=UTC),
-        datetime(2025, 6, 7, tzinfo=UTC),
+        datetime(2025, 6, 20, tzinfo=UTC),
     ),
     # for crop type, we will train a single model
     # for all 3 provinces since there are too few labels
     # so let's take the union of the ranges.
     "crop_type": (
         datetime(2024, 10, 23, tzinfo=UTC),
-        datetime(2025, 6, 7, tzinfo=UTC),
+        datetime(2025, 6, 20, tzinfo=UTC),
     ),
 }
 
@@ -150,6 +153,7 @@ def create_window(
     start_time: datetime,
     end_time: datetime,
     crop_type: bool,
+    splitter: DataSplitterInterface,
 ) -> None:
     """Create a single window and write label layer."""
     fid, latitude, longitude, category_id = rec
@@ -192,11 +196,6 @@ def create_window(
     )
 
     if split == "train":
-        # split into a train and val set using the spatial data
-        # splitter, keep the test set as it was originally
-        splitter = SpatialDataSplitter(
-            train_prop=0.8, val_prop=0.2, test_prop=0.0, grid_size=32
-        )
         split = splitter.choose_split_for_window(window)
         window.options["split"] = split
     window.save()
@@ -231,6 +230,10 @@ def create_windows_from_gpkg(
     gdf = process_gpkg(gpkg_path, crop_type)
     records = list(iter_points(gdf, crop_type))
 
+    splitter = SpatialDataSplitter(
+        train_prop=0.9, val_prop=0.1, test_prop=0.0, grid_size=32
+    )
+
     jobs = [
         dict(
             rec=rec,
@@ -241,6 +244,7 @@ def create_windows_from_gpkg(
             start_time=start_time,
             end_time=end_time,
             crop_type=crop_type,
+            splitter=splitter,
         )
         for rec in records
     ]

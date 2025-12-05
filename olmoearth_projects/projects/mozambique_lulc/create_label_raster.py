@@ -91,10 +91,17 @@ if __name__ == "__main__":
         default=64,
         help="Number of worker processes to use",
     )
+    parser.add_argument("--crop_type", action="store_true", default=False)
     args = parser.parse_args()
 
+    if args.crop_type:
+        groups = ["crop_type"]
+    else:
+        groups = ["gaza", "manica", "zambezia"]
     dataset = Dataset(UPath(args.ds_path))
-    windows = dataset.load_windows(workers=args.workers, show_progress=True)
+    windows = dataset.load_windows(
+        workers=args.workers, show_progress=True, groups=groups
+    )
     p = multiprocessing.Pool(args.workers)
     outputs = p.imap_unordered(create_label_raster, windows)
     for _ in tqdm.tqdm(outputs, total=len(windows)):

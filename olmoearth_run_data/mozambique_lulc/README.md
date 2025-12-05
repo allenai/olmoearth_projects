@@ -31,7 +31,7 @@ rslearn dataset prepare --root $DATASET_PATH --workers 64 --no-use-initial-job -
 python -m rslp.main common launch_data_materialization_jobs --image yawenzzzz/rslp20251112h --ds_path $DATASET_PATH --clusters+=ai2/neptune-cirrascale --num_jobs 5
 ```
 
-Within `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc` there are two versions of the data:
+Within `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc` there are four versions of the data:
 - `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251023`, which only has the train and test split as defined in the gpkg files
 - `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251113`, which splits the training data into train and val data using a spatial split (introduced in [this commit](https://github.com/allenai/olmoearth_projects/pull/28/commits/1cfb86d40c8e2ccba830eb80410d1248544877c9)). This leads to the following train / val / test splits (with `val_ratio = 0.2`):
     - Gaza: 1,802 / 460 / 970
@@ -39,6 +39,9 @@ Within `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc` there are
 	- Zambezia: 949 / 276 / 525
 	- For crop type mapping, the following train / val / test splits, per class: `'corn': {'train': 917, 'val': 191, 'test': 3709}, 'sesame': {'train': 384, 'val': 0, 'test': 383}, 'beans': {'train': 932, 'val': 224, 'test': 417}, 'rice': {'train': 648, 'val': 512, 'test': 863}, 'millet': {'train': 36, 'val': 0, 'test': 57}, 'cassava': {'train': 685, 'val': 133, 'test': 201}, 'sorghum': {'train': 52, 'val': 0, 'test': 41},`
 - `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251114` which aligns the dates for all provinces (as in [this commit](https://github.com/allenai/olmoearth_projects/pull/28/commits/07ee7ef22a383b2c71ef6acab3171df8387924bd)).
+- `/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202`, which aligns the dates and the `dataset.json` & `config.json` so that 8 months of data are exported. We also update the val ratio to 0.1 to yield the following splits:
+    - crop type mapping: `'corn': {'train': 917, 'val': 191, 'test': 3709}, 'sesame': {'train': 384, 'val': 0, 'test': 383}, 'beans': {'train': 932, 'val': 224, 'test': 417}, 'rice': {'train': 648, 'val': 512, 'test': 863}, 'millet': {'train': 36, 'val': 0, 'test': 57}, 'cassava': {'train': 685, 'val': 133, 'test': 201}, 'sorghum': {'train': 52, 'val': 0, 'test': 41},`
+	- LULC: `{'Trees': {'train': 479, 'val': 56, 'test': 229}, 'Cropland': {'train': 1355, 'val': 159, 'test': 649}, 'Buildings': {'train': 858, 'val': 89, 'test': 406}, 'Bare Ground': {'train': 619, 'val': 50, 'test': 288}, 'Water': {'train': 556, 'val': 55, 'test': 263}, 'Rangeland': {'train': 514, 'val': 57, 'test': 245}, 'Flooded Vegetation': {'train': 500, 'val': 57, 'test': 237}`.
 
 Finally - we treat this as a segmentation task, not as a classification task (this makes inference faster, without hurting performance). This means the point labels need to be transformed into rasters:
 
