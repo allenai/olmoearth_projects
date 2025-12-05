@@ -7,11 +7,11 @@ import numpy as np
 def relative_area(bounds: tuple[float, float, float, float]) -> float:
     """Find the area of the bounding box.
 
-    A = R^2 * (cos(f2)-cos(f1)) * (l2-l1) / 180
+    A = R^2 * (sin(f2)-sin(f1)) * (l2-l1) / 180
     Since we are using ratios, we omit the R and 180 constants.
     """
     min_lon, min_lat, max_lon, max_lat = bounds
-    return np.sin(np.radians(max_lat)) - np.sin(np.radians(min_lat)) * (
+    return (np.sin(np.radians(max_lat)) - np.sin(np.radians(min_lat))) * (
         max_lon - min_lon
     )
 
