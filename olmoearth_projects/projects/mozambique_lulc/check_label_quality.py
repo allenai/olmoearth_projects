@@ -46,5 +46,5 @@ if __name__ == "__main__":
             geometry.append(box(*window.bounds))
 
     df = gpd.GeoDataFrame({"label": labels, "geometry": geometry})
-    print(f"Checking label quality for {len(df)} instances.")
+    print(f"Checking label quality for {len(df)} instances.", flush=True)
     check_label_quality(df)
