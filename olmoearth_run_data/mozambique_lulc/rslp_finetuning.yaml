@@ -10,7 +10,7 @@ model:
             checkpoint_path: /weka/dfive-default/helios/checkpoints/joer/phase2.0_base_lr0.0001_wd0.02/step667200
             selector:
             - encoder
-            patch_size: 1
+            patch_size: 4
             random_initialization: false
             embedding_size: null
             autocast_dtype: bfloat16
@@ -18,7 +18,7 @@ model:
           segment:
           - class_path: rslearn.models.upsample.Upsample
             init_args:
-              scale_factor: 1
+              scale_factor: 4
               mode: bilinear
           - class_path: rslearn.models.conv.Conv
             init_args:
@@ -50,7 +50,7 @@ model:
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
-    path: /weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251114
+    path: /weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202
     inputs:
       sentinel2_l2a:
         data_type: "raster"
@@ -207,7 +207,7 @@ data:
         input_mapping:
           segment:
             label: "targets"
-    batch_size: 4
+    batch_size: 64
     num_workers: 32
     default_config:
       transforms:

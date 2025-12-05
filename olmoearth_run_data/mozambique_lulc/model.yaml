@@ -9,12 +9,12 @@ model:
             init_args:
               checkpoint_path: ${EXTRA_FILES_PATH}
               selector: ["encoder"]
-              patch_size: 1
+              patch_size: 4
         decoders:
           segment:
             - class_path: rslearn.models.upsample.Upsample
               init_args:
-                scale_factor: 1
+                scale_factor: 4
             - class_path: rslearn.models.conv.Conv
               init_args:
                 in_channels: 768
@@ -193,7 +193,7 @@ data:
         input_mapping:
           segment:
             label: "targets"
-    batch_size: 2
+    batch_size: 64
     num_workers: ${NUM_WORKERS}
     default_config:
       transforms:

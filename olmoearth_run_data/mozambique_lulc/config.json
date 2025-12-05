@@ -20,74 +20,6 @@
       },
       "type": "vector"
     },
-    "sentinel1_ascending": {
-      "band_sets": [
-        {
-          "bands": [
-            "vv",
-            "vh"
-          ],
-          "dtype": "float32"
-        }
-      ],
-      "data_source": {
-        "cache_dir": "cache/planetary_computer",
-        "ingest": false,
-        "name": "rslp.satlas.data_sources.MonthlySentinel1",
-        "query": {
-          "sar:instrument_mode": {
-            "eq": "IW"
-          },
-          "sar:polarizations": {
-            "eq": [
-              "VV",
-              "VH"
-            ]
-          },
-          "sat:orbit_state": {
-            "eq": "ascending"
-          }
-        },
-        "query_config": {
-          "max_matches": 6
-        }
-      },
-      "type": "raster"
-    },
-    "sentinel1_descending": {
-      "band_sets": [
-        {
-          "bands": [
-            "vv",
-            "vh"
-          ],
-          "dtype": "float32"
-        }
-      ],
-      "data_source": {
-        "cache_dir": "cache/planetary_computer",
-        "ingest": false,
-        "name": "rslp.satlas.data_sources.MonthlySentinel1",
-        "query": {
-          "sar:instrument_mode": {
-            "eq": "IW"
-          },
-          "sar:polarizations": {
-            "eq": [
-              "VV",
-              "VH"
-            ]
-          },
-          "sat:orbit_state": {
-            "eq": "descending"
-          }
-        },
-        "query_config": {
-          "max_matches": 6
-        }
-      },
-      "type": "raster"
-    },
     "sentinel2": {
       "band_sets": [
         {
@@ -124,10 +56,12 @@
         "cache_dir": "cache/planetary_computer",
         "harmonize": true,
         "ingest": false,
-        "max_cloud_cover": 50,
-        "name": "rslp.satlas.data_sources.MonthlyAzureSentinel2",
+        "name": "rslearn.data_sources.planetary_computer.Sentinel2",
         "query_config": {
-          "max_matches": 6
+          "max_matches": 8,
+          "min_matches": 8,
+          "period_duration": "30d",
+          "space_mode": "PER_PERIOD_MOSAIC"
         },
         "sort_by": "eo:cloud_cover"
       },
