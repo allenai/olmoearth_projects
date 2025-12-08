@@ -49,7 +49,7 @@ def check_label_quality(
     table.add_column("Metric", style="magenta")
     table.add_column("Value", justify="right", style="green")
 
-    table.add_row("", "# instances", str(len(df)))
+    table.add_row("# instances", "", str(len(df)))
 
     for check_name, check_f in checks.items():
         results = check_f(df)
