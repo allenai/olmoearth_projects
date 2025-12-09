@@ -59,7 +59,6 @@ data:
         passthrough: true
         dtype: FLOAT32
         load_all_item_groups: true
-        load_all_layers: true
       label:
         data_type: "raster"
         layers: ["label_raster"]
