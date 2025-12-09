@@ -58,7 +58,7 @@ data:
         bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
         passthrough: true
         dtype: FLOAT32
-        load_all_item_groups: true
+        load_all_layers: true
       label:
         data_type: "raster"
         layers: ["label_raster"]
