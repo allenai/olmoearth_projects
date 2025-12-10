@@ -21,10 +21,6 @@ model:
                 kernel_size: 1
                 activation:
                   class_path: torch.nn.Identity
-            - class_path: rslearn.models.pick_features.PickFeatures
-              init_args:
-                indexes: [0]
-                collapse: true
             - class_path: rslearn.train.tasks.segmentation.SegmentationHead
     lr: 0.0001
     plateau: true

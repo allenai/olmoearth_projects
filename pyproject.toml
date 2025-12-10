@@ -14,7 +14,7 @@ dependencies = [
     "openpyxl>=3.1.5",
     "python-dotenv>=1.0",
     "PyYAML>=6",
-    "rslearn[extra]>=0.0.16",
+    "rslearn[extra]>=0.0.18",
     "wandb>=0.21",
     "olmoearth-runner>=0.1.10",
     "olmoearth_pretrain",
