@@ -4,7 +4,7 @@ import pandas as pd
 from olmoearth_projects.utils.label_quality import check_label_quality
 
 
-def test_spatial_clustering_classification() -> None:
+def test_label_quality_wrapper() -> None:
     df = pd.DataFrame(
         {
             "City": ["Brasilia", "Santiago", "Bogota", "Caracas"],
