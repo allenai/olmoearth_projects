@@ -17,11 +17,9 @@ model:
             token_pooling: false
         decoders:
           segment:
-          - class_path: rslearn.models.attention_pooling.AttentionPool
+          - class_path: rslearn.models.attention_pooling.SimpleAttentionPool
             init_args:
               in_dim: 768
-              num_heads: 12
-              linear_on_kv: false
           - class_path: rslearn.models.upsample.Upsample
             init_args:
               scale_factor: 4
