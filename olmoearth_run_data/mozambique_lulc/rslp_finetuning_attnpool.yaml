@@ -20,6 +20,7 @@ model:
           - class_path: rslearn.models.attention_pooling.SimpleAttentionPool
             init_args:
               in_dim: 768
+              hidden_linear: true
           - class_path: rslearn.models.upsample.Upsample
             init_args:
               scale_factor: 4
