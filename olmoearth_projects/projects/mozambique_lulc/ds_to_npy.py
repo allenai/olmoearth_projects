@@ -1,5 +1,8 @@
 """Save the dataset as a npy of pixel timeseries."""
 
+import argparse
+
+import numpy as np
 import torch
 from rslearn.config import DType
 from rslearn.dataset import Dataset
@@ -84,10 +87,20 @@ def load_dataset(
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--split",
+        type=str,
+        required=True,
+    )
+    parser.add_argument("--crop_type", action="store_true", default=False)
+    args = parser.parse_args()
     ds = load_dataset(
         path=UPath(
             "/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202"
-        )
+        ),
+        split=args.split,
+        crop_type=args.crop_type,
     )
 
     x, y = [], []
@@ -107,3 +120,6 @@ if __name__ == "__main__":
     x_np = torch.stack(x, dim=0).numpy()
     y_np = torch.concat(y)
     print(x_np.shape, y_np.shape)
+    np.save(f"x{'_crop_type' if args.crop_type else ''}_{args.split}.npy", x_np)
+    np.save(f"y{'_crop_type' if args.crop_type else ''}_{args.split}.npy", y_np)
+    print("Saved!")
