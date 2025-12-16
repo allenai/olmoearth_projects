@@ -89,6 +89,20 @@ if __name__ == "__main__":
         )
     )
 
-    print(ds[0][1]["segment"]["valid"].shape)
-    print(ds[0][0]["sentinel2_l2a"].shape)
-    print(torch.argwhere(ds[0][1]["segment"]["valid"]))
+    x, y = [], []
+    for i in range(len(ds)):
+        label = ds[i][1]["segment"]["valid"]
+        s2 = ds[i][0]["sentinel2_l2a"]
+
+        # isolate the target pixel
+        target_pixels = torch.argwhere(label)
+        assert target_pixels.shape[0] == 1
+        target_pixel_x, target_pixel_y = target_pixels[0][0], target_pixels[0][1]
+
+        assert label[target_pixel_x, target_pixel_y] != 0  # 0 is missing
+        y.append(label[target_pixel_x, target_pixel_y])
+        x.append(s2[:, target_pixel_x, target_pixel_y])
+
+    x_np = torch.stack(x, dim=0).numpy()
+    y_np = torch.concat(y)
+    print(x_np.shape, y_np.shape)
