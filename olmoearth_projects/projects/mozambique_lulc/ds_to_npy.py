@@ -20,24 +20,26 @@ def load_dataset(
         split_config=SplitConfig(
             groups=["crop_type"] if crop_type else ["gaza", "manica", "zambezia"],
             tags={"split": split},
-            transforms=OlmoEarthNormalize(
-                band_names={
-                    "sentinel2_l2a": [
-                        "B02",
-                        "B03",
-                        "B04",
-                        "B08",
-                        "B05",
-                        "B06",
-                        "B07",
-                        "B8A",
-                        "B11",
-                        "B12",
-                        "B01",
-                        "B09",
-                    ]
-                }
-            ),
+            transforms=[
+                OlmoEarthNormalize(
+                    band_names={
+                        "sentinel2_l2a": [
+                            "B02",
+                            "B03",
+                            "B04",
+                            "B08",
+                            "B05",
+                            "B06",
+                            "B07",
+                            "B8A",
+                            "B11",
+                            "B12",
+                            "B01",
+                            "B09",
+                        ]
+                    }
+                )
+            ],
         ),
         inputs={
             "sentinel2_l2a": DataInput(
