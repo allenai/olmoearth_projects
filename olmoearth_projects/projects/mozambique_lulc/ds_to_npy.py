@@ -72,7 +72,7 @@ def load_dataset(
             ),
         },
         task=MultiTask(
-            tasks={"segment": {SegmentationTask(num_classes=8, zero_is_invalid=True)}},
+            tasks={"segment": SegmentationTask(num_classes=8, zero_is_invalid=True)},
             input_mapping={"segment": {"label": "targets"}},
         ),
         workers=32,
