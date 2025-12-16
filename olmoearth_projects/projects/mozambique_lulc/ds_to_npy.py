@@ -118,7 +118,7 @@ if __name__ == "__main__":
         x.append(s2[:, target_pixel_x, target_pixel_y])
 
     x_np = torch.stack(x, dim=0).numpy()
-    y_np = torch.concat(y)
+    y_np = torch.concat(y).numpy()
     print(x_np.shape, y_np.shape)
     np.save(f"x{'_crop_type' if args.crop_type else ''}_{args.split}.npy", x_np)
     np.save(f"y{'_crop_type' if args.crop_type else ''}_{args.split}.npy", y_np)
