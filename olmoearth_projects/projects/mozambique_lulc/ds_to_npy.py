@@ -87,4 +87,4 @@ if __name__ == "__main__":
             "/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202"
         )
     )
-    print(ds[0]["valid"].shape)
+    print(ds[0][0]["valid"].shape)
