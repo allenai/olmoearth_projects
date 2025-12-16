@@ -6,10 +6,11 @@ from rslearn.models.olmoearth_pretrain.norm import OlmoEarthNormalize
 from rslearn.train.dataset import DataInput, ModelDataset, SplitConfig
 from rslearn.train.tasks.multi_task import MultiTask
 from rslearn.train.tasks.segmentation import SegmentationTask
+from upath import UPath
 
 
 def load_dataset(
-    path: str, crop_type: bool = False, split: str = "train"
+    path: UPath, crop_type: bool = False, split: str = "train"
 ) -> ModelDataset:
     """Load dataset."""
     print("Loading dataset.")
@@ -80,6 +81,8 @@ def load_dataset(
 
 if __name__ == "__main__":
     ds = load_dataset(
-        path="/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202"
+        path=UPath(
+            "/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202"
+        )
     )
     print(ds[0])
