@@ -12,6 +12,7 @@ def load_dataset(
     path: str, crop_type: bool = False, split: str = "train"
 ) -> ModelDataset:
     """Load dataset."""
+    print("Loading dataset.")
     dataset = ModelDataset(
         dataset=Dataset(path=path),
         # just apply normalization here
