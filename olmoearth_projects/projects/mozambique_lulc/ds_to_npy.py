@@ -7,6 +7,7 @@ from rslearn.models.olmoearth_pretrain.norm import OlmoEarthNormalize
 from rslearn.train.dataset import DataInput, ModelDataset, SplitConfig
 from rslearn.train.tasks.multi_task import MultiTask
 from rslearn.train.tasks.segmentation import SegmentationTask
+from tqdm import tqdm
 from upath import UPath
 
 
@@ -90,7 +91,7 @@ if __name__ == "__main__":
     )
 
     x, y = [], []
-    for i in range(len(ds)):
+    for i in tqdm(range(len(ds))):
         label = ds[i][1]["segment"]["valid"]
         s2 = ds[i][0]["sentinel2_l2a"]
 
