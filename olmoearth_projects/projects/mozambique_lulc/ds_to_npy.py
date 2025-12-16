@@ -1,5 +1,6 @@
 """Save the dataset as a npy of pixel timeseries."""
 
+import torch
 from rslearn.config import DType
 from rslearn.dataset import Dataset
 from rslearn.models.olmoearth_pretrain.norm import OlmoEarthNormalize
@@ -87,4 +88,5 @@ if __name__ == "__main__":
             "/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202"
         )
     )
-    print(ds[0][1]["valid"].shape)
+    print(ds[0][1]["segment"]["valid"].shape)
+    print(torch.argwhere(ds[0][1]["segment"]["valid"]))
