@@ -1,6 +1,7 @@
 """Save the dataset as a npy of pixel timeseries."""
 
 import argparse
+from dataclasses import dataclass
 
 import numpy as np
 import torch
@@ -12,6 +13,18 @@ from rslearn.train.tasks.multi_task import MultiTask
 from rslearn.train.tasks.segmentation import SegmentationTask
 from tqdm import tqdm
 from upath import UPath
+
+
+@dataclass
+class AllData:
+    """Handy way to store all the data for training the RF."""
+
+    x_train: np.ndarray
+    y_train: np.ndarray
+    x_val: np.ndarray
+    y_val: np.ndarray
+    x_test: np.ndarray
+    y_test: np.ndarray
 
 
 def load_dataset(
@@ -86,26 +99,11 @@ def load_dataset(
     return dataset
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--split",
-        type=str,
-        required=True,
-    )
-    parser.add_argument("--crop_type", action="store_true", default=False)
-    args = parser.parse_args()
-    ds = load_dataset(
-        path=UPath(
-            "/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202"
-        ),
-        split=args.split,
-        crop_type=args.crop_type,
-    )
-
+def dataset_to_npy(ds: ModelDataset) -> tuple[np.ndarray, np.ndarray]:
+    """Load an rslearn dataset to npy arrays."""
     x, y = [], []
     for i in tqdm(range(len(ds))):
-        label = ds[i][1]["segment"]["valid"]
+        label = ds[i][1]["segment"]["classes"]
         s2 = ds[i][0]["sentinel2_l2a"]
 
         # isolate the target pixel
@@ -119,7 +117,46 @@ if __name__ == "__main__":
 
     x_np = torch.stack(x, dim=0).numpy()
     y_np = torch.stack(y, dim=0).numpy()
-    print(x_np.shape, y_np.shape)
-    np.save(f"x{'_crop_type' if args.crop_type else ''}_{args.split}.npy", x_np)
-    np.save(f"y{'_crop_type' if args.crop_type else ''}_{args.split}.npy", y_np)
-    print("Saved!")
+
+    return x_np, y_np
+
+
+def load_npys(ds_path: UPath, npy_path: UPath, crop_type: bool) -> AllData:
+    """Load saved npys. If they don't exist, recreate them."""
+    alldata_dict: dict[str, np.ndarray] = {}
+
+    for split in ["train", "val", "test"]:
+        expected_suffix = f"{'_crop_type' if crop_type else ''}_{split}.npy"
+        if not (npy_path / f"x{expected_suffix}").exists():
+            print(f"Missing npys for {split}, loading from data.")
+            ds = load_dataset(ds_path, crop_type, split)
+            x, y = dataset_to_npy(ds)
+            np.save(npy_path / f"x{'_crop_type' if crop_type else ''}_{split}.npy", x)
+            np.save(npy_path / f"y{'_crop_type' if crop_type else ''}_{split}.npy", y)
+        else:
+            print("Loading existing npys.")
+            x = np.load(npy_path / f"x{'_crop_type' if crop_type else ''}_{split}.npy")
+            y = np.load(npy_path / f"y{'_crop_type' if crop_type else ''}_{split}.npy")
+        alldata_dict[f"x_{split}"] = x
+        alldata_dict[f"y_{split}"] = y
+
+    return AllData(**alldata_dict)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--ds_path",
+        default="/weka/dfive-default/rslearn-eai/datasets/crop/mozambique_lulc/20251202",
+        type=str,
+    )
+    parser.add_argument(
+        "--npy_path",
+        type=str,
+        required=True,
+    )
+    parser.add_argument("--crop_type", action="store_true", default=False)
+    args = parser.parse_args()
+
+    all_data = load_npys(UPath(args.ds_path), UPath(args.npy_path), args.crop_type)
+    print(all_data)
