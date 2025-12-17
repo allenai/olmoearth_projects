@@ -103,11 +103,12 @@ def dataset_to_npy(ds: ModelDataset) -> tuple[np.ndarray, np.ndarray]:
     """Load an rslearn dataset to npy arrays."""
     x, y = [], []
     for i in tqdm(range(len(ds))):
+        valid_label = ds[i][1]["segment"]["valid"]
         label = ds[i][1]["segment"]["classes"]
         s2 = ds[i][0]["sentinel2_l2a"]
 
         # isolate the target pixel
-        target_pixels = torch.argwhere(label)
+        target_pixels = torch.argwhere(valid_label)
         assert target_pixels.shape[0] == 1
         target_pixel_x, target_pixel_y = target_pixels[0][0], target_pixels[0][1]
 
