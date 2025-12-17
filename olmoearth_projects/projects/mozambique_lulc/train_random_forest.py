@@ -11,8 +11,33 @@ from rslearn.models.olmoearth_pretrain.norm import OlmoEarthNormalize
 from rslearn.train.dataset import DataInput, ModelDataset, SplitConfig
 from rslearn.train.tasks.multi_task import MultiTask
 from rslearn.train.tasks.segmentation import SegmentationTask
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 from upath import UPath
+
+CLASS_MAP = {
+    1: "Water",
+    2: "Bare Ground",
+    3: "Rangeland",
+    4: "Flooded Vegetation",
+    5: "Trees",
+    6: "Cropland",
+    7: "Buildings",
+}
+
+# reversed; in the crop type gpkg
+# the strings are saved and we want to
+# get the ints back for the category id
+CROP_TYPE_MAP = {
+    1: "corn",
+    2: "cassava",
+    3: "rice",
+    4: "sesame",
+    5: "beans",
+    6: "millet",
+    7: "sorghum",
+}
 
 
 @dataclass
@@ -135,13 +160,46 @@ def load_npys(ds_path: UPath, npy_path: UPath, crop_type: bool) -> AllData:
             np.save(npy_path / f"x{'_crop_type' if crop_type else ''}_{split}.npy", x)
             np.save(npy_path / f"y{'_crop_type' if crop_type else ''}_{split}.npy", y)
         else:
-            print("Loading existing npys.")
+            print(f"Loading existing npys for {split}.")
             x = np.load(npy_path / f"x{'_crop_type' if crop_type else ''}_{split}.npy")
             y = np.load(npy_path / f"y{'_crop_type' if crop_type else ''}_{split}.npy")
         alldata_dict[f"x_{split}"] = x
         alldata_dict[f"y_{split}"] = y
 
     return AllData(**alldata_dict)
+
+
+def train_random_forest(
+    data: AllData, crop_type: bool, include_val_in_train: bool = False
+) -> dict[str, float]:
+    """Train a random forest and record metrics."""
+    if include_val_in_train:
+        x = np.concatenate([data.x_train, data.x_val], axis=0)
+        y = np.concatenate([data.y_train, data.y_val], axis=0)
+    else:
+        x, y = data.x_train, data.y_train
+    model = RandomForestClassifier().fit(x, y)
+    preds = model.predict(data.x_test)
+
+    # compute the metrics
+    metrics_dict: dict[str, float] = {
+        "accuracy_score": accuracy_score(data.y_test, preds),
+    }
+    for class_idx in np.unique(data.y_test):
+        class_name = CLASS_MAP[class_idx] if not crop_type else CROP_TYPE_MAP[class_idx]
+        tp = sum((preds == class_idx) & (data.y_test == class_idx))
+        fp = sum((preds == class_idx) & (data.y_test != class_idx))
+        fn = sum((preds != class_idx) & (data.y_test == class_idx))
+
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+        f1 = 2 * precision * recall / (precision + recall)
+
+        metrics_dict[f"{class_name}_precision"] = precision
+        metrics_dict[f"{class_name}_recall"] = recall
+        metrics_dict[f"{class_name}_f1"] = f1
+
+    return metrics_dict
 
 
 if __name__ == "__main__":
@@ -160,4 +218,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     all_data = load_npys(UPath(args.ds_path), UPath(args.npy_path), args.crop_type)
-    print(all_data)
+    print(train_random_forest(all_data, args.crop_type))
