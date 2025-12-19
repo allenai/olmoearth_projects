@@ -68,7 +68,7 @@ jobs:
       - name: Run integrated pipeline in Beaker job
         run: |
           docker run --rm \
-            -e BEAKER_TOKEN="BEAKER_TOKEN" \
+            -e BEAKER_TOKEN="${BEAKER_TOKEN}" \
             -e BEAKER_ADDR="${BEAKER_ADDR}" \
             "$BEAKER_IMAGE_NAME" \
             python -m olmoearth_projects.projects.forest_loss_driver.deploy.start_beaker_job
