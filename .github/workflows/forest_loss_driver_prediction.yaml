@@ -14,10 +14,7 @@ env:
   # After creation, it is prefixed by username, so when we delete we need to use this
   # full name.
   BEAKER_IMAGE_FULL_NAME: "favyen/forest_loss_driver"
-  # BEAKER_TOKEN is Henry's token but it has space at beginning which causes issue when
-  # using it here.
-  # BEAKER_TOKEN_2 is Favyen's token, without the space issue.
-  BEAKER_TOKEN: ${{ secrets.BEAKER_TOKEN_2 }}
+  BEAKER_TOKEN: ${{ secrets.BEAKER_TOKEN }}
   BEAKER_ADDR: ${{ secrets.BEAKER_ADDR }}
 
 concurrency:
@@ -25,7 +22,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build_and_start_beaker_job:
     runs-on: ubuntu-latest
     permissions:
       contents: read
