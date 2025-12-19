@@ -1,6 +1,7 @@
 name: Forest-Loss-Driver-Prediction
 
 on:
+  pull-request:
   workflow_dispatch:
   schedule:
     - cron: '0 8 * * 6'  # Run at 8:00 AM UTC every Saturday
