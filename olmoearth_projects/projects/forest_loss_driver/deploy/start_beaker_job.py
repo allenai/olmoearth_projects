@@ -47,6 +47,10 @@ if __name__ == "__main__":
                 name="GOOGLE_CLOUD_PROJECT",  # nosec
                 value=GOOGLE_CLOUD_PROJECT,  # nosec
             ),
+            BeakerEnvVar(
+                name="STUDIO_API_KEY",  # nosec
+                secret="STUDIO_API_KEY",  # nosec
+            ),
         ]
         datasets = [
             BeakerDataMount(
