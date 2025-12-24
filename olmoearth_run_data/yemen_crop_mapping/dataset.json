@@ -4,7 +4,7 @@
         "band_sets": [
           {
             "bands": [
-              "category"
+              "crop_land"
             ],
             "dtype": "int32"
           }

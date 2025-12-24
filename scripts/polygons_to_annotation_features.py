@@ -36,6 +36,7 @@ from shapely.geometry import shape as shapely_shape
 from shapely.geometry import box as shapely_box
 from shapely.geometry.base import BaseGeometry
 from shapely.geometry import Polygon, MultiPolygon
+from shapely.ops import unary_union
 from olmoearth_run.runner.models.training.annotation_features import AnnotationTaskFeature, AnnotationFeature, AnnotationTaskFeatureProperties, AnnotationFeatureProperties
 from pydantic import BaseModel, Field, ConfigDict
 from geojson_pydantic.features import FeatureCollection
@@ -97,7 +98,9 @@ def dense_polygons_to_annotation_features(geojson_path: Path) -> tuple[dict, dic
     oe_end_time = label_features[0]["properties"]["end_time"]
 
     all_features = [shapely_shape(feature["geometry"]) for feature in label_features]
-    merged_geometry = MultiPolygon(all_features)
+    merged = unary_union(all_features)
+    # Ensure result is a MultiPolygon for consistency
+    merged_geometry = merged if isinstance(merged, MultiPolygon) else MultiPolygon([merged])
     task_id = uuid.uuid4()
     annotation_task_properties = AnnotationTaskFeatureProperties(
         oe_annotations_task_id=task_id,
@@ -131,41 +134,67 @@ def dense_polygons_to_annotation_features(geojson_path: Path) -> tuple[dict, dic
     return annotation_task_feature, annotation_features
 
 
-def write_annotation_features(annotation_features: list[AnnotationFeature], output_dir: Path):
+def process_input(input_path: Path) -> tuple[list[AnnotationTaskFeature], list[AnnotationFeature]]:
     """
-    Write the annotation features to a GeoJSON file
+    Process either a single GeoJSON file or a directory of GeoJSON files.
+    Returns combined lists of task features and annotation features.
     """
-    annotation_feature_collection = FeatureCollection(type="FeatureCollection", features=annotation_features)
+    all_task_features: list[AnnotationTaskFeature] = []
+    all_annotation_features: list[AnnotationFeature] = []
+
+    if input_path.is_file():
+        geojson_files = [input_path]
+    elif input_path.is_dir():
+        geojson_files = sorted(input_path.glob("*.geojson"))
+        if not geojson_files:
+            raise ValueError(f"No .geojson files found in directory: {input_path}")
+    else:
+        raise ValueError(f"Input path does not exist: {input_path}")
+
+    for geojson_path in geojson_files:
+        print(f"Processing: {geojson_path.name}")
+        task_feature, annotation_features = dense_polygons_to_annotation_features(geojson_path)
+        print("Features created!")
+        all_task_features.append(task_feature)
+        all_annotation_features.extend(annotation_features)
+
+    print(f"Processed {len(geojson_files)} file(s): {len(all_task_features)} tasks, {len(all_annotation_features)} annotations")
+    return all_task_features, all_annotation_features
+
+
+def write_feature_collections(
+    task_features: list[AnnotationTaskFeature],
+    annotation_features: list[AnnotationFeature],
+    output_dir: Path,
+):
+    """
+    Write the task features and annotation features to GeoJSON FeatureCollection files.
+    """
     os.makedirs(output_dir, exist_ok=True)
-    output_path = output_dir / ANNOTATION_FEATURES_FILE_NAME
-    with open(output_path, 'w') as f:
+
+    # Write annotation features
+    annotation_feature_collection = FeatureCollection(type="FeatureCollection", features=annotation_features)
+    annotation_output_path = output_dir / ANNOTATION_FEATURES_FILE_NAME
+    with open(annotation_output_path, 'w') as f:
         json.dump(annotation_feature_collection.model_dump(mode='json'), f)
 
-def write_task_features(annotation_task_feature: AnnotationTaskFeature, output_dir: Path):
-    """
-    Write the annotation task feature to a GeoJSON FeatureCollection file.
-    """
-    # TODO: Update to use the appropriate pydantic FeatureCollection type here before the final output again
-    from collections.abc import Sequence
-
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = output_dir / ANNOTATION_TASK_FEATURES_FILE_NAME
-
-    # Wrap the annotation task feature in a FeatureCollection
+    # Write task features
     task_feature_collection = {
         "type": "FeatureCollection",
-        "features": [annotation_task_feature.model_dump(mode='json')]
+        "features": [tf.model_dump(mode='json') for tf in task_features]
     }
-    with open(output_path, 'w') as f:
+    task_output_path = output_dir / ANNOTATION_TASK_FEATURES_FILE_NAME
+    with open(task_output_path, 'w') as f:
         json.dump(task_feature_collection, f)
+
+    print(f"Wrote {ANNOTATION_FEATURES_FILE_NAME} and {ANNOTATION_TASK_FEATURES_FILE_NAME} to {output_dir}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert a GeoJSON of labeled polygons into the two files that `olmoearth_run` expects for fine-tuning")
-    parser.add_argument("input", type=Path, help="The input GeoJSON file")
+    parser = argparse.ArgumentParser(description="Convert GeoJSON(s) of labeled polygons into the two files that `olmoearth_run` expects for fine-tuning")
+    parser.add_argument("input", type=Path, help="Input GeoJSON file or directory containing .geojson files")
     parser.add_argument("output_dir", type=Path, help="The output directory for the annotation features")
     args = parser.parse_args()
 
-    annotation_task_feature, annotation_features = dense_polygons_to_annotation_features(args.input)
-    write_annotation_features(annotation_features, args.output_dir)
-    write_task_features(annotation_task_feature, args.output_dir)
+    task_features, annotation_features = process_input(args.input)
+    write_feature_collections(task_features, annotation_features, args.output_dir)

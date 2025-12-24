@@ -55,6 +55,308 @@ data:
               nodata_value: 255
               metric_kwargs:
                 average: "micro"
+              other_metrics:
+                # Macro and weighted averages
+                macro_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: "macro"
+                macro_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: "macro"
+                macro_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: "macro"
+                weighted_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: "weighted"
+                weighted_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: "weighted"
+                weighted_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: "weighted"
+                # Per-class metrics: orchards (class 0)
+                orchards_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 0
+                orchards_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 0
+                orchards_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 0
+                # Per-class metrics: coffee (class 1)
+                coffee_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 1
+                coffee_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 1
+                coffee_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 1
+                # Per-class metrics: inactive_cropland (class 2)
+                inactive_cropland_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 2
+                inactive_cropland_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 2
+                inactive_cropland_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 2
+                # Per-class metrics: cereals (class 3)
+                cereals_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 3
+                cereals_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 3
+                cereals_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 3
+                # Per-class metrics: not_cropland (class 4)
+                not_cropland_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 4
+                not_cropland_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 4
+                not_cropland_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 4
+                # Per-class metrics: greenhouse (class 5)
+                greenhouse_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 5
+                greenhouse_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 5
+                greenhouse_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 5
+                # Per-class metrics: fodder (class 6)
+                fodder_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 6
+                fodder_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 6
+                fodder_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 6
+                # Per-class metrics: mixed_other (class 7)
+                mixed_other_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 7
+                mixed_other_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 7
+                mixed_other_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 7
+                # Per-class metrics: qat (class 8)
+                qat_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 8
+                qat_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 8
+                qat_f1:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassF1Score
+                      init_args:
+                        num_classes: 9
+                        average: null
+                    class_idx: 8
         input_mapping:
           segment:
             targets: targets
@@ -83,7 +385,7 @@ data:
       tags:
         split: "test"
 trainer:
-  max_epochs: 100
+  max_epochs: 20
   logger:
     class_path: lightning.pytorch.loggers.WandbLogger
     init_args:
