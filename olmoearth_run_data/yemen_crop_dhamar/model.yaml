@@ -360,7 +360,7 @@ data:
         input_mapping:
           segment:
             targets: targets
-    batch_size: 4
+    batch_size: 32
     num_workers: ${NUM_WORKERS}
     default_config:
       transforms:

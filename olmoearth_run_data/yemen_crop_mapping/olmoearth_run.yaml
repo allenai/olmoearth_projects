@@ -5,11 +5,12 @@ window_prep:
     class_path: olmoearth_projects.projects.yemen_crop.dense_polygon_to_raster.DensePolygonToRasterWindowPreparer
     init_args:
       window_resolution: 10.0
+      input_size: 64
   data_splitter:
     class_path: olmoearth_run.runner.tools.data_splitters.spatial_data_splitter.SpatialDataSplitter
     init_args:
-      train_prop: 0.75
-      val_prop: 0.25
+      train_prop: 0.8
+      val_prop: 0.20
       test_prop: 0.0
       grid_size: 128 # in pixels
   label_layer: "label"

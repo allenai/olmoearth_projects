@@ -8,12 +8,12 @@ model:
           - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
             init_args:
               model_id: OLMOEARTH_V1_BASE
-              patch_size: 4
+              patch_size: 1
         decoders:
           segment:
             - class_path: rslearn.models.upsample.Upsample
               init_args:
-                scale_factor: 4
+                scale_factor: 1
             - class_path: rslearn.models.conv.Conv
               init_args:
                 in_channels: 768
@@ -25,7 +25,16 @@ model:
               init_args:
                 indexes: [0]
                 collapse: true
-            - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+            - class_path: olmoearth_projects.projects.yemen_crop.segmentation.SegmentationHead
+              init_args:
+                use_class_weights: true
+                num_classes: 9
+    lr: 0.001
+    plateau: true
+    plateau_factor: 0.2
+    plateau_patience: 2
+    plateau_min_lr: 0
+    plateau_cooldown: 5
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
@@ -360,9 +369,10 @@ data:
         input_mapping:
           segment:
             targets: targets
-    batch_size: 4
+    batch_size: 16
     num_workers: ${NUM_WORKERS}
     default_config:
+      patch_size: 16 # input_size for the model
       transforms:
         - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
           init_args:
@@ -373,19 +383,29 @@ data:
         - class_path: rslearn.train.transforms.flip.Flip
           init_args:
             image_selectors: ["sentinel2_l2a", "target/segment/classes", "target/segment/valid"]
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
       groups: ["spatial_split"]
       tags:
         split: "train"
     val_config:
+      load_all_patches: true
       groups: ["spatial_split"]
       tags:
         split: "val"
     test_config:
+      load_all_patches: true
       groups: ["spatial_split"]
       tags:
         split: "test"
 trainer:
-  max_epochs: 20
+  max_epochs: 100
+  strategy:
+    class_path: lightning.pytorch.strategies.DDPStrategy
+    init_args:
+      find_unused_parameters: false
   logger:
     class_path: lightning.pytorch.loggers.WandbLogger
     init_args:
@@ -400,13 +420,14 @@ trainer:
       init_args:
         save_top_k: 1
         save_last: true
-        monitor: val_loss
-        mode: min
+        monitor: val_segment/macro_f1
+        mode: max
         dirpath: ${TRAINER_DATA_PATH}
     - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
       init_args:
         module_selector: ["model", "encoder", 0]
         unfreeze_at_epoch: 10
+        unfreeze_lr_factor: 10
     - class_path: rslearn.train.prediction_writer.RslearnWriter
       init_args:
         path: ${DATASET_PATH}
