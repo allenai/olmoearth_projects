@@ -12,6 +12,7 @@ from rslearn.data_sources.planetary_computer import Sentinel2
 from rslearn.dataset.manage import retry
 from rslearn.utils.feature import Feature
 from rslearn.utils.geometry import STGeometry
+from rslearn.utils.mp import star_imap_unordered
 
 # Duration and offset modifications to make to the forest loss event timestamp when
 # looking for assets for visualization.
@@ -26,11 +27,14 @@ def _get_data_source() -> Sentinel2:
     return Sentinel2(sort_by="eo:cloud_cover")
 
 
-def _get_assets_for_feat(feat: Feature) -> tuple[list[dict], list[dict]]:
+def _get_assets_for_feat(
+    feat: Feature, num_assets: int
+) -> tuple[list[dict], list[dict]]:
     """Get the Sentinel-2 assets for a feature.
 
     Args:
         feat: the feature to identify assets for.
+        num_assets: the maximum number of pre and post assets to get.
 
     Returns: a tuple (pre_assets, post_assets) containing lists of Planetary Computer
         asset URLs for pre-event Sentinel-2 TCI images and post-event images.
@@ -49,7 +53,7 @@ def _get_assets_for_feat(feat: Feature) -> tuple[list[dict], list[dict]]:
         )
         query_config = QueryConfig(
             space_mode=SpaceMode.CONTAINS,
-            max_matches=3,
+            max_matches=num_assets,
         )
         # Run request with retries since Planetary Computer often has transient errors.
         item_groups: list[list[Item]] = retry(
@@ -76,7 +80,9 @@ def _get_assets_for_feat(feat: Feature) -> tuple[list[dict], list[dict]]:
     return (pre_assets, post_assets)
 
 
-def get_sentinel2_assets(features: list[Feature], workers: int) -> None:
+def get_sentinel2_assets(
+    features: list[Feature], workers: int, num_assets: int = 3
+) -> None:
     """Identify suitable pre and post Sentinel-2 assets for each feature.
 
     The Planetary Computer asset URLs are added as properties to the feature. The
@@ -85,10 +91,18 @@ def get_sentinel2_assets(features: list[Feature], workers: int) -> None:
     Args:
         features: the forest loss event features. Their properties will be updated.
         workers: number of worker processes to use.
+        num_assets: the maximum number of pre and post assets to get
     """
     p = multiprocessing.Pool(workers)
+    get_assets_for_feat_args = [
+        dict(
+            feat=feat,
+            num_assets=num_assets,
+        )
+        for feat in features
+    ]
     outputs = tqdm.tqdm(
-        p.imap(_get_assets_for_feat, features),
+        star_imap_unordered(p, _get_assets_for_feat, get_assets_for_feat_args),
         desc="Identify pre/post Sentinel-2 assets",
         total=len(features),
     )
