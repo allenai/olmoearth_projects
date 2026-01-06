@@ -4,11 +4,11 @@ This script processes landslide inventory data to create training labels for
 landslide detection models. It generates:
 
 1. Landslide polygons (positive samples) from inventory data
-2. No-landslide polygons (negative samples) using the same geometry 1 month earlier
+2. No-landslide polygons (negative samples) as rings around landslide polygons
 
-The script filters to high-confidence events, creates negative samples by
-temporal offset, removes overlaps where other landslides occurred, applies
-geographic balancing, and computes task geometries.
+The script filters to high-confidence events, creates negative samples as ring
+buffers around landslides, removes overlaps where other landslides occurred,
+applies geographic balancing, and computes task geometries.
 
 Example:
     $ python prepare_labels.py --input-zip olmoearth_run_data/landslides/inventories.zip
@@ -53,10 +53,9 @@ COL_TASK_GEOM = "task_geom"
 COL_POLYGON_ID = "polygon_id"
 COL_GEOM_CRS = "COL_GEOM_CRS"
 
-# Time constants (in days)
-NEGATIVE_SAMPLE_OFFSET_DAYS = 30  # Negative samples are 1 month before event
-
 # Geometry constants
+RING_WIDTH_M = 100.0  # Width of negative sample rings in meters
+GAP_WIDTH_M = 50.0  # Gap between landslide and negative ring in meters
 PIXEL_SIZE_M = 10.0  # Pixel size in meters for bbox calculations
 TASK_GEOM_BUFFER_M = 20  # Buffer size in meters for task geometry
 MIN_BBOX_PIX10M = 1  # Minimum bbox size in 10m pixels to keep
@@ -107,6 +106,18 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=DEFAULT_N_WORKERS,
         help="Number of worker processes for parallel CRS computation. Defaults to %(default)s.",
+    )
+    parser.add_argument(
+        "--ring-width",
+        type=float,
+        default=RING_WIDTH_M,
+        help="Width of negative sample rings in meters. Defaults to %(default)s.",
+    )
+    parser.add_argument(
+        "--gap-width",
+        type=float,
+        default=GAP_WIDTH_M,
+        help="Gap between landslide and negative ring in meters. Defaults to %(default)s.",
     )
     return parser.parse_args()
 
@@ -228,64 +239,134 @@ def load_landslide_inventory(zip_path: Path) -> gpd.GeoDataFrame:
 
 def create_negative_samples(
     landslides: gpd.GeoDataFrame,
+    ring_width: float = RING_WIDTH_M,
+    gap_width: float = GAP_WIDTH_M,
 ) -> gpd.GeoDataFrame:
-    """Create negative samples using same geometry 1 month earlier.
+    """Create negative samples as rings around landslide polygons.
+
+    Creates ring-shaped negative samples by buffering landslide polygons and
+    taking the difference between outer and inner buffers. Uses per-geometry
+    CRS for accurate spatial operations.
 
     Args:
-        landslides: GeoDataFrame with landslide polygons and event_date.
+        landslides: GeoDataFrame with landslide polygons, event_date, and COL_GEOM_CRS.
+        ring_width: Width of the negative sample rings in meters.
+        gap_width: Gap between landslide and negative ring in meters.
 
     Returns:
-        GeoDataFrame with negative samples (no_landslide label).
+        GeoDataFrame with negative samples (no_landslide label) as rings.
     """
-    logging.info("Creating negative samples (1 month before event_date)")
-    negatives = landslides.copy()
-
-    # Set times to 1 month before event (exact match, no time window)
-    negatives[COL_START_TIME] = negatives[COL_EVENT_DATE] - pd.Timedelta(
-        days=NEGATIVE_SAMPLE_OFFSET_DAYS
+    logging.info(
+        "Creating negative samples as rings (ring_width=%.1fm, gap_width=%.1fm)",
+        ring_width,
+        gap_width,
     )
-    negatives[COL_END_TIME] = negatives[COL_START_TIME]  # Exact match
-    negatives[COL_LABEL] = LABEL_NO_LANDSLIDE
 
-    logging.info("Created %d negative sample polygons", len(negatives))
+    if COL_GEOM_CRS not in landslides.columns:
+        raise ValueError(
+            f"{COL_GEOM_CRS} column not found. CRS must be computed before creating rings."
+        )
+
+    # Group by CRS to process efficiently
+    crs_groups = landslides.groupby(COL_GEOM_CRS, observed=True)
+    n_groups = len(crs_groups)
+    logging.info("Processing %d CRS groups for ring creation", n_groups)
+
+    ring_geoms = []
+    ring_data = []
+
+    for geom_crs_str, group in tqdm(crs_groups, total=n_groups, desc="Creating rings"):
+        # Reproject group to its CRS for accurate buffering
+        group_metric = group.to_crs(geom_crs_str)
+
+        # Create outer and inner buffers
+        outer = group_metric.geometry.buffer(gap_width + ring_width)
+        inner = group_metric.geometry.buffer(gap_width)
+
+        # Create rings by taking difference (element-wise, preserving order)
+        rings_metric = outer.difference(inner)
+
+        # Process each ring individually to maintain correspondence
+        for idx, row in group.iterrows():
+            # Get the corresponding ring geometry (preserves index order)
+            ring_geom_metric = rings_metric.loc[idx]
+
+            # Skip if empty
+            if ring_geom_metric is None or ring_geom_metric.is_empty:
+                continue
+
+            # Convert to WGS84
+            ring_geom_wgs84 = (
+                gpd.GeoDataFrame(geometry=[ring_geom_metric], crs=geom_crs_str)
+                .to_crs(GEO_CRS)
+                .geometry.iloc[0]
+            )
+
+            ring_geoms.append(ring_geom_wgs84)
+
+            # Copy metadata from original landslide
+            ring_data.append(
+                {
+                    COL_EVENT_DATE: row[COL_EVENT_DATE],
+                    COL_START_TIME: row[COL_EVENT_DATE],  # Use same time as positive
+                    COL_END_TIME: row[COL_EVENT_DATE],  # Exact match
+                    COL_LABEL: LABEL_NO_LANDSLIDE,
+                    COL_GEOM_CRS: geom_crs_str,
+                    COL_LOCATION: row.get(COL_LOCATION),
+                }
+            )
+
+    # Create GeoDataFrame with rings
+    negatives = gpd.GeoDataFrame(ring_data, geometry=ring_geoms, crs=GEO_CRS)
+
+    # Filter out empty geometries
+    initial_count = len(negatives)
+    negatives = negatives[negatives.geometry.notnull() & ~negatives.geometry.is_empty]
+    negatives["geometry"] = negatives["geometry"].buffer(0)  # Fix invalid geometries
+
+    filtered_count = initial_count - len(negatives)
+    if filtered_count > 0:
+        logging.info(
+            "Filtered out %d empty ring geometries (%.1f%% of total)",
+            filtered_count,
+            100 * filtered_count / initial_count if initial_count > 0 else 0,
+        )
+
+    logging.info("Created %d negative sample ring polygons", len(negatives))
     return negatives
 
 
 def _remove_overlaps_from_negative(
     geom_metric: Any,
-    positives_before_metric: gpd.GeoDataFrame,
-    positives_before_sindex: Any,
+    positives_on_or_before_metric: gpd.GeoDataFrame,
+    positives_on_or_before_sindex: Any,
     negative_idx: Any,
 ) -> tuple[Any, bool]:
     """Remove overlapping portions from a negative sample geometry.
 
+    Removes ALL portions of the negative sample that overlap with any positive
+    sample that occurred on or before the negative's time.
+
     Args:
-        geom_metric: Negative sample geometry in metric CRS.
-        original_area: Original area of the geometry.
-        positives_before_metric: Positive samples that occurred before, in metric CRS.
-        positives_before_sindex: Spatial index for positives_before_metric.
-        negative_idx: Index of the negative sample (to exclude corresponding positive).
+        geom_metric: Negative sample geometry (ring) in metric CRS.
+        positives_on_or_before_metric: Positive samples that occurred on or before, in metric CRS.
+        positives_on_or_before_sindex: Spatial index for positives_on_or_before_metric.
+        negative_idx: Index of the negative sample (for reference, not used for exclusion).
 
     Returns:
         Tuple of (processed_geometry, should_skip) where should_skip is True if
         the negative should be entirely removed due to excessive overlap.
     """
-    # Find all intersecting landslides that occurred before this negative sample
+    # Find all intersecting landslides that occurred on or before this negative sample's time
     candidate_idx = list(
-        positives_before_sindex.query(geom_metric, predicate="intersects")
+        positives_on_or_before_sindex.query(geom_metric, predicate="intersects")
     )
 
     if not candidate_idx:
         return geom_metric, False
 
-    # Exclude the corresponding positive sample (same index)
-    # since negative samples are created from positive samples with same geometry
-    other_landslides_idx = [i for i in candidate_idx if i != negative_idx]
-
-    if not other_landslides_idx:
-        return geom_metric, False
-
-    intersecting = positives_before_metric.iloc[other_landslides_idx]
+    # Get all intersecting positives and union them to remove all overlaps at once
+    intersecting = positives_on_or_before_metric.iloc[candidate_idx]
     geoms_to_remove = [
         g for g in intersecting["geometry"] if g is not None and not g.is_empty
     ]
@@ -293,13 +374,19 @@ def _remove_overlaps_from_negative(
     if not geoms_to_remove:
         return geom_metric, False
 
+    # Union all overlapping positives and remove from the negative sample
     removal_geom = unary_union(geoms_to_remove)
     if removal_geom.is_empty:
         return geom_metric, False
 
-    # Remove the overlapping portion but keep the rest
-    # If the result is empty, it will be filtered out later
+    # Remove ALL overlapping portions from the negative sample
+    # This ensures no part of the negative overlaps with any positive
     trimmed_geom = geom_metric.difference(removal_geom)
+    # Ensure the result is valid
+    if trimmed_geom is None or trimmed_geom.is_empty:
+        return None, True  # Skip this negative entirely if nothing remains
+    # Fix any potential geometry issues
+    trimmed_geom = trimmed_geom.buffer(0)
     return trimmed_geom, False
 
 
@@ -308,16 +395,19 @@ def _process_negative_sample(
     idx: Any,
     geom_crs_str: str,
     negatives_crs: str,
-    positives_same_crs: gpd.GeoDataFrame,
+    positives_metric: gpd.GeoDataFrame,
 ) -> tuple[Any, Any] | None:
     """Process a single negative sample to remove overlaps.
+
+    This version expects positives to already be in metric CRS to avoid repeated
+    reprojections.
 
     Args:
         row: Row from negatives GeoDataFrame.
         idx: Index of the negative sample.
         geom_crs_str: CRS string for this geometry.
         negatives_crs: Original CRS of negatives GeoDataFrame.
-        positives_same_crs: Positive samples with the same CRS.
+        positives_metric: Positive samples already in metric CRS with event_date as datetime.
 
     Returns:
         Tuple of (processed_geometry_wgs84, idx) if the sample should be kept,
@@ -328,7 +418,7 @@ def _process_negative_sample(
         return None
 
     # Get the negative sample's time window
-    neg_start_time = row[COL_START_TIME]
+    neg_start_time = pd.to_datetime(row[COL_START_TIME])
 
     # Reproject this geometry to the group's CRS
     geom_metric = (
@@ -337,25 +427,21 @@ def _process_negative_sample(
         .geometry.iloc[0]
     )
 
-    # Filter positives to only those that occurred before the negative sample
-    if COL_EVENT_DATE not in positives_same_crs.columns:
-        raise ValueError(
-            f"{COL_EVENT_DATE} column not found in positives. "
-            "Required for time-based overlap filtering."
-        )
-    positives_before = positives_same_crs[
-        positives_same_crs[COL_EVENT_DATE] < neg_start_time
+    # Filter positives to only those that occurred on or before the negative sample's time
+    # Use vectorized comparison for efficiency
+    positives_on_or_before_metric = positives_metric[
+        positives_metric[COL_EVENT_DATE] <= neg_start_time
     ]
 
-    # Remove overlaps if there are positives before this negative sample
-    if len(positives_before) > 0:
-        positives_before_metric = positives_before.to_crs(geom_crs_str)
-        positives_before_sindex = positives_before_metric.sindex
+    # Remove overlaps if there are positives on or before this negative sample's time
+    if len(positives_on_or_before_metric) > 0:
+        # Create spatial index only once for this filtered set
+        positives_on_or_before_sindex = positives_on_or_before_metric.sindex
 
         geom_metric, should_skip = _remove_overlaps_from_negative(
             geom_metric,
-            positives_before_metric,
-            positives_before_sindex,
+            positives_on_or_before_metric,
+            positives_on_or_before_sindex,
             idx,
         )
 
@@ -379,17 +465,16 @@ def remove_overlapping_landslides(
     negatives: gpd.GeoDataFrame,
     positives: gpd.GeoDataFrame,
 ) -> gpd.GeoDataFrame:
-    """Remove portions of negative samples that overlap with other landslides.
+    """Remove portions of negative samples (rings) that overlap with other landslides.
 
-    Each negative sample corresponds to a specific positive sample (same geometry),
-    so we exclude that corresponding positive from the overlap check to avoid
-    removing the entire negative sample. Only positives that occurred before
-    the negative sample's time window are considered for overlap removal.
+    Negative samples are rings around landslide polygons, so they have a gap from
+    their source positive and don't overlap with it. Only positives that occurred
+    on or before the negative sample's time are considered for overlap removal.
 
     Uses per-geometry CRS determined by get_utm_ups_crs for accurate spatial operations.
 
     Args:
-        negatives: GeoDataFrame of negative sample polygons.
+        negatives: GeoDataFrame of negative sample ring polygons.
         positives: GeoDataFrame of positive (landslide) polygons.
 
     Returns:
@@ -414,13 +499,33 @@ def remove_overlapping_landslides(
     for geom_crs_str, neg_group in tqdm(
         crs_groups, total=n_groups, desc="Processing CRS groups"
     ):
-        # Filter positives to only those with the same CRS (more efficient)
+        # Filter positives to only those with the same CRS
         positives_same_crs = positives[positives[COL_GEOM_CRS] == geom_crs_str]
+
+        if len(positives_same_crs) == 0:
+            # No positives in this CRS, keep all negatives as-is
+            for idx, row in neg_group.iterrows():
+                processed_geoms.append(row.geometry)
+                indices.append(idx)
+            continue
+
+        # Pre-project positives to metric CRS once for the entire group
+        positives_metric = positives_same_crs.to_crs(geom_crs_str)
+
+        # Ensure event_date is datetime for efficient filtering
+        if COL_EVENT_DATE not in positives_metric.columns:
+            raise ValueError(
+                f"{COL_EVENT_DATE} column not found in positives. "
+                "Required for time-based overlap filtering."
+            )
+        positives_metric[COL_EVENT_DATE] = pd.to_datetime(
+            positives_metric[COL_EVENT_DATE]
+        )
 
         # Process all negatives in this CRS group
         for idx, row in neg_group.iterrows():
             result = _process_negative_sample(
-                row, idx, geom_crs_str, negatives.crs, positives_same_crs
+                row, idx, geom_crs_str, negatives.crs, positives_metric
             )
             if result is not None:
                 geom_wgs84, idx = result
@@ -699,7 +804,7 @@ def format_time_features(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """Format time features for positive and negative samples.
 
     For positive samples: start_time = event_date, end_time = event_date (exact match).
-    For negative samples: already set in create_negative_samples().
+    For negative samples: already set in create_negative_samples() (same as event_date).
 
     Args:
         gdf: GeoDataFrame with event_date and label columns.
@@ -751,11 +856,11 @@ def format_time_features(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 
 def save_output(gdf: gpd.GeoDataFrame, output_path: Path) -> None:
-    """Save the GeoDataFrame to GeoJSON format.
+    """Save the GeoDataFrame to GeoJSON and GeoPackage formats.
 
     Args:
         gdf: GeoDataFrame to save.
-        output_path: Path for output GeoJSON file.
+        output_path: Path for output GeoJSON file (GeoPackage will use .gpkg extension).
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     logging.info("Saving GeoJSON to %s", output_path)
@@ -776,8 +881,10 @@ def main() -> None:
     centroids = positives.geometry.representative_point()
     positives["COL_GEOM_CRS"] = compute_crs_parallel(centroids, args.workers)
 
-    # Create negative samples (CRS column will be copied automatically)
-    negatives = create_negative_samples(positives)
+    # Create negative samples as rings around landslides
+    negatives = create_negative_samples(
+        positives, ring_width=args.ring_width, gap_width=args.gap_width
+    )
 
     # Remove overlaps from negatives
     negatives = remove_overlapping_landslides(negatives, positives)
