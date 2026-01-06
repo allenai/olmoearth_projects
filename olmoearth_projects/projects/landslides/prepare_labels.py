@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Generate landslide and no-landslide label polygons for OlmoEarth fine-tuning.
 
 This script processes landslide inventory data to create training labels for
