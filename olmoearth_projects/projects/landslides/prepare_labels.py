@@ -56,7 +56,6 @@ COL_GEOM_CRS = "COL_GEOM_CRS"
 
 # Time constants (in days)
 NEGATIVE_SAMPLE_OFFSET_DAYS = 30  # Negative samples are 1 month before event
-TIME_WINDOW_DAYS = 30  # Duration of time window for each sample
 
 # Geometry constants
 PIXEL_SIZE_M = 10.0  # Pixel size in meters for bbox calculations
