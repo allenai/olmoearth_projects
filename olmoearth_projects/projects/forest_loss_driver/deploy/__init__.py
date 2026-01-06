@@ -304,11 +304,9 @@ def get_prediction_results(job_ids: list[str], run_paths: RunPaths) -> list[Feat
     vector_format = GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84)
     if run_paths.raw_studio_outputs_fname.exists():
         logger.info(
-            f"Loading previously downloaded Studio job outputs from {run_paths.raw_studio_outputs_fname.exists()}"
+            f"Loading previously downloaded Studio job outputs from {run_paths.raw_studio_outputs_fname}"
         )
-        return vector_format.decode_from_file(
-            run_paths.raw_studio_outputs_fname.exists()
-        )
+        return vector_format.decode_from_file(run_paths.raw_studio_outputs_fname)
 
     forest_loss_events: list[Feature] = []
     for job_id in job_ids:
@@ -316,9 +314,7 @@ def get_prediction_results(job_ids: list[str], run_paths: RunPaths) -> list[Feat
         forest_loss_events.extend(get_prediction_result(job_id))
 
     # Cache and return the events.
-    vector_format.encode_to_file(
-        run_paths.raw_studio_outputs_fname.exists(), forest_loss_events
-    )
+    vector_format.encode_to_file(run_paths.raw_studio_outputs_fname, forest_loss_events)
     return forest_loss_events
 
 
