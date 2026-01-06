@@ -39,7 +39,7 @@ postprocessing_strategies:
   process_dataset:
     class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
     init_args:
-      nodata_value: 10
+      nodata_value: 10 # does this need to align with the other nodata values for training
 
   process_partition:
     class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
@@ -53,37 +53,34 @@ inference_results_config:
   data_type: RASTER
   classification_fields:
     - property_name: segment
-  #     band_index: 1
-  #     allowed_values:
-  #       - value: 0
-  #         label: coffee
-  #         color: [124, 67, 18]
-  #       - value: 1
-  #         label: grassland
-  #         color: [169, 214, 146]
-  #       - value: 2
-  #         label: trees
-  #         color: [51, 160, 44]
-  #       - value: 3
-  #         label: maize
-  #         color: [240, 159, 28]
-  #       - value: 4
-  #         label: sugarcane
-  #         color: [251, 154, 153]
-  #       - value: 5
-  #         label: tea
-  #         color: [31, 234, 146]
-  #       - value: 6
-  #         label: vegetables
-  #         color: [166, 206, 227]
-  #       - value: 7
-  #         label: legumes
-  #         color: [227, 26, 28]
-  #       - value: 8
-  #         label: water
-  #         color: [31, 120, 180]
-  #       - value: 9
-  #         label: builtup
-  #         color: [136, 33, 233]
+      band_index: 1
+      allowed_values:
+        - value: 0
+          label: orchards
+          color: [218, 112, 214]      # purple
+        - value: 1
+          label: coffee
+          color: [165, 42, 42]        # brown
+        - value: 2
+          label: inactive_cropland
+          color: [128, 128, 128]      # gray
+        - value: 3
+          label: cereals
+          color: [255, 215, 0]        # gold
+        - value: 4
+          label: not_cropland
+          color: [70, 130, 180]       # steel blue
+        - value: 5
+          label: greenhouse
+          color: [0, 255, 127]        # spring green
+        - value: 6
+          label: fodder
+          color: [255, 99, 71]        # tomato
+        - value: 7
+          label: mixed_other
+          color: [0, 191, 255]        # deep sky blue
+        - value: 8
+          label: qat
+          color: [189, 183, 107]      # dark khaki
   # detection_objects: null
   # regression_fields: null

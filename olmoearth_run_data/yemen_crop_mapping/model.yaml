@@ -400,6 +400,10 @@ data:
       groups: ["spatial_split"]
       tags:
         split: "test"
+    predict_config:
+      load_all_patches: true
+      patch_size: 16
+      skip_targets: true
 trainer:
   max_epochs: 100
   strategy:
@@ -426,9 +430,11 @@ trainer:
     - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
       init_args:
         module_selector: ["model", "encoder", 0]
-        unfreeze_at_epoch: 10
+        unfreeze_at_epoch: 20
         unfreeze_lr_factor: 10
     - class_path: rslearn.train.prediction_writer.RslearnWriter
       init_args:
         path: ${DATASET_PATH}
         output_layer: ${PREDICTION_OUTPUT_LAYER}
+        selector: ["segment"]
+# EXTRA_FILES_PATH: ${EXTRA_FILES_PATH}
