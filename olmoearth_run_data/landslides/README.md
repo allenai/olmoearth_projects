@@ -28,7 +28,8 @@ uv run python olmoearth_projects/projects/landslides/prepare_labels.py \
 
 This creates `landslide_labels.json` with:
 - Positive samples: landslide polygons with event dates
-- Negative samples: same geometry with time shifted to before the event
+- Negative samples: ring buffers around landslide polygons
+- Overlap removal: portions of negative rings that overlap with other landslides are removed
 - Geographic and label balancing
 - Bounding box metrics and task geometries
 
