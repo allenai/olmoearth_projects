@@ -341,17 +341,20 @@ def _remove_overlaps_from_negative(
     positives_on_or_before_metric: gpd.GeoDataFrame,
     positives_on_or_before_sindex: Any,
     negative_idx: Any,
+    gap_width: float,
 ) -> tuple[Any, bool]:
     """Remove overlapping portions from a negative sample geometry.
 
     Removes ALL portions of the negative sample that overlap with any positive
-    sample that occurred on or before the negative's time.
+    sample that occurred on or before the negative's time. Positives are buffered
+    by gap_width to match the negative sampling approach.
 
     Args:
         geom_metric: Negative sample geometry (ring) in metric CRS.
         positives_on_or_before_metric: Positive samples that occurred on or before, in metric CRS.
         positives_on_or_before_sindex: Spatial index for positives_on_or_before_metric.
         negative_idx: Index of the negative sample (for reference, not used for exclusion).
+        gap_width: Gap width in meters used for negative sampling (to buffer positives).
 
     Returns:
         Tuple of (processed_geometry, should_skip) where should_skip is True if
@@ -365,22 +368,24 @@ def _remove_overlaps_from_negative(
     if not candidate_idx:
         return geom_metric, False
 
-    # Get all intersecting positives and union them to remove all overlaps at once
+    # Get all intersecting positives and buffer them by gap_width to match negative sampling
     intersecting = positives_on_or_before_metric.iloc[candidate_idx]
+    # Buffer positives by gap_width since negative rings start at gap_width from positives
+    buffered_positives = intersecting.geometry.buffer(gap_width)
     geoms_to_remove = [
-        g for g in intersecting["geometry"] if g is not None and not g.is_empty
+        g for g in buffered_positives if g is not None and not g.is_empty
     ]
 
     if not geoms_to_remove:
         return geom_metric, False
 
-    # Union all overlapping positives and remove from the negative sample
+    # Union all buffered overlapping positives and remove from the negative sample
     removal_geom = unary_union(geoms_to_remove)
     if removal_geom.is_empty:
         return geom_metric, False
 
     # Remove ALL overlapping portions from the negative sample
-    # This ensures no part of the negative overlaps with any positive
+    # This ensures no part of the negative overlaps with any buffered positive
     trimmed_geom = geom_metric.difference(removal_geom)
     # Ensure the result is valid
     if trimmed_geom is None or trimmed_geom.is_empty:
@@ -396,6 +401,7 @@ def _process_negative_sample(
     geom_crs_str: str,
     negatives_crs: str,
     positives_metric: gpd.GeoDataFrame,
+    gap_width: float,
 ) -> tuple[Any, Any] | None:
     """Process a single negative sample to remove overlaps.
 
@@ -408,6 +414,7 @@ def _process_negative_sample(
         geom_crs_str: CRS string for this geometry.
         negatives_crs: Original CRS of negatives GeoDataFrame.
         positives_metric: Positive samples already in metric CRS with event_date as datetime.
+        gap_width: Gap width in meters used for negative sampling.
 
     Returns:
         Tuple of (processed_geometry_wgs84, idx) if the sample should be kept,
@@ -443,6 +450,7 @@ def _process_negative_sample(
             positives_on_or_before_metric,
             positives_on_or_before_sindex,
             idx,
+            gap_width,
         )
 
         if should_skip:
@@ -464,18 +472,21 @@ def _process_negative_sample(
 def remove_overlapping_landslides(
     negatives: gpd.GeoDataFrame,
     positives: gpd.GeoDataFrame,
+    gap_width: float = GAP_WIDTH_M,
 ) -> gpd.GeoDataFrame:
     """Remove portions of negative samples (rings) that overlap with other landslides.
 
     Negative samples are rings around landslide polygons, so they have a gap from
     their source positive and don't overlap with it. Only positives that occurred
     on or before the negative sample's time are considered for overlap removal.
+    Positives are buffered by gap_width before removal to match the negative sampling.
 
     Uses per-geometry CRS determined by get_utm_ups_crs for accurate spatial operations.
 
     Args:
         negatives: GeoDataFrame of negative sample ring polygons.
         positives: GeoDataFrame of positive (landslide) polygons.
+        gap_width: Gap width in meters used for negative sampling (to buffer positives).
 
     Returns:
         Trimmed GeoDataFrame with overlapping portions removed.
@@ -525,7 +536,7 @@ def remove_overlapping_landslides(
         # Process all negatives in this CRS group
         for idx, row in neg_group.iterrows():
             result = _process_negative_sample(
-                row, idx, geom_crs_str, negatives.crs, positives_metric
+                row, idx, geom_crs_str, negatives.crs, positives_metric, gap_width
             )
             if result is not None:
                 geom_wgs84, idx = result
@@ -887,7 +898,9 @@ def main() -> None:
     )
 
     # Remove overlaps from negatives
-    negatives = remove_overlapping_landslides(negatives, positives)
+    negatives = remove_overlapping_landslides(
+        negatives, positives, gap_width=args.gap_width
+    )
 
     # Combine positive and negative samples
     combined = pd.concat([positives, negatives], ignore_index=True)
