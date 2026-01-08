@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux'",
@@ -31,8 +31,8 @@ dependencies = [
     { name = "psutil" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/23/60/2757c4f03a8705dbf80b1268b03881927878dca5ed07d74f733fb6c219e0/accelerate-1.11.0.tar.gz", hash = "sha256:bb1caf2597b4cd632b917b5000c591d10730bb024a79746f1ee205bba80bd229", size = 393715, upload-time = "2025-10-20T14:42:25.025Z" }
@@ -71,8 +71,8 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
     { name = "safetensors" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/68/f8/0a55822e471a1143fc4e55dbe6995259141260ed9c460c7eac448e9e9acd/ai2_olmo_core-2.3.0.tar.gz", hash = "sha256:7745fea1268cf0d882d28c25fbbfbedc969e2f9bf4f187d8c042105429d0dff7", size = 345084, upload-time = "2025-10-17T16:22:04.579Z" }
@@ -995,8 +995,8 @@ name = "efficientnet-pytorch"
 version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2e/a0/dd40b50aebf0028054b6b35062948da01123d7be38d08b6b1e5435df6363/efficientnet_pytorch-0.7.1.tar.gz", hash = "sha256:00b9b261effce59d2d47aae2ad238c29a2a65175470f41ada7ecac439b7c1ee1", size = 21012, upload-time = "2021-04-15T15:17:23.111Z" }
@@ -2144,8 +2144,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "kornia-rs" },
     { name = "packaging" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d7/49/3c3aa9c68262b87551d50cdeefff027394316abfe11937a729371a39f50a/kornia-0.8.1.tar.gz", hash = "sha256:9ce5a54a11df661794934a293f89f8b8d49e83dd09b0b9419f6082ab07afe433", size = 652542, upload-time = "2025-05-08T11:13:25.485Z" }
@@ -2208,8 +2208,8 @@ dependencies = [
     { name = "pytorch-lightning" },
     { name = "requests" },
     { name = "six" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
     { name = "tqdm" },
@@ -2243,8 +2243,8 @@ dependencies = [
     { name = "packaging" },
     { name = "pytorch-lightning" },
     { name = "pyyaml" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchmetrics" },
     { name = "tqdm" },
@@ -2872,7 +2872,7 @@ name = "nvidia-cudnn-cu12"
 version = "9.7.1.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", marker = "sys_platform == 'linux'" },
+    { name = "nvidia-cublas-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/25/dc/dc825c4b1c83b538e207e34f48f86063c88deaa35d46c651c7c181364ba2/nvidia_cudnn_cu12-9.7.1.26-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:6d011159a158f3cfc47bf851aea79e31bcff60d530b70ef70474c84cac484d07", size = 726851421, upload-time = "2025-02-06T22:18:29.812Z" },
@@ -2883,7 +2883,7 @@ name = "nvidia-cufft-cu12"
 version = "11.3.3.41"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "sys_platform == 'linux'" },
+    { name = "nvidia-nvjitlink-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ac/26/b53c493c38dccb1f1a42e1a21dc12cba2a77fbe36c652f7726d9ec4aba28/nvidia_cufft_cu12-11.3.3.41-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:da650080ab79fcdf7a4b06aa1b460e99860646b176a43f6208099bdc17836b6a", size = 193118795, upload-time = "2025-01-23T17:56:30.536Z" },
@@ -2910,9 +2910,9 @@ name = "nvidia-cusolver-cu12"
 version = "11.7.2.55"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", marker = "sys_platform == 'linux'" },
-    { name = "nvidia-cusparse-cu12", marker = "sys_platform == 'linux'" },
-    { name = "nvidia-nvjitlink-cu12", marker = "sys_platform == 'linux'" },
+    { name = "nvidia-cublas-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
+    { name = "nvidia-cusparse-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
+    { name = "nvidia-nvjitlink-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c2/08/953675873a136d96bb12f93b49ba045d1107bc94d2551c52b12fa6c7dec3/nvidia_cusolver_cu12-11.7.2.55-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:4d1354102f1e922cee9db51920dba9e2559877cf6ff5ad03a00d853adafb191b", size = 260373342, upload-time = "2025-01-23T17:58:56.406Z" },
@@ -2923,7 +2923,7 @@ name = "nvidia-cusparse-cu12"
 version = "12.5.7.53"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "sys_platform == 'linux'" },
+    { name = "nvidia-nvjitlink-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c2/ab/31e8149c66213b846c082a3b41b1365b831f41191f9f40c6ddbc8a7d550e/nvidia_cusparse_cu12-12.5.7.53-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:3c1b61eb8c85257ea07e9354606b26397612627fdcd327bfd91ccf6155e7c86d", size = 292064180, upload-time = "2025-01-23T18:00:23.233Z" },
@@ -2935,15 +2935,6 @@ version = "0.6.3"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3b/9a/72ef35b399b0e183bc2e8f6f558036922d453c4d8237dab26c666a04244b/nvidia_cusparselt_cu12-0.6.3-py3-none-manylinux2014_x86_64.whl", hash = "sha256:e5c8a26c36445dd2e6812f1177978a24e2d37cacce7e090f297a688d1ec44f46", size = 156785796, upload-time = "2024-10-15T21:29:17.709Z" },
-]
-
-[[package]]
-name = "nvidia-ml-py"
-version = "13.580.82"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/dd/6c/4a533f2c0185027c465adb6063086bc3728301e95f483665bfa9ebafb2d3/nvidia_ml_py-13.580.82.tar.gz", hash = "sha256:0c028805dc53a0e2a6985ea801888197765ac2ef8f1c9e29a7bf0d3616a5efc7", size = 47999, upload-time = "2025-09-11T16:44:56.267Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/96/d6d25a4c307d6645f4a9b91d620c0151c544ad38b5e371313a87d2761004/nvidia_ml_py-13.580.82-py3-none-any.whl", hash = "sha256:4361db337b0c551e2d101936dae2e9a60f957af26818e8c0c3a1f32b8db8d0a7", size = 49008, upload-time = "2025-09-11T16:44:54.915Z" },
 ]
 
 [[package]]
@@ -2997,8 +2988,8 @@ dependencies = [
     { name = "psutil" },
     { name = "rasterio" },
     { name = "shapely" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
     { name = "universal-pathlib" },
@@ -3038,7 +3029,7 @@ requires-dist = [
     { name = "interrogate", marker = "extra == 'dev'", specifier = ">=1.7.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.17.1,<2" },
     { name = "olmoearth-pretrain", git = "https://github.com/allenai/olmoearth_pretrain.git?branch=main" },
-    { name = "olmoearth-runner", specifier = ">=0.1.6" },
+    { name = "olmoearth-runner", specifier = ">=0.1.10" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.3.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.2" },
@@ -3047,7 +3038,7 @@ requires-dist = [
     { name = "pytest-xdist", marker = "extra == 'dev'" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "pyyaml", specifier = ">=6" },
-    { name = "rslearn", extras = ["extra"], specifier = ">=0.0.12" },
+    { name = "rslearn", extras = ["extra"], specifier = ">=0.0.16" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.7" },
     { name = "wandb", specifier = ">=0.21" },
 ]
@@ -3055,47 +3046,26 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "olmoearth-runner"
-version = "0.1.6"
+version = "0.1.10"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec", extra = ["gcs", "s3"] },
     { name = "geojson-pydantic" },
     { name = "google-cloud-storage" },
-    { name = "nvidia-ml-py" },
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-distro" },
-    { name = "opentelemetry-exporter-otlp" },
-    { name = "opentelemetry-exporter-otlp-proto-common" },
-    { name = "opentelemetry-exporter-otlp-proto-grpc" },
-    { name = "opentelemetry-exporter-otlp-proto-http" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-instrumentation-aiohttp-client" },
-    { name = "opentelemetry-instrumentation-asyncio" },
-    { name = "opentelemetry-instrumentation-botocore" },
-    { name = "opentelemetry-instrumentation-click" },
-    { name = "opentelemetry-instrumentation-grpc" },
-    { name = "opentelemetry-instrumentation-httpx" },
-    { name = "opentelemetry-instrumentation-logging" },
-    { name = "opentelemetry-instrumentation-requests" },
-    { name = "opentelemetry-instrumentation-system-metrics" },
-    { name = "opentelemetry-instrumentation-threading" },
-    { name = "opentelemetry-instrumentation-urllib" },
-    { name = "opentelemetry-instrumentation-urllib3" },
-    { name = "opentelemetry-proto" },
-    { name = "opentelemetry-sdk" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "opentelemetry-util-http" },
+    { name = "olmoearth-pretrain" },
+    { name = "prometheus-client" },
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "rasterio" },
     { name = "rslearn", extra = ["extra"] },
     { name = "shapely" },
     { name = "tenacity" },
+    { name = "typing-extensions" },
     { name = "universal-pathlib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/59/44/922addfc465ad820eabeeac72cf9295a82ff7276678a80696017234c7a3b/olmoearth_runner-0.1.6.tar.gz", hash = "sha256:aec71781d1ff5bc7c1b690dbbf2d3cd1477908003b008eca45c74b29853ec86a", size = 79900, upload-time = "2025-11-04T18:06:16.833Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9e/91/cd193673afe9220017465eaacaf55085f4700c653bd09c7dd50b29bdb3d5/olmoearth_runner-0.1.10.tar.gz", hash = "sha256:0be5b518a2ef5e0ef8b0d8863f87602d97a37262d79d44d6146f568a838b6657", size = 90618, upload-time = "2025-12-09T18:59:54.598Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c4/7d/beef16bd52d4916edacc754eb4046a3014f6fba6cca9d7a96dda8f9ae766/olmoearth_runner-0.1.6-py3-none-any.whl", hash = "sha256:cfe6a0ae97f50b4ad92ad3fe5428a16b1d75ddf21c6796e373270a3973ad391a", size = 114872, upload-time = "2025-11-04T18:06:15.59Z" },
+    { url = "https://files.pythonhosted.org/packages/de/a5/eeb73821acd8fd6ec235dc3593f4f0c8656322112f4dd678bd7eb57622a7/olmoearth_runner-0.1.10-py3-none-any.whl", hash = "sha256:8abadb0e987b29dd40fb4d1a42b1f8192e23cc77bec6c710ca2c0fcb93ffff4d", size = 136180, upload-time = "2025-12-09T18:59:53.124Z" },
 ]
 
 [[package]]
@@ -3154,287 +3124,6 @@ wheels = [
 ]
 
 [[package]]
-name = "opentelemetry-distro"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-sdk" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ef/73/909d18e3d609c9f72fdfc441dbf2f33d26d29126088de5b3df30f4867f8a/opentelemetry_distro-0.59b0.tar.gz", hash = "sha256:a72703a514e1773d35d1ec01489a5fd1f1e7ce92e93cf459ba60f85b880d0099", size = 2583, upload-time = "2025-10-16T08:39:28.111Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e3/a5/71d78732d30616b0b57cce416fa49e7f25ce57492eaf66d0b6864c1df35f/opentelemetry_distro-0.59b0-py3-none-any.whl", hash = "sha256:bbe568d84d801d7e1ead320c4521fc37a4c24b3b2cd49a64f6d8a3c10676cea4", size = 3346, upload-time = "2025-10-16T08:38:27.63Z" },
-]
-
-[[package]]
-name = "opentelemetry-exporter-otlp"
-version = "1.38.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-exporter-otlp-proto-grpc" },
-    { name = "opentelemetry-exporter-otlp-proto-http" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c2/2d/16e3487ddde2dee702bd746dd41950a8789b846d22a1c7e64824aac5ebea/opentelemetry_exporter_otlp-1.38.0.tar.gz", hash = "sha256:2f55acdd475e4136117eff20fbf1b9488b1b0b665ab64407516e1ac06f9c3f9d", size = 6147, upload-time = "2025-10-16T08:35:52.53Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fd/8a/81cd252b16b7d95ec1147982b6af81c7932d23918b4c3b15372531242ddd/opentelemetry_exporter_otlp-1.38.0-py3-none-any.whl", hash = "sha256:bc6562cef229fac8887ed7109fc5abc52315f39d9c03fd487bb8b4ef8fbbc231", size = 7018, upload-time = "2025-10-16T08:35:32.995Z" },
-]
-
-[[package]]
-name = "opentelemetry-exporter-otlp-proto-common"
-version = "1.38.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-proto" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/19/83/dd4660f2956ff88ed071e9e0e36e830df14b8c5dc06722dbde1841accbe8/opentelemetry_exporter_otlp_proto_common-1.38.0.tar.gz", hash = "sha256:e333278afab4695aa8114eeb7bf4e44e65c6607d54968271a249c180b2cb605c", size = 20431, upload-time = "2025-10-16T08:35:53.285Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/9e/55a41c9601191e8cd8eb626b54ee6827b9c9d4a46d736f32abc80d8039fc/opentelemetry_exporter_otlp_proto_common-1.38.0-py3-none-any.whl", hash = "sha256:03cb76ab213300fe4f4c62b7d8f17d97fcfd21b89f0b5ce38ea156327ddda74a", size = 18359, upload-time = "2025-10-16T08:35:34.099Z" },
-]
-
-[[package]]
-name = "opentelemetry-exporter-otlp-proto-grpc"
-version = "1.38.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "googleapis-common-protos" },
-    { name = "grpcio" },
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-exporter-otlp-proto-common" },
-    { name = "opentelemetry-proto" },
-    { name = "opentelemetry-sdk" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a2/c0/43222f5b97dc10812bc4f0abc5dc7cd0a2525a91b5151d26c9e2e958f52e/opentelemetry_exporter_otlp_proto_grpc-1.38.0.tar.gz", hash = "sha256:2473935e9eac71f401de6101d37d6f3f0f1831db92b953c7dcc912536158ebd6", size = 24676, upload-time = "2025-10-16T08:35:53.83Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/28/f0/bd831afbdba74ca2ce3982142a2fad707f8c487e8a3b6fef01f1d5945d1b/opentelemetry_exporter_otlp_proto_grpc-1.38.0-py3-none-any.whl", hash = "sha256:7c49fd9b4bd0dbe9ba13d91f764c2d20b0025649a6e4ac35792fb8d84d764bc7", size = 19695, upload-time = "2025-10-16T08:35:35.053Z" },
-]
-
-[[package]]
-name = "opentelemetry-exporter-otlp-proto-http"
-version = "1.38.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "googleapis-common-protos" },
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-exporter-otlp-proto-common" },
-    { name = "opentelemetry-proto" },
-    { name = "opentelemetry-sdk" },
-    { name = "requests" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/81/0a/debcdfb029fbd1ccd1563f7c287b89a6f7bef3b2902ade56797bfd020854/opentelemetry_exporter_otlp_proto_http-1.38.0.tar.gz", hash = "sha256:f16bd44baf15cbe07633c5112ffc68229d0edbeac7b37610be0b2def4e21e90b", size = 17282, upload-time = "2025-10-16T08:35:54.422Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e5/77/154004c99fb9f291f74aa0822a2f5bbf565a72d8126b3a1b63ed8e5f83c7/opentelemetry_exporter_otlp_proto_http-1.38.0-py3-none-any.whl", hash = "sha256:84b937305edfc563f08ec69b9cb2298be8188371217e867c1854d77198d0825b", size = 19579, upload-time = "2025-10-16T08:35:36.269Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "packaging" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/04/ed/9c65cd209407fd807fa05be03ee30f159bdac8d59e7ea16a8fe5a1601222/opentelemetry_instrumentation-0.59b0.tar.gz", hash = "sha256:6010f0faaacdaf7c4dff8aac84e226d23437b331dcda7e70367f6d73a7db1adc", size = 31544, upload-time = "2025-10-16T08:39:31.959Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/10/f5/7a40ff3f62bfe715dad2f633d7f1174ba1a7dd74254c15b2558b3401262a/opentelemetry_instrumentation-0.59b0-py3-none-any.whl", hash = "sha256:44082cc8fe56b0186e87ee8f7c17c327c4c2ce93bdbe86496e600985d74368ee", size = 33020, upload-time = "2025-10-16T08:38:31.463Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-aiohttp-client"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "opentelemetry-util-http" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/cb/e135fad3edfd8492bbf3e50ce6fa288f730b8ef8700d93e4c2e49cc1bf6c/opentelemetry_instrumentation_aiohttp_client-0.59b0.tar.gz", hash = "sha256:665ee520f2fb5f44d6d600918eb7bbd2c29b355e0d0deda49991db857adee51f", size = 15037, upload-time = "2025-10-16T08:39:33.093Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/db/99376c8f0d3141e92b9902ae1e5b51dc4f458fc23d03e3815722d64afbcb/opentelemetry_instrumentation_aiohttp_client-0.59b0-py3-none-any.whl", hash = "sha256:8e7f234d2b6b385d5b1757ba7f13baa71c45ec020e1a08ba7f7649da7958470a", size = 12378, upload-time = "2025-10-16T08:38:33.56Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-asyncio"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/d0/daa088094cf4d45fbe2ea40a777148a16a6bda4990d1a68e1f2ba3c35407/opentelemetry_instrumentation_asyncio-0.59b0.tar.gz", hash = "sha256:47a6c55a96096bf7e8b2a32e8e77c78f89727f8a68df9edde7a881b0dc7d2e8b", size = 14054, upload-time = "2025-10-16T08:39:37.133Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/2d/288479b22fcc373fefe017268ff45287df8d7fe4ea150398c53c06e20924/opentelemetry_instrumentation_asyncio-0.59b0-py3-none-any.whl", hash = "sha256:e518f51a6d22208c0e7efa66af0b2b0f779e46f1b9bbe1ece55c80f5e906b313", size = 14747, upload-time = "2025-10-16T08:38:38.849Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-botocore"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-propagator-aws-xray" },
-    { name = "opentelemetry-semantic-conventions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/09/2c/adc4ce388e90f8ba10b8795ab7f4ddf69fa3f5e54f6c76ca3941d9a9d30c/opentelemetry_instrumentation_botocore-0.59b0.tar.gz", hash = "sha256:445667ae82fedff1db42f3785de31df6f1f861928ecdb8044834ab0deb603e93", size = 120349, upload-time = "2025-10-16T08:39:40.236Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/cc/de76a7e071e75bd1a914986b3a48a7156f6ad1b0a52bf468fbb341943b25/opentelemetry_instrumentation_botocore-0.59b0-py3-none-any.whl", hash = "sha256:bdc8e6f20fe3c36b1f3bfcd4570e6ef20bd95ed2786c3635058f3daec5931ef5", size = 38128, upload-time = "2025-10-16T08:38:43.722Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-click"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/01/2b/c9f3ddcda308247341c8ad0bd8c98057717cdbf79ee102780d121fb7caf5/opentelemetry_instrumentation_click-0.59b0.tar.gz", hash = "sha256:8f5a18fd83528625bd33efa8e3c9d4c3bb69f20612ca98bcc8f19f6b35c0b90f", size = 4212, upload-time = "2025-10-16T08:39:41.96Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/a6/6173fdc3ce2dd60d0ddfee8260f979959c43d259266f74536d9f01f3721e/opentelemetry_instrumentation_click-0.59b0-py3-none-any.whl", hash = "sha256:587038e65c76bde32bade05779ca841ea743286ad074eae80f2d3afc28703ed2", size = 5019, upload-time = "2025-10-16T08:38:46.583Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-grpc"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/59/a6/6bffdb2e0ebb08d88c888bb84c33d0fd80369cb5ae737361f70deb4f2328/opentelemetry_instrumentation_grpc-0.59b0.tar.gz", hash = "sha256:71b537eb40dc72128463c637865d8463a989ccdea9d7450a7a10ba2202a20bb2", size = 31410, upload-time = "2025-10-16T08:39:47.873Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8e/a0/b07e7fb2ce489045bbaf9b38d2fc680777a2e052bb16cc312fdf3c1b3c97/opentelemetry_instrumentation_grpc-0.59b0-py3-none-any.whl", hash = "sha256:c10293b787189d4aaa5b974fd699d766ca90cc68f61e6d784564705cb2c5f1fc", size = 27199, upload-time = "2025-10-16T08:38:54.621Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-httpx"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "opentelemetry-util-http" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/18/6b/1bdf36b68cace9b4eae3cbbade4150c71c90aa392b127dda5bb5c2a49307/opentelemetry_instrumentation_httpx-0.59b0.tar.gz", hash = "sha256:a1cb9b89d9f05a82701cc9ab9cfa3db54fd76932489449778b350bc1b9f0e872", size = 19886, upload-time = "2025-10-16T08:39:48.428Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/16/c1e0745d20af392ec9060693531d7f01239deb2d81e460d0c379719691b8/opentelemetry_instrumentation_httpx-0.59b0-py3-none-any.whl", hash = "sha256:7dc9f66aef4ca3904d877f459a70c78eafd06131dc64d713b9b1b5a7d0a48f05", size = 15197, upload-time = "2025-10-16T08:38:55.507Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-logging"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/be/88/9c5f70fa8b8d96d30be378fc6eb1776e13aea456db15009f4eaef4928847/opentelemetry_instrumentation_logging-0.59b0.tar.gz", hash = "sha256:1b51116444edc74f699daf9002ded61529397100c9bc903c8b9aaa75a5218c76", size = 9969, upload-time = "2025-10-16T08:39:51.653Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/a0/340cc45d71437c2f7e27f13c1d2e335b18bbc7a24fd7d174018500b3c7ba/opentelemetry_instrumentation_logging-0.59b0-py3-none-any.whl", hash = "sha256:fdd4eddbd093fc421df8f7d356ecb15b320a1f3396b56bce5543048a5c457eea", size = 12577, upload-time = "2025-10-16T08:38:58.064Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-requests"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "opentelemetry-util-http" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/49/01/31282a46b09684dfc636bc066deb090bae6973e71e85e253a8c74e727b1f/opentelemetry_instrumentation_requests-0.59b0.tar.gz", hash = "sha256:9af2ffe3317f03074d7f865919139e89170b6763a0251b68c25e8e64e04b3400", size = 15186, upload-time = "2025-10-16T08:40:00.558Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e5/ea/c282ba418b2669e4f730cb3f68b02a0ca65f4baf801e971169a4cc449ffb/opentelemetry_instrumentation_requests-0.59b0-py3-none-any.whl", hash = "sha256:d43121532877e31a46c48649279cec2504ee1e0ceb3c87b80fe5ccd7eafc14c1", size = 12966, upload-time = "2025-10-16T08:39:09.919Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-system-metrics"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "psutil" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/72/b1/4982b7e2ab9bcf7e246ecb93907ea7c41add116a3012f6173884541025d6/opentelemetry_instrumentation_system_metrics-0.59b0.tar.gz", hash = "sha256:48150444e054e64699248b4fa3c8d771921f289b29caf4bbf9163a07c943aecc", size = 15870, upload-time = "2025-10-16T08:40:02.71Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fc/e3/ecd3ae176609ac20ba77b84b0b53bf0d465625ad81f041b01cd21f34ae88/opentelemetry_instrumentation_system_metrics-0.59b0-py3-none-any.whl", hash = "sha256:176d3722113383732fdb4a2c83a999218c2b8c1f2a25e242532fab6d2ad5123a", size = 13516, upload-time = "2025-10-16T08:39:13.176Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-threading"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/82/7a/84e97d8992808197006e607ae410c2219bdbbc23d1289ba0c244d3220741/opentelemetry_instrumentation_threading-0.59b0.tar.gz", hash = "sha256:ce5658730b697dcbc0e0d6d13643a69fd8aeb1b32fa8db3bade8ce114c7975f3", size = 8770, upload-time = "2025-10-16T08:40:03.587Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/50/32d29076aaa1c91983cdd3ca8c6bb4d344830cd7d87a7c0fdc2d98c58509/opentelemetry_instrumentation_threading-0.59b0-py3-none-any.whl", hash = "sha256:76da2fc01fe1dccebff6581080cff9e42ac7b27cc61eb563f3c4435c727e8eca", size = 9313, upload-time = "2025-10-16T08:39:15.876Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-urllib"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "opentelemetry-util-http" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/61/85/70cc79162aa778179520b82234e3a8668f0aea67a279bd81a2522868687d/opentelemetry_instrumentation_urllib-0.59b0.tar.gz", hash = "sha256:1e2bb3427ce13854453777d8dccf3b0144640b03846f00fc302bdb6e1f2f8c7a", size = 13931, upload-time = "2025-10-16T08:40:05.272Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/94/0e87ffe1edfdda27e401d8ebab71ee3dd9ceaac11f98b8f5c190820a317f/opentelemetry_instrumentation_urllib-0.59b0-py3-none-any.whl", hash = "sha256:ed2bd1a02e4334c13c13033681ff8cf10d5dfcd5b0e6d7514f94a00e7f7bd671", size = 12672, upload-time = "2025-10-16T08:39:19.079Z" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-urllib3"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-    { name = "opentelemetry-util-http" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/94/53/ff93665911808933b1af6fbbb1be2eb83c0c46e3b5f24b0b04c094b5b719/opentelemetry_instrumentation_urllib3-0.59b0.tar.gz", hash = "sha256:2de8d53a746bba043be1bc8f3246e1b131ebb6e94fe73601edd8b2bd91fe35b8", size = 15788, upload-time = "2025-10-16T08:40:05.889Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/3d/673cbea7aafb93a4613abf3d9c920d7c65a8cad79c910719dc286169bac8/opentelemetry_instrumentation_urllib3-0.59b0-py3-none-any.whl", hash = "sha256:a68c363092cf5db8c67c5778dbb2e4a14554e77baf7d276c374ea75ec926e148", size = 13187, upload-time = "2025-10-16T08:39:20.727Z" },
-]
-
-[[package]]
-name = "opentelemetry-propagator-aws-xray"
-version = "1.0.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/31/40004e9e55b1e5694ef3a7526f0b7637df44196fc68a8b7d248a3684680f/opentelemetry_propagator_aws_xray-1.0.2.tar.gz", hash = "sha256:6b2cee5479d2ef0172307b66ed2ed151f598a0fd29b3c01133ac87ca06326260", size = 10994, upload-time = "2024-08-05T17:45:57.601Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/89/849a0847871fd9745315896ad9e23d6479db84d90b8b36c4c26dc46e92b8/opentelemetry_propagator_aws_xray-1.0.2-py3-none-any.whl", hash = "sha256:1c99181ee228e99bddb638a0c911a297fa21f1c3a0af951f841e79919b5f1934", size = 10856, upload-time = "2024-08-05T17:45:56.492Z" },
-]
-
-[[package]]
 name = "opentelemetry-proto"
 version = "1.38.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3471,15 +3160,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/40/bc/8b9ad3802cd8ac6583a4eb7de7e5d7db004e89cb7efe7008f9c8a537ee75/opentelemetry_semantic_conventions-0.59b0.tar.gz", hash = "sha256:7a6db3f30d70202d5bf9fa4b69bc866ca6a30437287de6c510fb594878aed6b0", size = 129861, upload-time = "2025-10-16T08:36:03.346Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/24/7d/c88d7b15ba8fe5c6b8f93be50fc11795e9fc05386c44afaf6b76fe191f9b/opentelemetry_semantic_conventions-0.59b0-py3-none-any.whl", hash = "sha256:35d3b8833ef97d614136e253c1da9342b4c3c083bbaf29ce31d572a1c3825eed", size = 207954, upload-time = "2025-10-16T08:35:48.054Z" },
-]
-
-[[package]]
-name = "opentelemetry-util-http"
-version = "0.59b0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/34/f7/13cd081e7851c42520ab0e96efb17ffbd901111a50b8252ec1e240664020/opentelemetry_util_http-0.59b0.tar.gz", hash = "sha256:ae66ee91be31938d832f3b4bc4eb8a911f6eddd38969c4a871b1230db2a0a560", size = 9412, upload-time = "2025-10-16T08:40:11.335Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/56/62282d1d4482061360449dacc990c89cad0fc810a2ed937b636300f55023/opentelemetry_util_http-0.59b0-py3-none-any.whl", hash = "sha256:6d036a07563bce87bf521839c0671b507a02a0d39d7ea61b88efa14c6e25355d", size = 7648, upload-time = "2025-10-16T08:39:25.706Z" },
 ]
 
 [[package]]
@@ -3794,13 +3474,22 @@ version = "0.7.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "munch" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
     { name = "tqdm" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/84/0e/be6a0e58447ac16c938799d49bfb5fb7a80ac35e137547fc6cee2c08c4cf/pretrainedmodels-0.7.4.tar.gz", hash = "sha256:7e77ead4619a3e11ab3c41982c8ad5b86edffe37c87fd2a37ec3c2cc6470b98a", size = 58821, upload-time = "2018-10-29T08:18:45.373Z" }
+
+[[package]]
+name = "prometheus-client"
+version = "0.23.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/53/3edb5d68ecf6b38fcbcc1ad28391117d2a322d9a1a3eff04bfdb184d8c3b/prometheus_client-0.23.1.tar.gz", hash = "sha256:6ae8f9081eaaaf153a2e959d2e6c4f4fb57b12ef76c8c7980202f1e57b48b2ce", size = 80481, upload-time = "2025-09-18T20:47:25.043Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/db/14bafcb4af2139e046d03fd00dea7873e48eafe18b7d2797e73d6681f210/prometheus_client-0.23.1-py3-none-any.whl", hash = "sha256:dd1913e6e76b59cfe44e7a4b83e01afc9873c1bdfd2ed8739f1e76aeca115f99", size = 61145, upload-time = "2025-09-18T20:47:23.875Z" },
+]
 
 [[package]]
 name = "prompt-toolkit"
@@ -4480,8 +4169,8 @@ dependencies = [
     { name = "lightning-utilities" },
     { name = "packaging" },
     { name = "pyyaml" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchmetrics" },
     { name = "tqdm" },
@@ -4890,7 +4579,7 @@ wheels = [
 
 [[package]]
 name = "rslearn"
-version = "0.0.12"
+version = "0.0.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "boto3" },
@@ -4904,16 +4593,16 @@ dependencies = [
     { name = "pytimeparse" },
     { name = "rasterio" },
     { name = "shapely" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
     { name = "tqdm" },
     { name = "universal-pathlib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/13/13/3442233a254a7293c9b8c43e3836163f80676ded5a77c230e5cb4aaabc45/rslearn-0.0.12.tar.gz", hash = "sha256:075dfb9223a650a793022263ae69741de8a7ef694d424ac14f1ba8d9b07bda14", size = 310638, upload-time = "2025-10-29T22:58:48.813Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/6c/4ad3b5035abf2531045b8b077198d8737ecc0b28511e7c95c227b3a8bc99/rslearn-0.0.17.tar.gz", hash = "sha256:d748be0245dc44da9ca9d3e39f8a0a4b4b43e3e3e454a0900c6bfd7fa33aecc1", size = 316543, upload-time = "2025-12-01T20:18:10.913Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6f/d6/b8a6bd3682b4d55cc83cfd83d577c3b28edfab90801c38733a6882fc4f3c/rslearn-0.0.12-py3-none-any.whl", hash = "sha256:640860217c13bd406376440a4c72b3f0719f174a12c0322da84c65b3053f5328", size = 384851, upload-time = "2025-10-29T22:58:47.106Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/e7/1aefd8d6cf369fd3c7ae13a205ead6070d9768f501f6eafe775a7ace6785/rslearn-0.0.17-py3-none-any.whl", hash = "sha256:09c0fc1007c6fd8511ac4f37e052656b3bde85929213016b0e6a65a537ee252d", size = 391512, upload-time = "2025-12-01T20:18:09.632Z" },
 ]
 
 [package.optional-dependencies]
@@ -5040,8 +4729,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "matplotlib" },
     { name = "requests" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
 ]
@@ -5206,8 +4895,8 @@ dependencies = [
     { name = "pretrainedmodels" },
     { name = "six" },
     { name = "timm" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
     { name = "tqdm" },
@@ -5474,8 +5163,8 @@ dependencies = [
     { name = "termcolor" },
     { name = "tifffile" },
     { name = "timm" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchgeo" },
     { name = "torchmetrics" },
@@ -5516,8 +5205,8 @@ dependencies = [
     { name = "huggingface-hub" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchvision" },
 ]
@@ -5565,19 +5254,18 @@ name = "torch"
 version = "2.7.1"
 source = { registry = "https://download.pytorch.org/whl/cpu" }
 resolution-markers = [
-    "python_full_version >= '3.14' and sys_platform == 'darwin'",
     "python_full_version == '3.13.*' and sys_platform == 'darwin'",
     "python_full_version == '3.12.*' and sys_platform == 'darwin'",
     "python_full_version < '3.12' and sys_platform == 'darwin'",
 ]
 dependencies = [
-    { name = "filelock", marker = "sys_platform == 'darwin'" },
-    { name = "fsspec", marker = "sys_platform == 'darwin'" },
-    { name = "jinja2", marker = "sys_platform == 'darwin'" },
-    { name = "networkx", marker = "sys_platform == 'darwin'" },
-    { name = "setuptools", marker = "python_full_version >= '3.12' and sys_platform == 'darwin'" },
-    { name = "sympy", marker = "sys_platform == 'darwin'" },
-    { name = "typing-extensions", marker = "sys_platform == 'darwin'" },
+    { name = "filelock", marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "fsspec", marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "jinja2", marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "networkx", marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "setuptools", marker = "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "sympy", marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
 ]
 wheels = [
     { url = "https://download.pytorch.org/whl/cpu/torch-2.7.1-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:68a352c7f435abb5cb47e2c032dcd1012772ae2bacb6fc8b83b0c1b11874ab3a" },
@@ -5594,16 +5282,17 @@ resolution-markers = [
     "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'linux'",
     "python_full_version == '3.13.*' and sys_platform != 'darwin' and sys_platform != 'linux'",
     "python_full_version == '3.12.*' and sys_platform != 'darwin' and sys_platform != 'linux'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin'",
     "python_full_version < '3.12' and sys_platform != 'darwin' and sys_platform != 'linux'",
 ]
 dependencies = [
-    { name = "filelock", marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
-    { name = "fsspec", marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
-    { name = "jinja2", marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
-    { name = "networkx", marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
-    { name = "setuptools", marker = "python_full_version >= '3.12' and sys_platform != 'darwin' and sys_platform != 'linux'" },
-    { name = "sympy", marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
-    { name = "typing-extensions", marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "filelock", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "fsspec", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "jinja2", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "networkx", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (python_full_version >= '3.12' and sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "sympy", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+    { name = "typing-extensions", marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
 ]
 wheels = [
     { url = "https://download.pytorch.org/whl/cpu/torch-2.7.1%2Bcpu-cp311-cp311-win_amd64.whl", hash = "sha256:7b977eccbc85ae2bd19d6998de7b1f1f4bd3c04eaffd3015deb7934389783399" },
@@ -5682,8 +5371,8 @@ dependencies = [
     { name = "segmentation-models-pytorch" },
     { name = "shapely" },
     { name = "timm" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
     { name = "torchmetrics" },
     { name = "torchvision" },
@@ -5702,8 +5391,8 @@ dependencies = [
     { name = "lightning-utilities" },
     { name = "numpy" },
     { name = "packaging" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/85/2e/48a887a59ecc4a10ce9e8b35b3e3c5cef29d902c4eac143378526e7485cb/torchmetrics-1.8.2.tar.gz", hash = "sha256:cf64a901036bf107f17a524009eea7781c9c5315d130713aeca5747a686fe7a5", size = 580679, upload-time = "2025-09-03T14:00:54.077Z" }
@@ -5718,8 +5407,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "pillow" },
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin' and sys_platform != 'linux'" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.14' and sys_platform == 'darwin'" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.14' and sys_platform == 'darwin') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux'" },
 ]
 wheels = [

@@ -3,40 +3,16 @@
 import argparse
 import importlib
 import sys
-from datetime import datetime
 
 import dotenv
 import jsonargparse
 import jsonargparse.typing
+from rslearn.utils.jsonargparse import init_jsonargparse
 
 from olmoearth_projects.utils.logging import get_logger
 from olmoearth_projects.utils.mp import init_mp
 
 logger = get_logger(__name__)
-
-
-def datetime_serializer(v: datetime) -> str:
-    """Serialize datetime for jsonargparse.
-
-    Args:
-        v: the datetime object.
-
-    Returns:
-        the datetime encoded to string
-    """
-    return v.isoformat()
-
-
-def datetime_deserializer(v: str) -> datetime:
-    """Deserialize datetime for jsonargparse.
-
-    Args:
-        v: the encoded datetime.
-
-    Returns:
-        the decoded datetime object
-    """
-    return datetime.fromisoformat(v)
 
 
 def run_workflow(project: str, workflow: str, args: list[str]) -> None:
@@ -66,10 +42,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     init_mp()
-
-    # Setup jsonargparse.
-    jsonargparse.typing.register_type(
-        datetime, datetime_serializer, datetime_deserializer
-    )
-
+    init_jsonargparse()
     main()
