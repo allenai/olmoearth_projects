@@ -16,7 +16,7 @@ from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 from upath import UPath
 
-CLASS_MAP = {
+LULC_CLASS_MAP = {
     1: "Water",
     2: "Bare Ground",
     3: "Rangeland",
@@ -178,7 +178,7 @@ def train_random_forest(
         y = np.concatenate([data.y_train, data.y_val], axis=0)
     else:
         x, y = data.x_train, data.y_train
-    model = RandomForestClassifier().fit(x, y)
+    model = RandomForestClassifier(random_state=42).fit(x, y)
     preds = model.predict(data.x_test)
 
     # compute the metrics
@@ -186,7 +186,9 @@ def train_random_forest(
         "accuracy_score": accuracy_score(data.y_test, preds),
     }
     for class_idx in np.unique(data.y_test):
-        class_name = CLASS_MAP[class_idx] if not crop_type else CROP_TYPE_MAP[class_idx]
+        class_name = (
+            LULC_CLASS_MAP[class_idx] if not crop_type else CROP_TYPE_MAP[class_idx]
+        )
         tp = sum((preds == class_idx) & (data.y_test == class_idx))
         fp = sum((preds == class_idx) & (data.y_test != class_idx))
         fn = sum((preds != class_idx) & (data.y_test == class_idx))
