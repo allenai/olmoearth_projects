@@ -29,9 +29,8 @@ model:
               init_args:
                 indexes: [0]
                 collapse: true
-            - class_path: olmoearth_projects.projects.yemen_crop.segmentation.SegmentationHead
+            - class_path: rslearn.train.tasks.segmentation.SegmentationHead
               init_args:
-                use_class_weights: false
                 num_classes: 9
     lr: 0.001
     plateau: true
