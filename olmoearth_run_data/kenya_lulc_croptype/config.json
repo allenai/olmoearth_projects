@@ -3,11 +3,22 @@
     "label": {
       "type": "vector"
     },
-    "label_raster": {
+    "lulc_label_raster": {
       "band_sets": [
         {
           "bands": [
-            "label"
+            "lulc_label"
+          ],
+          "dtype": "int32"
+        }
+      ],
+      "type": "raster"
+    },
+    "maize_label_raster": {
+      "band_sets": [
+        {
+          "bands": [
+            "maize_label"
           ],
           "dtype": "int32"
         }
