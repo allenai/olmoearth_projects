@@ -26,9 +26,6 @@
       "type": "raster"
     },
     "output": {
-      "format": {
-        "name": "geojson"
-      },
       "type": "vector"
     },
     "sentinel2": {
