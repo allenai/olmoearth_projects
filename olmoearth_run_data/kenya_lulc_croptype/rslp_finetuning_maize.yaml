@@ -57,8 +57,8 @@ data:
         load_all_layers: true
       label:
         data_type: "raster"
-        layers: ["lulc_label_raster"]
-        bands: ["lulc_label"]
+        layers: ["maize_label_raster"]
+        bands: ["maize_label"]
         is_target: true
         dtype: INT32
     task:
@@ -73,7 +73,7 @@ data:
               metric_kwargs:
                 average: "micro"
               other_metrics:
-                not_crop_precision:
+                not_maize_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -82,7 +82,7 @@ data:
                         num_classes: 3
                         average: null
                     class_idx: 1
-                not_crop_recall:
+                not_maize_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -91,7 +91,7 @@ data:
                         num_classes: 3
                         average: null
                     class_idx: 1
-                crop_precision:
+                maize_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -100,7 +100,7 @@ data:
                         num_classes: 3
                         average: null
                     class_idx: 2
-                crop_recall:
+                maize_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
