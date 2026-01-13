@@ -71,6 +71,29 @@ Collect data from GeoGLAM and Harvest. Checking the label quality yields:
 │     spatial_extent │ trees_mixed                    │    0.09445086446004335 │
 └────────────────────┴────────────────────────────────┴────────────────────────┘
 ```
-Todo:
-- aggregate into cropland and croptype labels
-- materialize, etc.
+
+If we aggregate this into crop vs. non crop and maize vs. non maize labels, we get:
+```
+┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
+┃         Check name ┃ Metric   ┃              Value ┃
+┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━┩
+│        # instances │          │               5349 │
+│    label_imbalance │ not maize│ 0.8481959244718639 │
+│    label_imbalance │ maize    │ 0.1518040755281361 │
+│ spatial_clustering │ not_m_f1 │ 0.9122429202110478 │
+│ spatial_clustering │ maize_f1 │ 0.4223954642097803 │
+│     spatial_extent │ not_maize│                1.0 │
+│     spatial_extent │ maize    │ 0.1506813572429614 │
+└────────────────────┴──────────┴────────────────────┘
+┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┓
+┃         Check name ┃ Metric   ┃               Value ┃
+┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━┩
+│        # instances │          │                5349 │
+│    label_imbalance │ non crop │  0.3654888764255001 │
+│    label_imbalance │ crop     │  0.6345111235744999 │
+│ spatial_clustering │ nocrop_f1│  0.9664464993394981 │
+│ spatial_clustering │ crop_f1  │  0.9816288152755678 │
+│     spatial_extent │ non crop │                 1.0 │
+│     spatial_extent │ crop     │ 0.15344835124758235 │
+└────────────────────┴──────────┴─────────────────────┘
+```
