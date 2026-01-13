@@ -1,0 +1,75 @@
+{
+  "layers": {
+    "label": {
+      "type": "vector"
+    },
+    "label_raster": {
+      "band_sets": [
+        {
+          "bands": [
+            "label"
+          ],
+          "dtype": "int32"
+        }
+      ],
+      "type": "raster"
+    },
+    "output": {
+      "format": {
+        "name": "geojson"
+      },
+      "type": "vector"
+    },
+    "sentinel2": {
+      "band_sets": [
+        {
+          "bands": [
+            "B02",
+            "B03",
+            "B04",
+            "B08"
+          ],
+          "dtype": "uint16"
+        },
+        {
+          "bands": [
+            "B05",
+            "B06",
+            "B07",
+            "B8A",
+            "B11",
+            "B12"
+          ],
+          "dtype": "uint16",
+          "zoom_offset": -1
+        },
+        {
+          "bands": [
+            "B01",
+            "B09"
+          ],
+          "dtype": "uint16",
+          "zoom_offset": -2
+        }
+      ],
+      "data_source": {
+        "cache_dir": "cache/planetary_computer",
+        "harmonize": true,
+        "ingest": false,
+        "name": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "query_config": {
+          "max_matches": 5,
+          "min_matches": 5,
+          "period_duration": "30d",
+          "space_mode": "PER_PERIOD_MOSAIC"
+        },
+        "sort_by": "eo:cloud_cover"
+      },
+      "type": "raster"
+    }
+  },
+  "tile_store": {
+    "name": "file",
+    "root_dir": "tiles"
+  }
+}
