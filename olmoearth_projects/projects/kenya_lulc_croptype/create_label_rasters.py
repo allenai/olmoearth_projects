@@ -27,8 +27,8 @@ from rslearn.utils.raster_format import GeotiffRasterFormat
 from rslearn.utils.vector_format import GeojsonVectorFormat
 from upath import UPath
 
-CROPTYPE_CLASS_NAMES = ["invalid", "not_maize", "maize"]
-LULC_CLASS_NAMES = ["invalid", "not_crop", "crop"]
+CROPTYPE_CLASS_NAMES = ["invalid", "non_maize", "maize"]
+LULC_CLASS_NAMES = ["invalid", "non_crop", "crop"]
 PROPERTY_NAME = "category"
 
 
