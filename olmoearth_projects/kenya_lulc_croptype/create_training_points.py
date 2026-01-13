@@ -18,6 +18,8 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     ]
     print(f"After filtering {parquet_filepath}: {len(df)} instances.")
     df.valid_time = pd.to_datetime(df.valid_time)
+    # so far, the 2 parquet files were both collected during short rains so
+    # we can just take the year
     df["year"] = df.valid_time.dt.year
 
     return df[["sampling_ewoc_code", "valid_time", "year", "geometry"]]
@@ -36,7 +38,6 @@ def collate_parquet_folders(parquet_folder: Path) -> gpd.GeoDataFrame:
     ]:
         f_df = rdm_parquet_to_geojson(parquet_folder / filename)
         f_df["filename"] = filename
-        f_df["unique_field_id"] = "n/a"
         dfs.append(f_df)
     df = pd.concat(dfs)
     return df
