@@ -59,7 +59,7 @@ def create_label_raster(window: Window) -> None:
     window.mark_layer_completed("lulc_label_raster")
 
     # crop type
-    label_dir = window.get_layer_dir("croptype_label")
+    label_dir = window.get_layer_dir("maize_label")
     features = GeojsonVectorFormat().decode_vector(
         label_dir, window.projection, window.bounds
     )
@@ -72,11 +72,11 @@ def create_label_raster(window: Window) -> None:
         dtype=np.uint8,
     )
     raster[:, raster.shape[1] // 2, raster.shape[2] // 2] = class_id
-    raster_dir = window.get_raster_dir("croptype_label_raster", ["croptype_label"])
+    raster_dir = window.get_raster_dir("maize_label_raster", ["maize_label"])
     GeotiffRasterFormat().encode_raster(
         raster_dir, window.projection, window.bounds, raster
     )
-    window.mark_layer_completed("croptype_label_raster")
+    window.mark_layer_completed("maize_label_raster")
 
 
 if __name__ == "__main__":
