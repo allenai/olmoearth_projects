@@ -230,12 +230,13 @@ def wait_for_studio_job(job_id: str, max_consecutive_errors: int = 3) -> None:
         try:
             job_status = check_job_status()
             consecutive_errors = 0
-        except Exception:
+        except Exception as e:
             consecutive_errors += 1
             if consecutive_errors > max_consecutive_errors:
                 raise
-            logger.warning("Got error while polling job status, trying again: {e}")
+            logger.warning(f"Got error while polling job status, trying again: {e}")
             time.sleep(POLL_SLEEP_TIME)
+            continue
 
         logger.debug(f"Polled job status, status is {job_status}")
         if job_status in ["pending", "predicting"]:
@@ -277,8 +278,11 @@ def get_prediction_result(job_id: str) -> list[Feature]:
         tmp_fname = UPath(tmp_dir) / "data.geojson"
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+            # The download is zip archive which for our jobs should contain a single
+            # GeoJSON file. ".geojson" may appear in the middle of the name though, in
+            # case filename is like result.geojson?Expires=...&Signature=...
             fnames = z.namelist()
-            if len(fnames) != 1 or not fnames[0].endswith(".geojson"):
+            if len(fnames) != 1 or ".geojson" not in fnames[0]:
                 raise ValueError(
                     f"expected prediction result zip file to contain one GeoJSON file but got {fnames}"
                 )
