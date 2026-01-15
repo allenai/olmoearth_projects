@@ -9,6 +9,10 @@ For our first go, we will:
 1. Collect labels online, mostly (entirely?) leaning on WorldCereals' Reference Data Module.
 
 
+### 2026-01-14
+
+Maize validation performance looks pretty bad (maize recall > 0.4, precision > 0.6). Is this because we introduced imbalances when splitting the data between train / val / test? It seems like no.
+
 ### 2026-01-12
 
 Collect data from GeoGLAM and Harvest. Checking the label quality yields:
