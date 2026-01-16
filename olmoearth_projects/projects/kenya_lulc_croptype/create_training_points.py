@@ -6,6 +6,30 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
+# These cover all the unique sampling_ewoc_code values in the parquet files. If the parquet files are updated
+# this may need to be updated too.
+NON_TEMPORARY_CROPS = [
+    "non_cropland_incl_perennial",
+    "other_permanent_crops",
+    "fruits",
+    "permanent_crops",
+    "herbaceous_vegetation",
+    "shrubland",
+    "built_up",
+    "trees_mixed",
+]
+TEMPORARY_CROPS = [
+    "vegetables_fruits",
+    "maize",
+    "dry_pulses_legumes",
+    "wheat",
+    "grass_fodder_crops",
+    "potatoes",
+    "other_oilseeds",
+    "herb_spice_medicinal_crops",
+    "root_tuber_crops",
+]
+
 
 def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     """Sample negatives from WorldCereal RDM files."""
@@ -40,6 +64,12 @@ def collate_parquet_folders(parquet_folder: Path) -> gpd.GeoDataFrame:
         f_df["filename"] = filename
         dfs.append(f_df)
     df = pd.concat(dfs)
+
+    # check that our list is complete
+    for val in df.sampling_ewoc_code.unique():
+        assert val in NON_TEMPORARY_CROPS + TEMPORARY_CROPS
+
+    df["is_crop"] = df.apply(lambda x: x.sampling_ewoc_code in TEMPORARY_CROPS, axis=1)
     return df
 
 

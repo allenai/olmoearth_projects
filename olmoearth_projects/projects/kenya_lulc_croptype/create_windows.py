@@ -93,7 +93,7 @@ def load_geojson(geojson_path: UPath) -> gpd.GeoDataFrame:
 
 def iter_points(
     gdf: gpd.GeoDataFrame,
-) -> Iterable[tuple[float, float, str, str, int]]:
+) -> Iterable[tuple[float, float, str, str, int, int]]:
     """Yield (fid, latitude, longitude, category) per feature using centroid for polygons."""
     for fid, row in gdf.iterrows():
         geom = row.geometry
@@ -109,20 +109,21 @@ def iter_points(
         crop_type = row.sampling_ewoc_code
         source_filename = row.filename
         year = row.year
+        is_crop = row.is_crop
 
-        yield lat, lon, crop_type, source_filename, year
+        yield lat, lon, crop_type, source_filename, year, is_crop
 
 
 def create_window(
-    rec: tuple[float, float, str, str, int],
+    rec: tuple[float, float, str, str, int, int],
     ds_path: UPath,
     window_size: int,
 ) -> None:
     """Create a single window and write label layer."""
-    latitude, longitude, crop_type, source_filename, year = rec
+    latitude, longitude, crop_type, source_filename, year, is_crop = rec
 
     maize_or_not = 1 if crop_type == "maize" else 0
-    cropland_or_not = 1 if crop_type != "non_cropland_incl_perennial" else 0
+    cropland_or_not = 1 if is_crop else 0
     # Geometry/projection
     src_point = shapely.Point(longitude, latitude)
     src_geometry = STGeometry(WGS84_PROJECTION, src_point, None)
