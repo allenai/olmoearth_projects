@@ -429,7 +429,7 @@ trainer:
         save_last: true
         monitor: val_segment/macro_f1
         mode: max
-        dirpath: ${TRAINER_DATA_PATH}
+        dirpath: ${TRAINER_DATA_PATH}/${WANDB_NAME}
     - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
       init_args:
         module_selector: ["model", "encoder", 0]
