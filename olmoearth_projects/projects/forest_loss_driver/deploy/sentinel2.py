@@ -2,7 +2,9 @@
 
 import functools
 import multiprocessing
+from collections.abc import Callable
 from datetime import datetime, timedelta
+from multiprocessing.pool import IMapIterator
 from typing import Any
 
 import tqdm
@@ -12,7 +14,6 @@ from rslearn.data_sources.planetary_computer import Sentinel2
 from rslearn.dataset.manage import retry
 from rslearn.utils.feature import Feature
 from rslearn.utils.geometry import STGeometry
-from rslearn.utils.mp import star_imap_unordered
 
 # Duration and offset modifications to make to the forest loss event timestamp when
 # looking for assets for visualization.
@@ -25,6 +26,48 @@ POST_OFFSET = timedelta(days=7)
 def _get_data_source() -> Sentinel2:
     """Get cached data source for identifying assets."""
     return Sentinel2(sort_by="eo:cloud_cover")
+
+
+class StarImapWrapper:
+    """Wrapper for a function to implement star_imap.
+
+    A kwargs dict is passed to this wrapper, which then calls the underlying function
+    with the unwrapped kwargs.
+    """
+
+    def __init__(self, fn: Callable[..., Any]):
+        """Create a new StarImap.
+
+        Args:
+            fn: the underlying function to call.
+        """
+        self.fn = fn
+
+    def __call__(self, kwargs: dict[str, Any]) -> Any:
+        """Wrapped call to the underlying function.
+
+        Args:
+            kwargs: dict of keyword arguments to pass to the function.
+        """
+        return self.fn(**kwargs)
+
+
+def star_imap(
+    p: multiprocessing.pool.Pool,
+    fn: Callable[..., Any],
+    kwargs_list: list[dict[str, Any]],
+) -> IMapIterator:
+    """Wrapper for Pool.imap that exposes kwargs to the function.
+
+    Args:
+        p: the multiprocessing.pool.Pool to use.
+        fn: the function to call, which accepts keyword arguments.
+        kwargs_list: list of kwargs dicts to pass to the function.
+
+    Returns:
+        generator for outputs from the function in arbitrary order.
+    """
+    return p.imap(StarImapWrapper(fn), kwargs_list)
 
 
 def _get_assets_for_feat(
@@ -102,7 +145,7 @@ def get_sentinel2_assets(
         for feat in features
     ]
     outputs = tqdm.tqdm(
-        star_imap_unordered(p, _get_assets_for_feat, get_assets_for_feat_args),
+        star_imap(p, _get_assets_for_feat, get_assets_for_feat_args),
         desc="Identify pre/post Sentinel-2 assets",
         total=len(features),
     )
