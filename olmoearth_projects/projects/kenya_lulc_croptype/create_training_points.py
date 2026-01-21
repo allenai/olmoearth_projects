@@ -17,6 +17,12 @@ NON_TEMPORARY_CROPS = [
     "shrubland",
     "built_up",
     "trees_mixed",
+    "mixed_cropland",
+    "grasslands",
+    "trees_unspecified",
+    "wetlands",
+    "open_water",
+    "nuts",  # permanent crop
 ]
 TEMPORARY_CROPS = [
     "vegetables_fruits",
@@ -28,6 +34,15 @@ TEMPORARY_CROPS = [
     "other_oilseeds",
     "herb_spice_medicinal_crops",
     "root_tuber_crops",
+    "not_cultivated_fallow",  # temporary crops according to the legend
+    "mixed_arable_crops",
+    "sunflower",
+    "barley",
+    "millet",
+    "oats",
+    "sorghum",
+    "soy_soybeans",
+    "flower_crops",
 ]
 
 
@@ -37,7 +52,11 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     df = gpd.read_parquet(parquet_filepath)
     print(f"Original file length for {parquet_filepath}: {len(df)} instances.")
     df = df[
+        # this eliminates 704 (2021) + 2 (2023) points but it could be annual
+        # or perennial so its not useful for maize mapping or
+        # temporary crop mapping
         (df.sampling_ewoc_code != "cropland_unspecified")
+        # this only eliminates 29 points
         & (df.sampling_ewoc_code != "cereals")
     ]
     print(f"After filtering {parquet_filepath}: {len(df)} instances.")
@@ -54,11 +73,13 @@ def collate_parquet_folders(parquet_folder: Path) -> gpd.GeoDataFrame:
 
     1. https://rdm.esa-worldcereal.org/collections/2019_ken_nhicropharvest_point_100
     2. https://rdm.esa-worldcereal.org/collections/2021_ken_copernicusgeoglamsr_point_111
+    3. GeoGlam 2023, short rains
     """
     dfs = []
     for filename in [
         "2019_ken_nhicropharvest_point_100_dataset.parquet",
         "2021_ken_copernicusgeoglamsr_point_111_dataset.parquet",
+        "2022_KEN_COPERNICUS-GEOGLAM-SR_POINT_111.geoparquet",
     ]:
         f_df = rdm_parquet_to_geojson(parquet_folder / filename)
         f_df["filename"] = filename
