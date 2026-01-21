@@ -14,12 +14,6 @@
       ],
       "type": "raster"
     },
-    "output": {
-      "format": {
-        "name": "geojson"
-      },
-      "type": "vector"
-    },
     "sentinel2": {
       "band_sets": [
         {
