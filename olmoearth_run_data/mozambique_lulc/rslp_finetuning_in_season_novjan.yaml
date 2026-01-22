@@ -5,15 +5,10 @@ model:
       class_path: rslearn.models.multitask.MultiTaskModel
       init_args:
         encoder:
-        - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
-          init_args:
-            checkpoint_path: /weka/dfive-default/helios/checkpoints/joer/phase2.0_base_lr0.0001_wd0.02/step667200
-            selector:
-            - encoder
-            patch_size: 4
-            random_initialization: false
-            embedding_size: null
-            autocast_dtype: bfloat16
+          - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+              model_id: OLMOEARTH_V1_BASE
+              patch_size: 4
         decoders:
           segment:
           - class_path: rslearn.models.upsample.Upsample
