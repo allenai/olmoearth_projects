@@ -34,7 +34,6 @@ model:
             init_args:
               indexes:
               - 0
-              collapse: true
           - class_path: rslearn.train.tasks.segmentation.SegmentationHead
         lazy_decode: false
         loss_weights: null
