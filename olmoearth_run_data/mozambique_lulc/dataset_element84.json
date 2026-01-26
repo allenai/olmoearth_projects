@@ -43,10 +43,10 @@
         }
       ],
       "data_source": {
-        "class_path": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "class_path": "rslearn.data_sources.aws_sentinel2_element84.Sentinel2",
         "ingest": false,
         "init_args": {
-          "cache_dir": "cache/planetary_computer",
+          "cache_dir": "cache/aws_sentinel2_element84",
           "harmonize": true,
           "sort_by": "eo:cloud_cover"
         },
