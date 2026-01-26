@@ -1,6 +1,7 @@
 """Gather labels from the WorldCereal RDM."""
 
 import argparse
+from datetime import datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -69,7 +70,7 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
 
 
 def collate_parquet_folders(parquet_folder: Path) -> gpd.GeoDataFrame:
-    """We use the following files for negative sampling.
+    """We use the following files to obtain labels.
 
     1. https://rdm.esa-worldcereal.org/collections/2019_ken_nhicropharvest_point_100
     2. https://rdm.esa-worldcereal.org/collections/2021_ken_copernicusgeoglamsr_point_111
@@ -94,6 +95,34 @@ def collate_parquet_folders(parquet_folder: Path) -> gpd.GeoDataFrame:
     return df
 
 
+def load_gabi_negatives(geojson_path: Path) -> gpd.GeoDataFrame:
+    """These are corrective labels created by Gabriel Tseng.
+
+    We assume there is only a geometry column.
+
+    1. 20260126_gabi_negatives.geojson (created on January 26 2026). Since this was
+       collected in early 2026, I will assign the valid year as 2025 so that it covers
+       the 2025 short rains.
+    """
+    dfs = []
+    for filename, valid_date in [
+        ("20260126_gabi_negatives.geojson", datetime(2025, 12, 15))
+    ]:
+        df = gpd.read_file(geojson_path / filename)
+        df["sampling_ewoc_code"] = "non_cropland_incl_perennial"
+        df["is_crop"] = False
+        df["year"] = valid_date.year
+        df["valid_time"] = pd.to_datetime(valid_date)
+        df["filename"] = filename
+        dfs.append(df)
+        print(f"Added {len(df)} negative samples from {filename}")
+
+    df = pd.concat(dfs)
+    return df[
+        ["sampling_ewoc_code", "valid_time", "year", "geometry", "is_crop", "filename"]
+    ]
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -104,5 +133,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     label_dir = Path(args.label_dir)
-    samples = collate_parquet_folders(parquet_folder=label_dir / "rdm_parquet")
-    samples.to_file(label_dir / "labels.geojson", driver="GeoJSON")
+    mixed_samples = collate_parquet_folders(parquet_folder=label_dir / "rdm_parquet")
+    negative_samples = load_gabi_negatives(geojson_path=label_dir / "gabi_negatives")
+    combined_samples = pd.concat([mixed_samples, negative_samples])
+    combined_samples.to_file(label_dir / "labels.geojson", driver="GeoJSON")
