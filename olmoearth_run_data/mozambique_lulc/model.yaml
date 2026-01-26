@@ -7,8 +7,8 @@ model:
         encoder:
           - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
             init_args:
-              checkpoint_path: ${EXTRA_FILES_PATH}
-              selector: ["encoder"]
+              model_path: ${EXTRA_FILES_PATH}
+              embedding_size: 768
               patch_size: 4
         decoders:
           segment:
