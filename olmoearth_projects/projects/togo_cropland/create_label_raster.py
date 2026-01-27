@@ -38,7 +38,7 @@ def create_label_raster(window: Window) -> None:
     one for cropland mapping, and one for maize mapping.
     """
     # LULC
-    label_dir = window.get_layer_dir("lulc_label")
+    label_dir = window.get_layer_dir("cropland_label")
     features = GeojsonVectorFormat().decode_vector(
         label_dir, window.projection, window.bounds
     )
@@ -51,11 +51,11 @@ def create_label_raster(window: Window) -> None:
         dtype=np.uint8,
     )
     raster[:, raster.shape[1] // 2, raster.shape[2] // 2] = class_id
-    raster_dir = window.get_raster_dir("lulc_label_raster", ["lulc_label"])
+    raster_dir = window.get_raster_dir("cropland_label_raster", ["cropland_label"])
     GeotiffRasterFormat().encode_raster(
         raster_dir, window.projection, window.bounds, raster
     )
-    window.mark_layer_completed("lulc_label_raster")
+    window.mark_layer_completed("cropland_label_raster")
 
 
 if __name__ == "__main__":
