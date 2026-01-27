@@ -56,8 +56,8 @@ data:
         load_all_layers: true
       label:
         data_type: "raster"
-        layers: ["croptype_label_raster"]
-        bands: ["croptype_label"]
+        layers: ["cropland_label_raster"]
+        bands: ["cropland_label"]
         is_target: true
         dtype: INT32
     task:
