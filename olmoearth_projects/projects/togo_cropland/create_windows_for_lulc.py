@@ -73,6 +73,7 @@ def load_shapefiles(geojson_path: UPath) -> gpd.GeoDataFrame:
     shapefiles = ["crop_merged_v2", "noncrop_merged_v2", "togo_test_majority"]
     gdfs = []
     for filename in shapefiles:
+        print(f"Loading {filename}")
         filepath = geojson_path / filename
         gdf = gpd.read_file(filepath)
 
@@ -93,7 +94,7 @@ def load_shapefiles(geojson_path: UPath) -> gpd.GeoDataFrame:
             gdf["is_test"] = False
         gdf["filename"] = filepath.name
         gdfs.append(gdf)
-
+        print(f"Loaded {len(gdf)} labels from {filename}")
     return pd.concat(gdfs)
 
 
@@ -179,7 +180,7 @@ def create_window(
     window.mark_layer_completed(LULC_LABEL_LAYER)
 
 
-def create_windows_from_geojson(
+def create_windows_from_shapefile(
     geojson_path: UPath,
     ds_path: UPath,
     window_size: int,
@@ -244,7 +245,8 @@ if __name__ == "__main__":
     shapefile_dir = Path(args.shapefile_dir)
     ds_path = UPath(args.ds_path)
     # Run per file
-    create_windows_from_geojson(
+    print("Starting. ")
+    create_windows_from_shapefile(
         geojson_path=UPath(shapefile_dir),
         ds_path=ds_path,
         window_size=args.window_size,
