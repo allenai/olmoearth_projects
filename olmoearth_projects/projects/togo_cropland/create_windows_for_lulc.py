@@ -83,15 +83,17 @@ def load_shapefiles(geojson_path: UPath) -> gpd.GeoDataFrame:
                 "Was this file created using `create_training_points.py`?"
             )
 
-        if "noncrop" in filepath.name:
-            gdf["is_crop"] = False
-        else:
-            gdf["is_crop"] = True
-
         if "test" in filepath.name:
             gdf["is_test"] = True
+            gdf["is_crop"] = gdf["label"].astype(int).astype(bool)
         else:
             gdf["is_test"] = False
+
+            if "noncrop" in filepath.name:
+                gdf["is_crop"] = False
+            else:
+                gdf["is_crop"] = True
+
         gdf["filename"] = filepath.name
         gdfs.append(gdf)
         print(f"Loaded {len(gdf)} labels from {filename}")
