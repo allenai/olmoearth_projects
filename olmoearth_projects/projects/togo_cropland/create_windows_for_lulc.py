@@ -32,7 +32,7 @@ YEAR = 2019
 # day, month. This covers Togo's major growing season
 # and contains 8 30-day periods.
 START_MONTH, START_DAY = 2, 1  # February 1
-END_MONTH, END_DAY = 9, 30  # dec 30
+END_MONTH, END_DAY = 9, 30  # September 30
 
 
 def calculate_bounds(
