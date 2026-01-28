@@ -1,0 +1,138 @@
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.singletask.SingleTaskModel
+      init_args:
+        encoder:
+          - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+              model_id: OLMOEARTH_V1_BASE
+              patch_size: 4
+        decoder:
+          - class_path: rslearn.models.unet.UNetDecoder
+            init_args:
+              in_channels: [[4, 768]]
+              out_channels: 2
+              num_channels: {2: 256, 1: 128}
+          - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+    scheduler:
+      class_path: rslearn.train.scheduler.PlateauScheduler
+      init_args:
+        factor: 0.2
+        patience: 2
+        min_lr: 0
+        cooldown: 10
+    optimizer:
+      class_path: rslearn.train.optimizer.AdamW
+      init_args:
+        lr: 0.0001
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    path: ${DATASET_PATH}
+    inputs:
+      sentinel2_l2a:
+        data_type: "raster"
+        layers: ["sentinel2"]
+        bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+        passthrough: true
+        dtype: FLOAT32
+        load_all_layers: true
+        load_all_item_groups: true
+      targets:
+        data_type: "raster"
+        layers: ["label"]
+        bands: ["label"]
+        is_target: true
+        dtype: INT32
+    task:
+      class_path: rslearn.train.tasks.segmentation.SegmentationTask
+      init_args:
+        num_classes: 2
+        # Remap boundary class (2) to be crop (1).
+        # Since we just want non-crop / crop.
+        class_id_mapping: {2: 1}
+        # 3 is used to indicate unknown pixels.
+        # There shouldn't really be any since we exclude the countries with presence-only labels.
+        nodata_value: 3
+        metric_kwargs:
+          average: "micro"
+        # For visualization from uint16 bands to RGB image.
+        image_bands: [2, 1, 0]
+        remap_values: [[0, 2500], [0, 255]]
+    batch_size: 8
+    num_workers: ${NUM_WORKERS}
+    default_config:
+      patch_size: 64
+      transforms:
+        # Copy sentinel2_l2a -> image so we can do visualization (which expects "image" key).
+        - class_path: rslearn.train.transforms.concatenate.Concatenate
+          init_args:
+            selections:
+              sentinel2_l2a: []
+            output_selector: image
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+    train_config:
+      transforms:
+        # Copy sentinel2_l2a -> image so we can do visualization (which expects "image" key).
+        - class_path: rslearn.train.transforms.concatenate.Concatenate
+          init_args:
+            selections:
+              sentinel2_l2a: []
+            output_selector: image
+        - class_path: rslearn.train.transforms.flip.Flip
+          init_args:
+            image_selectors: ["sentinel2_l2a", "target/classes", "target/valid"]
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+      groups: ["austria", "belgium", "cambodia", "corsica", "croatia", "denmark", "estonia", "finland", "france", "germany", "latvia", "lithuania", "luxembourg", "netherlands", "portugal", "slovakia", "slovenia", "south_africa", "spain", "sweden", "vietnam"]
+      tags:
+        split: "train"
+    val_config:
+      groups: ["austria", "belgium", "cambodia", "corsica", "croatia", "denmark", "estonia", "finland", "france", "germany", "latvia", "lithuania", "luxembourg", "netherlands", "portugal", "slovakia", "slovenia", "south_africa", "spain", "sweden", "vietnam"]
+      tags:
+        split: "val"
+    test_config:
+      groups: ["austria", "belgium", "cambodia", "corsica", "croatia", "denmark", "estonia", "finland", "france", "germany", "latvia", "lithuania", "luxembourg", "netherlands", "portugal", "slovakia", "slovenia", "south_africa", "spain", "sweden", "vietnam"]
+      tags:
+        split: "test"
+    predict_config:
+      load_all_patches: true
+      overlap_ratio: 0.125  # 8 / 64
+      skip_targets: true
+trainer:
+  max_epochs: 100
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "epoch"
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: ${TRAINER_DATA_PATH}
+        save_top_k: 1
+        save_last: true
+        monitor: val_accuracy
+        mode: max
+    - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+      init_args:
+        module_selector: ["model", "encoder", 0]
+        unfreeze_at_epoch: 20
+        unfreeze_lr_factor: 10
+    - class_path: rslearn.train.prediction_writer.RslearnWriter
+      init_args:
+        path: placeholder
+        output_layer: ${PREDICTION_OUTPUT_LAYER}
+        merger:
+          class_path: rslearn.train.prediction_writer.RasterMerger
+          init_args:
+            padding: 4
+# unused: ${EXTRA_FILES_PATH}
+# unused: ${WANDB_PROJECT}
+# unused: ${WANDB_NAME}
+# unused: ${WANDB_ENTITY}
