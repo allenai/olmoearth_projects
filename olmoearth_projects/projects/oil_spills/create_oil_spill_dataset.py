@@ -13,7 +13,7 @@ Example usage:
 
 ```bash
 uv run python create_oil_spill_dataset.py \
-    --out /Users/alexb/github/olmoearth_projects/olmoearth_run_data/oil_spills/labels.geoson \
+    --out /Users/alexb/github/olmoearth_projects/olmoearth_run_data/oil_spills/labels.geojson \
     --limit 7000 \
     --make-ring-negatives
 """

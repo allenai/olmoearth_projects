@@ -68,11 +68,13 @@ data:
     num_workers: ${NUM_WORKERS}
     default_config:
       transforms:
-        - class_path: rslearn.transforms.normalize.Normalize
+        - class_path: rslearn.train.transforms.sentinel1.Sentinel1ToDecibels
           init_args:
-            band_sets:
-              sentinel1: [0, 1]  # Normalize both VV and VH bands
-            method: "standardize"
+            selectors: ["sentinel1"]
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel1: ["vv", "vh"]
       patch_size: 128
     train_config:
       groups: ["spatial_split_10km"]
