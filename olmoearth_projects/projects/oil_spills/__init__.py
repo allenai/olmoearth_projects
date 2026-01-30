@@ -1,0 +1,1 @@
+"""Oil Spills Detection project."""
