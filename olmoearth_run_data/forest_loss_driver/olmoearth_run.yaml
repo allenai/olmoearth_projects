@@ -37,7 +37,9 @@ inference_results_config:
 
 partition_strategies:
   partition_request_geometry:
-    class_path: olmoearth_run.runner.tools.partitioners.noop_partitioner.NoopPartitioner
+    class_path: olmoearth_run.runner.tools.partitioners.chunk_partitioner.ChunkPartitioner
+    init_args:
+      num_geometries_per_partition: 5000
 
   prepare_window_geometries:
     class_path: olmoearth_run.runner.tools.partitioners.fixed_window_partitioner.FixedWindowPartitioner
