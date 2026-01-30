@@ -1,0 +1,190 @@
+model:
+  class_path: rslearn.train.lightning_module.RslearnLightningModule
+  init_args:
+    model:
+      class_path: rslearn.models.multitask.MultiTaskModel
+      init_args:
+        encoder:
+          - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+              model_path: ${EXTRA_FILES_PATH}
+              embedding_size: 768
+              patch_size: 4
+        decoders:
+          segment:
+            - class_path: rslearn.models.upsample.Upsample
+              init_args:
+                scale_factor: 4
+            - class_path: rslearn.models.conv.Conv
+              init_args:
+                in_channels: 768
+                out_channels: 3
+                kernel_size: 1
+                activation:
+                  class_path: torch.nn.Identity
+            - class_path: rslearn.models.pick_features.PickFeatures
+              init_args:
+                indexes: [0]
+            - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+    lr: 0.0001
+    plateau: true
+    plateau_factor: 0.2
+    plateau_patience: 2
+    plateau_min_lr: 0
+    plateau_cooldown: 10
+data:
+  class_path: rslearn.train.data_module.RslearnDataModule
+  init_args:
+    path: ${DATASET_PATH}
+    inputs:
+      sentinel2_l2a:
+        data_type: "raster"
+        layers: ["sentinel2"]
+        bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+        passthrough: true
+        dtype: FLOAT32
+        load_all_item_groups: true
+        load_all_layers: true
+      label:
+        data_type: "raster"
+        layers: ["cropland_label_raster"]
+        bands: ["cropland_label"]
+        is_target: true
+        dtype: INT32
+    task:
+      class_path: rslearn.train.tasks.multi_task.MultiTask
+      init_args:
+        tasks:
+          segment:
+            class_path: rslearn.train.tasks.segmentation.SegmentationTask
+            init_args:
+              num_classes: 8
+              zero_is_invalid: true
+              metric_kwargs:
+                average: "micro"
+              other_metrics:
+                not_crop_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 3
+                        average: null
+                    class_idx: 1
+                not_crop_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 3
+                        average: null
+                    class_idx: 1
+                crop_precision:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassPrecision
+                      init_args:
+                        num_classes: 3
+                        average: null
+                    class_idx: 2
+                crop_recall:
+                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
+                  init_args:
+                    metric:
+                      class_path: torchmetrics.classification.MulticlassRecall
+                      init_args:
+                        num_classes: 3
+                        average: null
+                    class_idx: 2
+        input_mapping:
+          segment:
+            label: "targets"
+    batch_size: 64
+    num_workers: ${NUM_WORKERS}
+    default_config:
+      transforms:
+        - class_path: rslearn.train.transforms.pad.Pad
+          init_args:
+            size: 4
+            mode: "center"
+            image_selectors: ["sentinel2_l2a", "target/crop_type_classification/classes", "target/crop_type_classification/valid"]
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+    train_config:
+      transforms:
+        - class_path: rslearn.train.transforms.pad.Pad
+          init_args:
+            size: 31
+            mode: "center"
+            image_selectors: ["sentinel2_l2a", "target/segment/classes", "target/segment/valid"]
+        - class_path: rslearn.train.transforms.crop.Crop
+          init_args:
+            crop_size: 16
+            image_selectors: ["sentinel2_l2a", "target/segment/classes", "target/segment/valid"]
+        - class_path: rslearn.train.transforms.flip.Flip
+          init_args:
+            image_selectors: ["sentinel2_l2a", "target/segment/classes", "target/segment/valid"]
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+      groups: ["kenya_cropland_maize"]
+      tags:
+        split: "train"
+    val_config:
+      patch_size: 16
+      groups: ["kenya_cropland_maize"]
+      tags:
+        split: "test"
+    test_config:
+      patch_size: 16
+      groups: ["kenya_cropland_maize"]
+      tags:
+        split: "test"
+    predict_config:
+      load_all_patches: true
+      patch_size: 16
+      overlap_ratio: 0.25  # 4 / 16
+      skip_targets: true
+      transforms:
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+trainer:
+  max_epochs: 100
+  default_root_dir: ${TRAINER_DATA_PATH}
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: ${WANDB_PROJECT}
+      name: ${WANDB_NAME}
+      entity: ${WANDB_ENTITY}
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "epoch"
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        save_top_k: 1
+        save_last: true
+        monitor: val_loss
+        mode: min
+    - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
+      init_args:
+        module_selector: ["model", "encoder", 0]
+        unfreeze_at_epoch: 2
+    - class_path: rslearn.train.prediction_writer.RslearnWriter
+      init_args:
+        path: placeholder
+        output_layer: ${PREDICTION_OUTPUT_LAYER}
+        selector: ["segment"]
+        merger:
+          class_path: rslearn.train.prediction_writer.RasterMerger
+          init_args:
+            padding: 2
