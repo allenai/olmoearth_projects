@@ -62,43 +62,8 @@ data:
               zero_is_invalid: true
               metric_kwargs:
                 average: "micro"
-              other_metrics:
-                not_crop_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 1
-                not_crop_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 1
-                crop_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 2
-                crop_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 2
+              enable_f1_metric: true
+              report_metric_per_class: true
         input_mapping:
           segment:
             label: "targets"
