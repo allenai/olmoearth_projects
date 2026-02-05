@@ -60,45 +60,10 @@ data:
             init_args:
               num_classes: 8
               zero_is_invalid: true
+              enable_f1_metric: true
+              report_metric_per_class: true
               metric_kwargs:
                 average: "micro"
-              other_metrics:
-                not_crop_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 1
-                not_crop_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 1
-                crop_precision:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassPrecision
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 2
-                crop_recall:
-                  class_path: rslearn.train.tasks.segmentation.SegmentationMetric
-                  init_args:
-                    metric:
-                      class_path: torchmetrics.classification.MulticlassRecall
-                      init_args:
-                        num_classes: 3
-                        average: null
-                    class_idx: 2
         input_mapping:
           segment:
             label: "targets"
@@ -108,7 +73,7 @@ data:
       transforms:
         - class_path: rslearn.train.transforms.pad.Pad
           init_args:
-            size: 4
+            size: 31
             mode: "center"
             image_selectors: ["sentinel2_l2a", "target/crop_type_classification/classes", "target/crop_type_classification/valid"]
         - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
