@@ -1,0 +1,31 @@
+integrated_config:
+  weka_base_dir: "/weka/dfive-default/rslearn-eai/datasets/forest_loss_driver/prediction"
+  gcs_base_dir: "gs://ai2-rslearn-projects-data/forest_loss_driver/tiles"
+  extract_alerts_args:
+    gcs_tiff_filenames:
+      - "040W_10S_030W_00N.tif"
+      - "040W_20S_030W_10S.tif"
+      - "050W_00N_040W_10N.tif"
+      - "050W_10S_040W_00N.tif"
+      - "050W_20S_040W_10S.tif"
+      - "060W_00N_050W_10N.tif"
+      - "060W_10S_050W_00N.tif"
+      - "060W_20S_050W_10S.tif"
+      - "070W_00N_060W_10N.tif"
+      - "070W_10S_060W_00N.tif"
+      - "070W_20S_060W_10S.tif"
+      - "080W_00N_070W_10N.tif"
+      - "080W_10S_070W_00N.tif"
+      - "080W_20S_070W_10S.tif"
+    out_fname: "placeholder"
+    country_data_path: "/weka/dfive-default/rslearn-eai/artifacts/natural_earth_countries/20240830/ne_10m_admin_0_countries.shp"
+    countries: ["PE", "BR", "CO"]
+    days: 120
+    # Alternatives for small-scale run.
+    #gcs_tiff_filenames:
+    #- "080W_10S_070W_00N.tif"
+    #countries: ["PE"]
+    #days: 60
+  asset_workers: 128
+  make_tiles_workers: 128
+  write_individual_events_workers: 128

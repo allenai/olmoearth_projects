@@ -1,0 +1,74 @@
+name: Forest-Loss-Driver-Prediction
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * 6'  # Run at 8:00 AM UTC every Saturday
+
+env:
+  OE_PROJECT: "projects.forest_loss_driver.deploy"
+  OE_WORKFLOW: "integrated_pipeline"
+  # Name to use when creating Beaker image.
+  BEAKER_IMAGE_NAME: "forest_loss_driver"
+  # After creation, it is prefixed by username, so when we delete we need to use this
+  # full name.
+  BEAKER_IMAGE_FULL_NAME: "favyen/forest_loss_driver"
+  BEAKER_TOKEN: ${{ secrets.BEAKER_TOKEN }}
+  BEAKER_ADDR: ${{ secrets.BEAKER_ADDR }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_start_beaker_job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Avoid issues with running out of disk space.
+      - name: Cleanup disk space
+        run: |
+          sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+          sudo docker image prune --all --force >/dev/null 2>&1 || true
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+
+      # Setup Beaker CLI.
+      - name: Setup Beaker
+        uses: allenai/setup-beaker@v2
+        with:
+          token: ${{ env.BEAKER_TOKEN }}
+          workspace: "ai2/earth-systems"
+
+      # Build Docker image.
+      - name: Build Docker image
+        id: build-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: olmoearth_run_data/forest_loss_driver/deploy.Dockerfile
+          push: false
+          load: true
+          tags: ${{ env.BEAKER_IMAGE_NAME }}
+
+      # We upload the image from previous step to Beaker.
+      - name: Create Beaker Image
+        run: |
+          beaker image delete "$BEAKER_IMAGE_FULL_NAME" || true
+          beaker image create --name "$BEAKER_IMAGE_NAME" "$BEAKER_IMAGE_NAME"
+
+      # Now we can launch the Beaker job.
+      - name: Run integrated pipeline in Beaker job
+        run: |
+          docker run --rm \
+            -e BEAKER_TOKEN="${BEAKER_TOKEN}" \
+            -e BEAKER_ADDR="${BEAKER_ADDR}" \
+            "$BEAKER_IMAGE_NAME" \
+            python -m olmoearth_projects.projects.forest_loss_driver.deploy.start_beaker_job

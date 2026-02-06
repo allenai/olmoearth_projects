@@ -1,6 +1,7 @@
 """Create prediction GeoJSON for forest loss driver classification from GLAD alerts."""
 
 import math
+import multiprocessing
 import random
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -20,6 +21,7 @@ from rslearn.const import SHAPEFILE_AUX_EXTENSIONS, WGS84_PROJECTION
 from rslearn.utils.feature import Feature
 from rslearn.utils.fsspec import get_upath_local, open_rasterio_upath_reader
 from rslearn.utils.geometry import PixelBounds, Projection, STGeometry
+from rslearn.utils.mp import star_imap_unordered
 from rslearn.utils.raster_format import get_raster_projection_and_bounds
 from rslearn.utils.vector_format import GeojsonCoordinateMode, GeojsonVectorFormat
 from upath import UPath
@@ -60,7 +62,7 @@ class ExtractAlertsArgs:
         days: the number of days to consider before the prediction time.
         min_area: the minimum area threshold for an event to be extracted.
         max_number_of_events: the maximum number of events to extract per GLAD tile.
-        workers: the number of worker processes to use.
+        workers: number of parallel worker processes to use for extracting events.
     """
 
     gcs_tiff_filenames: list[str]
@@ -73,15 +75,15 @@ class ExtractAlertsArgs:
     date_prefix: str = "gs://earthenginepartners-hansen/S2alert/alertDate/"
     prediction_utc_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     min_confidence: int = 2
-    days: int = 365
+    days: int = 160
     min_area: float = 16.0
     max_number_of_events: int | None = None
-    workers: int = 32
+    workers: int = 8
 
 
-def load_country_polygon(
+def load_country_polygons(
     country_data_path: UPath, countries: list[str]
-) -> shapely.Geometry:
+) -> dict[str, shapely.Geometry]:
     """Get the polygons corresponding to the specified countries.
 
     country_data_path should point to the shapefile downloaded and extracted from
@@ -93,29 +95,31 @@ def load_country_polygon(
     aux_files: list[UPath] = []
     for ext in SHAPEFILE_AUX_EXTENSIONS:
         aux_files.append(country_data_path.parent / (prefix + ext))
-    country_wgs84_shp: shapely.Geometry | None = None
+    country_wgs84_shps: dict[str, shapely.Geometry] = {}
     with get_upath_local(country_data_path, extra_paths=aux_files) as local_fname:
         with fiona.open(local_fname) as src:
             for feat in src:
-                if feat["properties"]["ISO_A2"] not in countries:
+                country_name = feat["properties"]["ISO_A2"]
+                if country_name not in countries:
                     continue
                 cur_shp = shapely.geometry.shape(feat["geometry"])
-                if country_wgs84_shp:
-                    country_wgs84_shp = country_wgs84_shp.union(cur_shp)
+                if country_name in country_wgs84_shps:
+                    country_wgs84_shps[country_name] = country_wgs84_shps[
+                        country_name
+                    ].union(cur_shp)
                 else:
-                    country_wgs84_shp = cur_shp
+                    country_wgs84_shps[country_name] = cur_shp
 
-    assert country_wgs84_shp is not None
-    return country_wgs84_shp
+    return country_wgs84_shps
 
 
 def process_shapes_into_events(
     tif_fname: str,
     shapes: list[shapely.Geometry],
-    date_data: npt.NDArray,
+    masked_date_data: npt.NDArray,
     projection: Projection,
     bounds: PixelBounds,
-    country_wgs84_shp: shapely.Polygon,
+    country_wgs84_shps: dict[str, shapely.Geometry] | None,
     min_area: float,
 ) -> list[Feature]:
     """Process the forest loss shapes into vector features.
@@ -123,10 +127,14 @@ def process_shapes_into_events(
     Args:
         tif_fname: the GLAD tile filename.
         shapes: the shapes extracted from the forest loss mask.
-        date_data: the GLAD date raster.
+        masked_date_data: the GLAD date raster, masked with the confidence and date
+            constraints.
         projection: the projection of the pixel coordinates.
         bounds: the bounds of the pixel coordinates.
-        country_wgs84_shp: the country polygon to limit events to.
+        country_wgs84_shps: optional dict mapping from country name to the country
+            polygon in WGS84 coordinates. If set, only forest loss events in these
+            countries will be returned, and the event properties will include a country
+            field.
         min_area: minimum area constraint for each shape.
     """
     events: list[Feature] = []
@@ -150,7 +158,7 @@ def process_shapes_into_events(
         # Get center point (clipped to shape) and note the corresponding date.
         center_shp, _ = shapely.ops.nearest_points(shp, shp.centroid)
         center_pixel = (int(center_shp.x), int(center_shp.y))
-        cur_days = int(date_data[center_pixel[1], center_pixel[0]])
+        cur_days = int(masked_date_data[center_pixel[1], center_pixel[0]])
 
         if cur_days == 0:
             # Sometimes this can happen if the clipping was off a bit, and the
@@ -166,29 +174,43 @@ def process_shapes_into_events(
             (cur_date, cur_date),
         )
         center_wgs84_geom = center_src_geom.to_projection(WGS84_PROJECTION)
-        if country_wgs84_shp is not None and not country_wgs84_shp.contains(
-            center_wgs84_geom.shp
-        ):
-            country_skip_count += 1
-            continue
+        matched_country: str | None = None
+        if country_wgs84_shps is not None:
+            for country_name, country_wgs84_shp in country_wgs84_shps.items():
+                if not country_wgs84_shp.contains(center_wgs84_geom.shp):
+                    continue
+                matched_country = country_name
+                break
+
+            if matched_country is None:
+                country_skip_count += 1
+                continue
+
+        # Translate shape to add the window topleft to the relative pixel coordinates,
+        # yielding absolute coordinates. Here we also buffer the polygon to make sure
+        # it is valid. We use quad_segs=4 to mitigate the growth in number of vertices
+        # (the default is 8).
+        translated_shp = shapely.affinity.translate(shp, xoff=bounds[0], yoff=bounds[1])
+        translated_shp = shapely.buffer(translated_shp, distance=1, quad_segs=4)
 
         polygon_src_geom = STGeometry(
             projection,
-            shapely.affinity.translate(shp, xoff=bounds[0], yoff=bounds[1]),
+            translated_shp,
             (cur_date, cur_date),
         )
         polygon_wgs84_geom = polygon_src_geom.to_projection(WGS84_PROJECTION)
-        events.append(
-            Feature(
-                polygon_wgs84_geom,
-                properties=dict(
-                    center_pixel=center_pixel,
-                    tif_fname=tif_fname,
-                    oe_start_time=cur_date.isoformat(),
-                    oe_end_time=cur_date.isoformat(),
-                ),
-            )
+        feat = Feature(
+            polygon_wgs84_geom,
+            properties=dict(
+                center_pixel=center_pixel,
+                tif_fname=tif_fname,
+                oe_start_time=cur_date.isoformat(),
+                oe_end_time=cur_date.isoformat(),
+            ),
         )
+        if matched_country is not None:
+            feat.properties["country"] = matched_country
+        events.append(feat)
 
     logger.debug(f"Skipped {background_skip_count} shapes as background")
     logger.debug(f"Skipped {area_skip_count} shapes due to area")
@@ -199,14 +221,15 @@ def process_shapes_into_events(
 def extract_events_for_tile(
     args: ExtractAlertsArgs,
     tif_fname: str,
-    country_wgs84_shp: shapely.Geometry | None,
+    country_wgs84_shps: dict[str, shapely.Geometry] | None,
 ) -> list[Feature]:
     """Extract vector features of forest loss events for the given GLAD alert tile.
 
     Args:
         args: the ExtractAlertsArgs.
         tif_fname: the GLAD alert tile filename to process.
-        country_wgs84_shp: the country geometry to limit events to.
+        country_wgs84_shps: optional dict mapping from country names to the WGS84
+            country polygons to limit events to.
 
     Returns:
         list of vector features.
@@ -244,15 +267,31 @@ def extract_events_for_tile(
     shapes = list(rasterio.features.shapes(forest_loss_mask))
 
     # Finally we can process those shapes into forest loss events.
-    return process_shapes_into_events(
+    # It requires a masked version of date_data, which we compute by multiplying
+    # date_data by the constraints masked.
+    masked_date_data = date_data * forest_loss_mask
+    events = process_shapes_into_events(
         tif_fname=tif_fname,
         shapes=shapes,
-        date_data=date_data,
+        masked_date_data=masked_date_data,
         projection=projection,
         bounds=bounds,
-        country_wgs84_shp=country_wgs84_shp,
+        country_wgs84_shps=country_wgs84_shps,
         min_area=args.min_area,
     )
+
+    # Limit to maximum number of events if desired.
+    if (
+        args.max_number_of_events is not None
+        and len(events) > args.max_number_of_events
+    ):
+        logger.info(
+            f"For tile {tif_fname}, limiting from {len(events)} to {args.max_number_of_events} events"
+        )
+        events = random.sample(events, args.max_number_of_events)
+
+    logger.info(f"Got {len(events)} events for tile {tif_fname}")
+    return events
 
 
 def extract_alerts(
@@ -266,41 +305,36 @@ def extract_alerts(
     logger.info(f"Extract_alerts for {str(extract_alerts_args)}")
 
     # Get country geometries to limit the area where we look for alerts.
-    country_wgs84_shp: shapely.Geometry | None = None
+    country_wgs84_shps: dict[str, shapely.Geometry] | None = None
     if extract_alerts_args.countries is not None:
-        country_wgs84_shp = load_country_polygon(
+        country_wgs84_shps = load_country_polygons(
             UPath(extract_alerts_args.country_data_path), extract_alerts_args.countries
         )
 
-    # Process the GLAD alert tiles one tile at a time.
-    # Each tile has two files we need to read, the confidence raster (which we use to
-    # threshold pixels by confidence threshold) and date raster (which we use to only
-    # select pixels with recent forest loss based on specified number of days).
-    events: list[Feature] = []
-
-    for fname in extract_alerts_args.gcs_tiff_filenames:
-        # Get the events.
-        cur_events = extract_events_for_tile(
-            extract_alerts_args, fname, country_wgs84_shp=country_wgs84_shp
+    # Process the GLAD alert tiles in parallel.
+    # From each tile we extract some number of forest loss events.
+    extract_events_for_tile_jobs = [
+        dict(
+            args=extract_alerts_args,
+            tif_fname=tif_fname,
+            country_wgs84_shps=country_wgs84_shps,
         )
+        for tif_fname in extract_alerts_args.gcs_tiff_filenames
+    ]
+    p = multiprocessing.Pool(extract_alerts_args.workers)
+    outputs = star_imap_unordered(
+        p, extract_events_for_tile, extract_events_for_tile_jobs
+    )
 
-        # Limit to maximum number of events if desired.
-        if (
-            extract_alerts_args.max_number_of_events is not None
-            and len(cur_events) > extract_alerts_args.max_number_of_events
-        ):
-            logger.info(
-                f"Limiting from {len(cur_events)} to {extract_alerts_args.max_number_of_events} events"
-            )
-            cur_events = random.sample(
-                cur_events, extract_alerts_args.max_number_of_events
-            )
+    all_events: list[Feature] = []
+    for cur_events in tqdm.tqdm(outputs, total=len(extract_events_for_tile_jobs)):
+        all_events.extend(cur_events)
+    p.close()
 
-        logger.info(f"Writing {len(cur_events)} windows")
-        events.extend(cur_events)
+    logger.info(f"Total events: {len(all_events)}")
 
-    logger.info(f"Total events: {len(events)}")
-
+    out_fname = UPath(extract_alerts_args.out_fname)
+    out_fname.parent.mkdir(parents=True, exist_ok=True)
     GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84).encode_to_file(
-        UPath(extract_alerts_args.out_fname), events
+        out_fname, all_events
     )
