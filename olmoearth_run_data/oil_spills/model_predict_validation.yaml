@@ -75,24 +75,12 @@ data:
             sentinel1:
             - vv
             - vh
-    train_config:
-      tags:
-        split: train
-      transforms:
-      - class_path: rslearn.train.transforms.sentinel1.Sentinel1ToDecibels
-        init_args:
-          selectors:
-          - sentinel1
-      - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
-        init_args:
-          band_names:
-            sentinel1:
-            - vv
-            - vh
-    val_config:
+    predict_config:
       tags:
         split: val
       patch_size: 128
+      load_all_patches: false
+      skip_targets: false
       transforms:
       - class_path: rslearn.train.transforms.sentinel1.Sentinel1ToDecibels
         init_args:
@@ -104,51 +92,9 @@ data:
             sentinel1:
             - vv
             - vh
-    test_config:
-      tags:
-        split: test
-      patch_size: 128
-      transforms:
-      - class_path: rslearn.train.transforms.sentinel1.Sentinel1ToDecibels
-        init_args:
-          selectors:
-          - sentinel1
-      - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
-        init_args:
-          band_names:
-            sentinel1:
-            - vv
-            - vh
-    predict_config:
-      patch_size: 128
-      load_all_patches: true
-      skip_targets: true
-      overlap_ratio: 0.125
-      output_layer_name_skip_inference_if_exists: output
 trainer:
-  max_epochs: 100
-  logger:
-    class_path: lightning.pytorch.loggers.WandbLogger
-    init_args:
-      project: ${WANDB_PROJECT}
-      name: ${WANDB_NAME}
-      entity: ${WANDB_ENTITY}
   callbacks:
-  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+  - class_path: rslearn.train.prediction_writer.RslearnWriter
     init_args:
-      logging_interval: epoch
-  - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
-    init_args:
-      module_selector:
-      - model
-      - encoder
-      - 0
-      unfreeze_at_epoch: 10
-      unfreeze_lr_factor: 10.0
-  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
-    init_args:
-      monitor: val_accuracy
-      mode: max
-      dirpath: ${TRAINER_DATA_PATH}
-      save_top_k: 1
-      save_last: true
+      path: ${DATASET_PATH}
+      output_layer: output

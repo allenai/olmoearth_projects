@@ -33,6 +33,11 @@ window_prep:
     class_path: olmoearth_run.runner.tools.labeled_window_preparers.polygon_to_raster_window_preparer.PolygonToRasterWindowPreparer
     init_args:
       window_resolution: 10.0
+      grid_config:
+        class_path: olmoearth_run.runner.tools.labeled_window_preparers.polygon_to_raster_window_preparer.GridConfig
+        init_args:
+          window_size_px: 128
+          gridding_strategy: pad_to_fill
 
   data_splitter:
     class_path: olmoearth_run.runner.tools.data_splitters.spatial_data_splitter.SpatialDataSplitter
