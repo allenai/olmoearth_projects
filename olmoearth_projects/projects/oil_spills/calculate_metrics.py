@@ -11,13 +11,12 @@ TODO: For point label datasets, we need to handle random cropping:
 - Currently only works for polygon labels where predictions match label dimensions
 """
 
-import json
+import shutil
+from pathlib import Path
+
 import numpy as np
 import rasterio
-from pathlib import Path
-from sklearn.metrics import confusion_matrix, classification_report
-from typing import Dict, List, Tuple
-import shutil
+from sklearn.metrics import classification_report, confusion_matrix
 
 # ============================================================================
 # CONFIGURATION - Modify these for your task
@@ -45,7 +44,7 @@ N_EXAMPLES_PER_CATEGORY = 5  # Number of example windows to save for each catego
 # Helper Functions
 # ============================================================================
 
-def find_validation_windows(base_path: Path) -> List[Dict]:
+def find_validation_windows(base_path: Path) -> list[dict]:
     """Find all validation windows with both labels and predictions.
 
     Returns:
@@ -73,7 +72,7 @@ def find_validation_windows(base_path: Path) -> List[Dict]:
     return windows
 
 
-def load_and_align_data(label_file: Path, pred_file: Path) -> Tuple[np.ndarray, np.ndarray, Dict]:
+def load_and_align_data(label_file: Path, pred_file: Path) -> tuple[np.ndarray, np.ndarray, dict]:
     """Load label and prediction, check alignment, and return valid pixels.
 
     Returns:
@@ -140,10 +139,9 @@ def categorize_window(label_valid: np.ndarray, pred_valid: np.ndarray) -> str:
         return 'TN'
 
 
-def save_example_windows(windows: List[Dict], categories: Dict[str, List[str]],
+def save_example_windows(windows: list[dict], categories: dict[str, list[str]],
                         output_dir: Path, n_per_category: int = 5):
     """Save example windows for each category to output directory."""
-
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for category, window_names in categories.items():
@@ -172,9 +170,8 @@ def save_example_windows(windows: List[Dict], categories: Dict[str, List[str]],
 # ============================================================================
 
 def calculate_metrics(base_path: Path, save_examples: bool = True,
-                     examples_dir: Path = None) -> Dict:
+                     examples_dir: Path = None) -> dict:
     """Calculate confusion matrix and metrics across all validation windows."""
-
     windows = find_validation_windows(base_path)
     print(f"Found {len(windows)} validation windows with predictions\n")
 
@@ -331,7 +328,7 @@ if __name__ == "__main__":
         print(f"Error: Path does not exist: {base_path}")
         sys.exit(1)
 
-    print(f"Calculating metrics for validation set...")
+    print("Calculating metrics for validation set...")
     print(f"Base path: {base_path}")
     print(f"Label layer: {LABEL_LAYER_NAME}")
     print(f"Prediction layer: {PREDICTION_LAYER_NAME}")

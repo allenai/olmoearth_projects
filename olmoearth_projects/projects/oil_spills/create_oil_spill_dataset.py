@@ -23,7 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import geopandas as gpd
 import pandas as pd
@@ -31,15 +31,16 @@ import requests
 from shapely.geometry import mapping
 from shapely.geometry.base import BaseGeometry
 
-
 CERULEAN_ENDPOINT = "https://api.cerulean.skytruth.org/collections/public.slick_plus/items"
 
 
 def to_utc_iso(dt_like: Any) -> str:
+    """Convert a datetime-like value to a UTC ISO 8601 string."""
     return pd.to_datetime(dt_like, utc=True).tz_convert("UTC").isoformat()
 
 
 def ensure_wgs84(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Reproject a GeoDataFrame to WGS84 (EPSG:4326) if needed."""
     if gdf.crs is None:
         gdf = gdf.set_crs(4326, allow_override=True)
     if gdf.crs.to_epsg() != 4326:
@@ -48,12 +49,14 @@ def ensure_wgs84(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 
 def build_filter() -> str:
+    """Build a CQL filter for HITL-reviewed slicks, excluding BACKGROUND and AMBIGUOUS."""
     # HITL present, exclude BACKGROUND (1) and AMBIGUOUS (9)
     # Use explicit EQ conditions matching Cerulean API syntax
     return "(hitl_cls EQ 2 OR hitl_cls EQ 3 OR hitl_cls EQ 4 OR hitl_cls EQ 5 OR hitl_cls EQ 6 OR hitl_cls EQ 7 OR hitl_cls EQ 8)"
 
 
-def fetch_geojson(limit: int, timeout_s: float) -> Dict[str, Any]:
+def fetch_geojson(limit: int, timeout_s: float) -> dict[str, Any]:
+    """Fetch slick features from the Cerulean API as GeoJSON."""
     params = {
         "limit": str(limit),
         "filter": build_filter(),
@@ -67,9 +70,9 @@ def ring_negative(
     geom_wgs84: BaseGeometry,
     gap_m: float,
     width_m: float,
-) -> Optional[BaseGeometry]:
-    """
-    ring = buffer(gap + width) - buffer(gap)
+) -> BaseGeometry | None:
+    """Ring = buffer(gap + width) - buffer(gap).
+
     Computed in EPSG:3857, returned in EPSG:4326.
     """
     if geom_wgs84 is None or geom_wgs84.is_empty:
@@ -87,6 +90,7 @@ def ring_negative(
 
 
 def main() -> int:
+    """Fetch Cerulean slicks and write a GeoJSON for olmoearth_run annotation creation."""
     ap = argparse.ArgumentParser(
         description="Fetch Cerulean HITL slicks and prepare GeoJSON for oer_annotation_creation.py"
     )
@@ -114,7 +118,7 @@ def main() -> int:
     if missing:
         raise SystemExit(f"Missing expected fields from API: {missing}")
 
-    out_features: List[Dict[str, Any]] = []
+    out_features: list[dict[str, Any]] = []
 
     for _, row in gdf.iterrows():
         geom = row.geometry
