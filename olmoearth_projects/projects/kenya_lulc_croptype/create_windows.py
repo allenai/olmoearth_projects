@@ -13,7 +13,7 @@ from olmoearth_run.runner.tools.data_splitters.spatial_data_splitter import (
     SpatialDataSplitter,
 )
 from rslearn.const import WGS84_PROJECTION
-from rslearn.dataset import Window
+from rslearn.dataset import Dataset, Window
 from rslearn.utils import Projection, STGeometry, get_utm_ups_crs
 from rslearn.utils.feature import Feature
 from rslearn.utils.mp import star_imap_unordered
@@ -136,8 +136,9 @@ def create_window(
     fid_for_window_name = source_filename.split(".")[0]
     window_name = f"{latitude:.6f}_{longitude:.6f}_{fid_for_window_name}"
 
+    dataset = Dataset(ds_path)
     window = Window(
-        path=Window.get_window_root(ds_path, GROUP, window_name),
+        dataset=dataset.storage,
         group=GROUP,
         name=window_name,
         projection=dst_projection,
