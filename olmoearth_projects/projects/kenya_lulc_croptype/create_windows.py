@@ -13,7 +13,7 @@ from olmoearth_run.runner.tools.data_splitters.spatial_data_splitter import (
     SpatialDataSplitter,
 )
 from rslearn.const import WGS84_PROJECTION
-from rslearn.dataset import Window, Dataset
+from rslearn.dataset import Dataset, Window
 from rslearn.utils import Projection, STGeometry, get_utm_ups_crs
 from rslearn.utils.feature import Feature
 from rslearn.utils.mp import star_imap_unordered
