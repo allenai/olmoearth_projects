@@ -5,15 +5,10 @@ model:
       class_path: rslearn.models.multitask.MultiTaskModel
       init_args:
         encoder:
-        - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
-          init_args:
-            checkpoint_path: /weka/dfive-default/helios/checkpoints/joer/phase2.0_base_lr0.0001_wd0.02/step667200
-            selector:
-            - encoder
-            patch_size: 4
-            random_initialization: false
-            embedding_size: null
-            autocast_dtype: bfloat16
+          - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
+            init_args:
+              model_id: OLMOEARTH_V1_BASE
+              patch_size: 4
         decoders:
           segment:
           - class_path: rslearn.models.upsample.Upsample
@@ -34,7 +29,6 @@ model:
             init_args:
               indexes:
               - 0
-              collapse: true
           - class_path: rslearn.train.tasks.segmentation.SegmentationHead
         lazy_decode: false
         loss_weights: null
@@ -54,7 +48,7 @@ data:
     inputs:
       sentinel2_l2a:
         data_type: "raster"
-        layers: ["sentinel2", "sentinel2.1", "sentinel2.2", "sentinel2.3", "sentinel2.4", "sentinel2.5", "sentinel2.6"]
+        layers: ["sentinel2.6", "sentinel2.7"]
         bands: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
         passthrough: true
         dtype: FLOAT32
@@ -77,7 +71,7 @@ data:
               metric_kwargs:
                 average: "micro"
               other_metrics:
-                corn_precision:
+                water_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -86,7 +80,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 1
-                corn_recall:
+                water_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -95,7 +89,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 1
-                cassava_precision:
+                bareground_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -104,7 +98,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 2
-                cassava_recall:
+                bareground_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -113,7 +107,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 2
-                rice_precision:
+                rangeland_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -122,7 +116,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 3
-                rice_recall:
+                rangeland_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -131,7 +125,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 3
-                sesame_precision:
+                floodedvegetation_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -140,7 +134,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 4
-                sesame_recall:
+                floodedvegetation_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -149,7 +143,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 4
-                beans_precision:
+                trees_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -158,7 +152,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 5
-                beans_recall:
+                trees_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -167,7 +161,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 5
-                millet_precision:
+                cropland_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -176,7 +170,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 6
-                millet_recall:
+                cropland_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -185,7 +179,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 6
-                sorghum_precision:
+                buildings_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -194,7 +188,7 @@ data:
                         num_classes: 8
                         average: null
                     class_idx: 7
-                sorghum_recall:
+                buildings_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -232,17 +226,17 @@ data:
           init_args:
             band_names:
               sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
-      groups: ["crop_type"]
+      groups: ["gaza", "manica", "zambezia"]
       tags:
         split: "train"
     val_config:
       patch_size: 16
-      groups: ["crop_type"]
+      groups: ["gaza", "manica", "zambezia"]
       tags:
         split: "val"
     test_config:
       patch_size: 16
-      groups: ["crop_type"]
+      groups: ["gaza", "manica", "zambezia"]
       tags:
         split: "test"
 trainer:

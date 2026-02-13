@@ -118,7 +118,22 @@ WOODY_FUNCTIONAL_TYPES = frozenset(
     ["large shrub", "shrub", "small tree", "subshrub", "tree"]
 )
 
-INPUT_WORKBOOK_URL = "https://springernature.figshare.com/ndownloader/files/45049786"
+FIGSHARE_ARTICLE_ID = 25413790
+FIGSHARE_FILE_ID = 45049786
+
+
+def get_workbook_download_url() -> str:
+    """Get the workbook download URL from the Figshare API."""
+    api_url = f"https://api.figshare.com/v2/articles/{FIGSHARE_ARTICLE_ID}/files"
+    response = requests.get(api_url, timeout=30)
+    response.raise_for_status()
+    files = response.json()
+    for f in files:
+        if f["id"] == FIGSHARE_FILE_ID:
+            return f["download_url"]
+    raise ValueError(
+        f"File {FIGSHARE_FILE_ID} not found in article {FIGSHARE_ARTICLE_ID}"
+    )
 
 
 def parse_bounding_box(bbox_str: str) -> tuple[float, float, float, float]:
@@ -163,7 +178,8 @@ def download_workbook(output_path: Path) -> None:
     Args:
         output_path: path to write the workbook file
     """
-    response = requests.get(INPUT_WORKBOOK_URL, stream=True, timeout=60)
+    download_url = get_workbook_download_url()
+    response = requests.get(download_url, stream=True, timeout=120)
     response.raise_for_status()
 
     total_size = int(response.headers.get("content-length", 0))
@@ -179,6 +195,10 @@ def download_workbook(output_path: Path) -> None:
 
     if total_size != 0 and progress_bar.n != total_size:
         raise RuntimeError("Could not download file")
+    if progress_bar.n == 0:
+        raise RuntimeError(
+            "Downloaded file is empty. The download URL may have changed."
+        )
 
 
 def process_fuel_type_data(
@@ -245,7 +265,11 @@ def process_fuel_type_data(
     if len(grouped_df) > 0:
         mean_value = grouped_df[Column.VALUE].mean()
         std_value = grouped_df[Column.VALUE].std()
+        min_value = grouped_df[Column.VALUE].min()
+        max_value = grouped_df[Column.VALUE].max()
         print(f"  LFMC mean: {mean_value:.2f} ± {std_value:.2f}")
+        print(f"  LFMC min: {min_value:.2f}")
+        print(f"  LFMC max: {max_value:.2f}")
 
     return grouped_df
 
@@ -270,7 +294,10 @@ def create_csv(
     """
     print("Reading the workbook")
     df = pd.read_excel(
-        input_workbook_path, sheet_name=SHEET_NAME, usecols=list(COLUMN_MAP.keys())
+        input_workbook_path,
+        sheet_name=SHEET_NAME,
+        usecols=list(COLUMN_MAP.keys()),
+        engine="openpyxl",
     )
     df = df.rename(columns=COLUMN_MAP)
     print(f"Initial number of samples: {len(df)}")
