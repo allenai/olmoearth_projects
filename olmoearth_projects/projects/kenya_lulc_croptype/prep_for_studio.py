@@ -12,6 +12,27 @@ import geopandas as gpd
 START_MONTH, START_DAY = 8, 1  # August 1
 END_MONTH, END_DAY = 12, 30  # dec 30
 
+TEMPORARY_CROPS = [
+    "vegetables_fruits",
+    "maize",
+    "dry_pulses_legumes",
+    "wheat",
+    "grass_fodder_crops",
+    "potatoes",
+    "other_oilseeds",
+    "herb_spice_medicinal_crops",
+    "root_tuber_crops",
+    "not_cultivated_fallow",  # temporary crops according to the legend
+    "mixed_arable_crops",
+    "sunflower",
+    "barley",
+    "millet",
+    "oats",
+    "sorghum",
+    "soy_soybeans",
+    "flower_crops",
+]
+
 if __name__ == "__main__":
     labels = gpd.read_file("kenya_labels/labels.geojson")
 
@@ -20,11 +41,14 @@ if __name__ == "__main__":
     labels["maize_or_not"] = labels.apply(
         lambda x: "maize" if x.sampling_ewoc_code == "maize" else "not_maize", axis=1
     )
+    labels["crop_or_not"] = labels.apply(
+        lambda x: "crop" if x.sampling_ewoc_code in TEMPORARY_CROPS else "not_crop",
+        axis=1,
+    )
     labels["start_time"] = labels.apply(
         lambda x: datetime(x.year, START_MONTH, START_DAY).strftime("%Y-%m-%d"), axis=1
     )
     labels["end_time"] = labels.apply(
         lambda x: datetime(x.year, END_MONTH, END_DAY).strftime("%Y-%m-%d"), axis=1
     )
-
     labels.to_file("kenya_labels/labels_for_studio.geojson", driver="GeoJSON")
