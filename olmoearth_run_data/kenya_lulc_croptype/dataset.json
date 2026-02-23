@@ -51,8 +51,8 @@
           "sort_by": "eo:cloud_cover"
         },
         "query_config": {
-          "max_matches": 5,
-          "min_matches": 5,
+          "max_matches": 6,
+          "min_matches": 6,
           "period_duration": "30d",
           "space_mode": "PER_PERIOD_MOSAIC"
         }
