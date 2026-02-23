@@ -143,7 +143,7 @@ def create_window(
 
     dataset = Dataset(ds_path)
     window = Window(
-        dataset=dataset.storage,
+        storage=dataset.storage,
         group=GROUP,
         name=window_name,
         projection=dst_projection,
