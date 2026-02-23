@@ -26,9 +26,11 @@ CROPTYPE_LABEL_LAYER = "maize_label"
 GROUP = "kenya_cropland_maize"
 
 
-# day, month. Short rain cultivation is from August to December.
+# day, month. long rain (East) / short rain (West) cultivation is from August to January.
+# probably shouldn't go all the way to end of February since that's when planting starts
+# for the long rains in the West
 START_MONTH, START_DAY = 8, 1  # August 1
-END_MONTH, END_DAY = 12, 30  # dec 30
+END_MONTH, END_DAY = 1, 30  # jan 30, next year
 
 
 def calculate_bounds(
@@ -74,6 +76,8 @@ def load_geojson(geojson_path: UPath) -> gpd.GeoDataFrame:
         "year",
         "geometry",
         "filename",
+        "is_crop",
+        "is_maize",
     }
     missing = [c for c in required_cols if c not in gdf.columns]
     if missing:
@@ -93,7 +97,7 @@ def load_geojson(geojson_path: UPath) -> gpd.GeoDataFrame:
 
 def iter_points(
     gdf: gpd.GeoDataFrame,
-) -> Iterable[tuple[float, float, str, str, int, int]]:
+) -> Iterable[tuple[float, float, str, str, int, int, str]]:
     """Yield (fid, latitude, longitude, category) per feature using centroid for polygons."""
     for fid, row in gdf.iterrows():
         geom = row.geometry
@@ -110,20 +114,21 @@ def iter_points(
         source_filename = row.filename
         year = row.year
         is_crop = row.is_crop
+        is_maize = row.is_maize
 
-        yield lat, lon, crop_type, source_filename, year, is_crop
+        yield lat, lon, crop_type, source_filename, year, is_crop, is_maize
 
 
 def create_window(
-    rec: tuple[float, float, str, str, int, int],
+    rec: tuple[float, float, str, str, int, int, str],
     ds_path: UPath,
     window_size: int,
 ) -> None:
     """Create a single window and write label layer."""
-    latitude, longitude, crop_type, source_filename, year, is_crop = rec
+    latitude, longitude, crop_type, source_filename, year, is_crop, is_maize = rec
 
-    maize_or_not = 1 if crop_type == "maize" else 0
     cropland_or_not = 1 if is_crop else 0
+    maize_or_not = {"maize": 1, "not_maize": 0, "n/a": -1}[is_maize]
     # Geometry/projection
     src_point = shapely.Point(longitude, latitude)
     src_geometry = STGeometry(WGS84_PROJECTION, src_point, None)
@@ -145,13 +150,13 @@ def create_window(
         bounds=bounds,
         time_range=(
             datetime(year, START_MONTH, START_DAY, tzinfo=UTC),
-            datetime(year, END_MONTH, END_DAY, tzinfo=UTC),
+            datetime(year + 1, END_MONTH, END_DAY, tzinfo=UTC),
         ),
         options={
             "lulc_category_id": cropland_or_not,
             "maize_category_id": maize_or_not,
             "lulc_category": "crop" if cropland_or_not else "non_crop",
-            "maize_category": "maize" if maize_or_not else "non_maize",
+            "maize_category": is_maize,
             "crop_type": crop_type,  # not used when learning
             "source_filename": source_filename,
         },
@@ -178,17 +183,19 @@ def create_window(
     window.mark_layer_completed(LULC_LABEL_LAYER)
 
     # Maize label layers (same as before, using window geometry)
-    feature = Feature(
-        window.get_geometry(),
-        {
-            "category_id": maize_or_not,
-            "category": "maize" if maize_or_not else "non_maize",
-            "split": split,
-        },
-    )
-    layer_dir = window.get_layer_dir(CROPTYPE_LABEL_LAYER)
-    GeojsonVectorFormat().encode_vector(layer_dir, [feature])
-    window.mark_layer_completed(CROPTYPE_LABEL_LAYER)
+    # but only if its not an n/a class
+    if is_maize != "n/a":
+        feature = Feature(
+            window.get_geometry(),
+            {
+                "category_id": maize_or_not,
+                "category": "maize" if maize_or_not else "non_maize",
+                "split": split,
+            },
+        )
+        layer_dir = window.get_layer_dir(CROPTYPE_LABEL_LAYER)
+        GeojsonVectorFormat().encode_vector(layer_dir, [feature])
+        window.mark_layer_completed(CROPTYPE_LABEL_LAYER)
 
 
 def create_windows_from_geojson(
