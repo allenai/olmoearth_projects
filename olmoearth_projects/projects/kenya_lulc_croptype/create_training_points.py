@@ -135,6 +135,7 @@ def load_gabi_negatives(geojson_path: Path) -> gpd.GeoDataFrame:
         df = gpd.read_file(geojson_path / filename)
         df["sampling_ewoc_code"] = "non_cropland_incl_perennial"
         df["is_crop"] = False
+        df["is_maize"] = "not_maize"
         df["year"] = valid_date.year
         df["valid_time"] = pd.to_datetime(valid_date)
         df["filename"] = filename
