@@ -144,7 +144,15 @@ def load_gabi_negatives(geojson_path: Path) -> gpd.GeoDataFrame:
 
     df = pd.concat(dfs)
     return df[
-        ["sampling_ewoc_code", "valid_time", "year", "geometry", "is_crop", "filename"]
+        [
+            "sampling_ewoc_code",
+            "valid_time",
+            "year",
+            "geometry",
+            "is_crop",
+            "is_maize",
+            "filename",
+        ]
     ]
 
 
