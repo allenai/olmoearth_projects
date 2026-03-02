@@ -33,6 +33,11 @@ dev = [
     "ruff>=0.7",
 ]
 
+# Dependencies needed for forest loss driver inference pipeline.
+forest_loss_driver = [
+    "beaker-py>=2.0",
+]
+
 [project.urls]
 homepage = "https://github.com/allenai/olmoearth_projects"
 issues = "https://github.com/allenai/olmoearth_projects/issues"
