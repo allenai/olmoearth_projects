@@ -12,9 +12,9 @@ import argparse
 import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
-import matplotlib.pyplot as plt
 from scipy import stats
 
 
@@ -54,8 +54,11 @@ def compute_averages(
 
 
 def find_spikes_local(avgs: np.ndarray, neighbor_factor: float = 1.5) -> np.ndarray:
-    """Find spikes using local maxima: points greater than `neighbor_factor`×
-    both neighbors. This is the approach from the original notebook."""
+    """Find spikes using local maxima.
+
+    Points greater than `neighbor_factor`×
+    both neighbors. This is the approach from the original notebook.
+    """
     if len(avgs) < 3:
         return np.array([], dtype=int)
     left = avgs[:-2]
@@ -116,7 +119,9 @@ def analyze_spacing(maxima: np.ndarray, label: str) -> dict:
     # should appear with roughly equal frequency. A tiny p-value means the
     # distribution is significantly non-uniform → some spacing dominates.
     if len(unique) >= 2:
-        expected = np.full_like(counts, fill_value=len(spacings) / len(unique), dtype=float)
+        expected = np.full_like(
+            counts, fill_value=len(spacings) / len(unique), dtype=float
+        )
         chi2, p_value = stats.chisquare(counts.astype(float), f_exp=expected)
     else:
         chi2, p_value = 0.0, 1.0
@@ -141,7 +146,7 @@ def generate_report(
     col_analysis: dict,
     max_index: int,
     output_path: str,
-):
+) -> None:
     """Generate a multi-panel report figure."""
     fig = plt.figure(figsize=(16, 10))
     # Top row: single wide axes spanning both columns
@@ -157,15 +162,31 @@ def generate_report(
     ax = ax_top
     ax.plot(np.arange(col_n), col_avgs[:col_n], linewidth=0.5, alpha=0.6, color="C0")
     col_sp_vis = col_spikes[col_spikes < col_n]
-    ax.scatter(col_sp_vis, col_avgs[col_sp_vis], color="C0", s=12, zorder=5, label=f"Col spikes ({len(col_spikes)} total)")
+    ax.scatter(
+        col_sp_vis,
+        col_avgs[col_sp_vis],
+        color="C0",
+        s=12,
+        zorder=5,
+        label=f"Col spikes ({len(col_spikes)} total)",
+    )
 
     ax.plot(np.arange(row_n), row_avgs[:row_n], linewidth=0.5, alpha=0.6, color="C1")
     row_sp_vis = row_spikes[row_spikes < row_n]
-    ax.scatter(row_sp_vis, row_avgs[row_sp_vis], color="C1", s=12, zorder=5, label=f"Row spikes ({len(row_spikes)} total)")
+    ax.scatter(
+        row_sp_vis,
+        row_avgs[row_sp_vis],
+        color="C1",
+        s=12,
+        zorder=5,
+        label=f"Row spikes ({len(row_spikes)} total)",
+    )
 
     ax.set_ylabel("Mean transition rate")
     ax.set_xlabel("Index")
-    ax.set_title(f"Transition averages with detected spikes (first {max_index} indices)")
+    ax.set_title(
+        f"Transition averages with detected spikes (first {max_index} indices)"
+    )
     ax.legend()
     ax.set_ylim(bottom=0)
 
@@ -175,8 +196,12 @@ def generate_report(
         top = col_analysis["top_spacings"][:10]
         labels = [str(s) for s, _ in top]
         counts = [c for _, c in top]
-        ax.bar(range(len(top)), counts, tick_label=labels, edgecolor="black", linewidth=0.5)
-        ax.set_title(f"Col spike spacings — top {len(top)} most frequent\nRegularity: {col_analysis['regularity_score']:.2f}  χ² p={col_analysis['p_value']:.2e}")
+        ax.bar(
+            range(len(top)), counts, tick_label=labels, edgecolor="black", linewidth=0.5
+        )
+        ax.set_title(
+            f"Col spike spacings — top {len(top)} most frequent\nRegularity: {col_analysis['regularity_score']:.2f}  χ² p={col_analysis['p_value']:.2e}"
+        )
     else:
         ax.set_title("Col spike spacings — insufficient data")
     ax.set_xlabel("Spacing (pixels)")
@@ -188,8 +213,12 @@ def generate_report(
         top = row_analysis["top_spacings"][:10]
         labels = [str(s) for s, _ in top]
         counts = [c for _, c in top]
-        ax.bar(range(len(top)), counts, tick_label=labels, edgecolor="black", linewidth=0.5)
-        ax.set_title(f"Row spike spacings — top {len(top)} most frequent\nRegularity: {row_analysis['regularity_score']:.2f}  χ² p={row_analysis['p_value']:.2e}")
+        ax.bar(
+            range(len(top)), counts, tick_label=labels, edgecolor="black", linewidth=0.5
+        )
+        ax.set_title(
+            f"Row spike spacings — top {len(top)} most frequent\nRegularity: {row_analysis['regularity_score']:.2f}  χ² p={row_analysis['p_value']:.2e}"
+        )
     else:
         ax.set_title("Row spike spacings — insufficient data")
     ax.set_xlabel("Spacing (pixels)")
@@ -201,7 +230,8 @@ def generate_report(
     print(f"Report saved to: {output_path}")
 
 
-def main():
+def main() -> None:
+    """Run script."""
     parser = argparse.ArgumentParser(
         description="Detect grid artifacts in discrete classification GeoTIFFs."
     )
@@ -248,7 +278,9 @@ def main():
         print(f"Error: {input_path} does not exist", file=sys.stderr)
         sys.exit(1)
 
-    output_path = args.output or str(input_path.with_suffix("")) + "_grid_artifact_report.png"
+    output_path = (
+        args.output or str(input_path.with_suffix("")) + "_grid_artifact_report.png"
+    )
 
     # 1. Read data
     print(f"Reading {input_path} (band {args.band})...")
@@ -276,7 +308,9 @@ def main():
         row_spikes = find_spikes(row_avgs, z_thresh=args.z_thresh)
         col_spikes = find_spikes(col_avgs, z_thresh=args.z_thresh)
     else:
-        print(f"Finding spikes (method=local, neighbor-factor={args.neighbor_factor})...")
+        print(
+            f"Finding spikes (method=local, neighbor-factor={args.neighbor_factor})..."
+        )
         row_spikes = find_spikes_local(row_avgs, neighbor_factor=args.neighbor_factor)
         col_spikes = find_spikes_local(col_avgs, neighbor_factor=args.neighbor_factor)
     print(f"  Row spikes: {len(row_spikes)}, Col spikes: {len(col_spikes)}")
@@ -296,18 +330,23 @@ def main():
             p = analysis["p_value"]
             print(f"  Regularity score: {score:.2f}  |  Chi-squared p-value: {p:.2e}")
             if p < 0.01 and score > 0.3:
-                print(f"  ⚠️  HIGH — likely grid artifacts (dominant spacing accounts for {score:.0%} of gaps, p={p:.2e})")
+                print(
+                    f"  ⚠️  HIGH — likely grid artifacts (dominant spacing accounts for {score:.0%} of gaps, p={p:.2e})"
+                )
             elif p < 0.05:
                 print(f"  ⚡ MODERATE — possible grid artifacts (p={p:.2e})")
             else:
                 print(f"  ✓ LOW — no significant periodicity (p={p:.2e})")
 
     # 7. Generate report plot
-    print(f"\nGenerating report...")
+    print("\nGenerating report...")
     generate_report(
-        row_avgs, col_avgs,
-        row_spikes, col_spikes,
-        row_analysis, col_analysis,
+        row_avgs,
+        col_avgs,
+        row_spikes,
+        col_spikes,
+        row_analysis,
+        col_analysis,
         max_index=args.max_index,
         output_path=output_path,
     )
