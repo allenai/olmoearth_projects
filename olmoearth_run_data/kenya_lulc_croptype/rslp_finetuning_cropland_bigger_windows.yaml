@@ -33,7 +33,7 @@ model:
         lazy_decode: false
         loss_weights: null
         trunk: null
-    lr: 0.0001
+    lr: 0.00001
     scheduler:
       class_path: rslearn.train.scheduler.PlateauScheduler
       init_args:
