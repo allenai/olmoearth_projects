@@ -46,16 +46,16 @@ In addition, an additonal round of negative (non-crop) labelling was conducted i
 └────────────────────┴──────────┴─────────────────────┘
 ```
 ### Generating the data
-```bash
-export DATASET_PATH=/weka/dfive-default/rslearn-eai/datasets/crop/kenya_maize_cropland/20260126
 
-python /weka/dfive-default/gabrielt/olmoearth_projects/olmoearth_projects/projects/kenya_lulc_croptype/create_windows.py --geojson_file /weka/dfive-default/gabrielt/datasets/kenya_labels/labels.geojson --ds_path $DATASET_PATH --window_size 32
-```
 You will then need to copy a `config.json` into `$DATASET_PATH`. The config being used is available in [config.json](config.json).
 
 Once the config is copied into the dataset root, the following commands can be run:
 
 ```bash
+export DATASET_PATH=/weka/dfive-default/rslearn-eai/datasets/crop/kenya_maize_cropland/20260126
+
+python /weka/dfive-default/gabrielt/olmoearth_projects/olmoearth_projects/projects/kenya_lulc_croptype/create_windows.py --geojson_file /weka/dfive-default/gabrielt/datasets/kenya_labels/labels.geojson --ds_path $DATASET_PATH --window_size 32
+
 rslearn dataset prepare --root $DATASET_PATH --workers 64 --no-use-initial-job --retry-max-attempts 8 --retry-backoff-seconds 60
 
 python -m rslp.main common launch_data_materialization_jobs --image yawenzzzz/rslp20251112h --ds_path $DATASET_PATH --clusters+=ai2/neptune-cirrascale --num_jobs 5

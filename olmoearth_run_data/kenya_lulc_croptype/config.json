@@ -66,8 +66,8 @@
         "ingest": false,
         "name": "rslearn.data_sources.planetary_computer.Sentinel2",
         "query_config": {
-          "max_matches": 5,
-          "min_matches": 5,
+          "max_matches": 6,
+          "min_matches": 6,
           "period_duration": "30d",
           "space_mode": "PER_PERIOD_MOSAIC"
         },
