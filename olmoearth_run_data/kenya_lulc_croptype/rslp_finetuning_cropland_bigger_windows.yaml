@@ -33,8 +33,11 @@ model:
         lazy_decode: false
         loss_weights: null
         trunk: null
-    lr: 0.00001
-    weight_decay: 0.01
+    optimizer:
+      class_path: rslearn.train.optimizer.AdamW
+      init_args:
+        lr: 0.00001
+        weight_decay: 0.01
     scheduler:
       class_path: rslearn.train.scheduler.PlateauScheduler
       init_args:
