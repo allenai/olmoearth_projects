@@ -1,5 +1,6 @@
 """Each file has a different format, so we have a function per file."""
 
+from datetime import datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -12,6 +13,13 @@ RDM_LABELS_TO_IGNORE = [
     "cropland_unspecified",
     "temporary_crops",
 ]
+
+# https://www.fao.org/giews/countrybrief/country.jsp?code=eth
+# based on this, the growing season is from February to December
+# or Janury. We will do February to December to avoid any overlap
+# this is 11 30-day periods
+START_MONTH, START_DAY = 2, 1
+END_MONTH, END_DAY = 12, 30
 
 
 def prepare_maize_data_csv(label_dir: Path) -> gpd.GeoDataFrame:
@@ -122,4 +130,13 @@ if __name__ == "__main__":
     if use_rdm:
         gdfs.append(prepare_worldcereal_rdm(label_dir))
 
-    pd.concat(gdfs).to_file(label_dir / "labels.geojson")
+    labels: gpd.GeoDataFrame = pd.concat(gdfs)
+
+    # add the start_time and end_time columns
+    labels["start_time"] = labels.apply(
+        lambda x: datetime(x.year, START_MONTH, START_DAY).strftime("%Y-%m-%d"), axis=1
+    )
+    labels["end_time"] = labels.apply(
+        lambda x: datetime(x.year, END_MONTH, END_DAY).strftime("%Y-%m-%d"), axis=1
+    )
+    labels.to_file(label_dir / "labels.geojson", driver="GeoJSON")
