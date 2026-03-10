@@ -52,7 +52,7 @@ You will then need to copy a `config.json` into `$DATASET_PATH`. The config bein
 Once the config is copied into the dataset root, the following commands can be run:
 
 ```bash
-export DATASET_PATH=/weka/dfive-default/rslearn-eai/datasets/crop/kenya_maize_cropland/20260126
+export DATASET_PATH=/weka/dfive-default/rslearn-eai/datasets/crop/kenya_maize_cropland/20260223
 
 python /weka/dfive-default/gabrielt/olmoearth_projects/olmoearth_projects/projects/kenya_lulc_croptype/create_windows.py --geojson_file /weka/dfive-default/gabrielt/datasets/kenya_labels/labels.geojson --ds_path $DATASET_PATH --window_size 32
 
