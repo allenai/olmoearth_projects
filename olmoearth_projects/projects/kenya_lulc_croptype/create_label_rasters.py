@@ -60,23 +60,28 @@ def create_label_raster(window: Window) -> None:
 
     # crop type
     label_dir = window.get_layer_dir("maize_label")
-    features = GeojsonVectorFormat().decode_vector(
-        label_dir, window.projection, window.bounds
-    )
-    class_name = features[0].properties[PROPERTY_NAME]
-    class_id = CROPTYPE_CLASS_NAMES.index(class_name)
+    if label_dir.exists():
+        features = GeojsonVectorFormat().decode_vector(
+            label_dir, window.projection, window.bounds
+        )
+        class_name = features[0].properties[PROPERTY_NAME]
+        class_id = CROPTYPE_CLASS_NAMES.index(class_name)
 
-    # Draw the class_id in the middle 1x1 of the raster.
-    raster = np.zeros(
-        (1, window.bounds[3] - window.bounds[1], window.bounds[2] - window.bounds[0]),
-        dtype=np.uint8,
-    )
-    raster[:, raster.shape[1] // 2, raster.shape[2] // 2] = class_id
-    raster_dir = window.get_raster_dir("maize_label_raster", ["maize_label"])
-    GeotiffRasterFormat().encode_raster(
-        raster_dir, window.projection, window.bounds, raster
-    )
-    window.mark_layer_completed("maize_label_raster")
+        # Draw the class_id in the middle 1x1 of the raster.
+        raster = np.zeros(
+            (
+                1,
+                window.bounds[3] - window.bounds[1],
+                window.bounds[2] - window.bounds[0],
+            ),
+            dtype=np.uint8,
+        )
+        raster[:, raster.shape[1] // 2, raster.shape[2] // 2] = class_id
+        raster_dir = window.get_raster_dir("maize_label_raster", ["maize_label"])
+        GeotiffRasterFormat().encode_raster(
+            raster_dir, window.projection, window.bounds, raster
+        )
+        window.mark_layer_completed("maize_label_raster")
 
 
 if __name__ == "__main__":

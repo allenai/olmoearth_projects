@@ -33,7 +33,11 @@ model:
         lazy_decode: false
         loss_weights: null
         trunk: null
-    lr: 0.0001
+    optimizer:
+      class_path: rslearn.train.optimizer.AdamW
+      init_args:
+        lr: 0.00001
+        weight_decay: 0.01
     scheduler:
       class_path: rslearn.train.scheduler.PlateauScheduler
       init_args:
@@ -44,7 +48,7 @@ model:
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
-    path: /weka/dfive-default/rslearn-eai/datasets/crop/kenya_maize_cropland/20260223
+    path: /weka/dfive-default/rslearn-eai/datasets/crop/kenya_maize_cropland/20260302
     inputs:
       sentinel2_l2a:
         data_type: "raster"
@@ -56,8 +60,8 @@ data:
         load_all_layers: true
       label:
         data_type: "raster"
-        layers: ["lulc_label_raster"]
-        bands: ["lulc_label"]
+        layers: ["maize_label_raster"]
+        bands: ["maize_label"]
         is_target: true
         dtype: INT32
     task:
@@ -72,7 +76,7 @@ data:
               metric_kwargs:
                 average: "micro"
               other_metrics:
-                not_crop_precision:
+                not_maize_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -81,7 +85,7 @@ data:
                         num_classes: 3
                         average: null
                     class_idx: 1
-                not_crop_recall:
+                not_maize_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -90,7 +94,7 @@ data:
                         num_classes: 3
                         average: null
                     class_idx: 1
-                crop_precision:
+                maize_precision:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -99,7 +103,7 @@ data:
                         num_classes: 3
                         average: null
                     class_idx: 2
-                crop_recall:
+                maize_recall:
                   class_path: rslearn.train.tasks.segmentation.SegmentationMetric
                   init_args:
                     metric:
@@ -123,12 +127,12 @@ data:
       transforms:
         - class_path: rslearn.train.transforms.pad.Pad
           init_args:
-            size: 31
+            size: 63
             mode: "center"
             image_selectors: ["sentinel2_l2a", "target/segment/classes", "target/segment/valid"]
         - class_path: rslearn.train.transforms.crop.Crop
           init_args:
-            crop_size: 16
+            crop_size: 32
             image_selectors: ["sentinel2_l2a", "target/segment/classes", "target/segment/valid"]
         - class_path: rslearn.train.transforms.flip.Flip
           init_args:
@@ -141,12 +145,12 @@ data:
       tags:
         split: "train"
     val_config:
-      patch_size: 16
+      patch_size: 32
       groups: ["kenya_cropland_maize"]
       tags:
         split: "val"
     test_config:
-      patch_size: 16
+      patch_size: 32
       groups: ["kenya_cropland_maize"]
       tags:
         split: "test"

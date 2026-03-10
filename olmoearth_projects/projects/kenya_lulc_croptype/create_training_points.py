@@ -44,6 +44,27 @@ TEMPORARY_CROPS = [
     "sorghum",
     "soy_soybeans",
     "flower_crops",
+    "cereals",
+]
+
+
+# technically, worldcereal labels this as
+# a unique not-temporary-crop class, but this leaves
+# a lot of room for confusion (e.g. "corn_with_trees"
+# might look a lot like corn for the model depending
+# on where exactly the point is)
+LABELS_TO_IGNORE = [
+    "mixed_cropland",
+    # Unknown cropped land, either annual or perennial
+    "cropland_unspecified",
+]
+
+# we will ignore these labels during
+# maize mapping since its unclear
+# whether they are maize or not.
+MAYBE_MAIZE_MAYBE_NOT = [
+    "mixed_arable_crops",  # e.g. "maize_mixed_with_yam" or "vegetables_mixed_with_sunflower"
+    "cereals",
 ]
 
 
@@ -52,14 +73,7 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     # which sampling_ewoc_code classes are negatives (basically just excluding maize & unspecified cropland)
     df = gpd.read_parquet(parquet_filepath)
     print(f"Original file length for {parquet_filepath}: {len(df)} instances.")
-    df = df[
-        # this eliminates 704 (2021) + 2 (2023) points but it could be annual
-        # or perennial so its not useful for maize mapping or
-        # temporary crop mapping
-        (df.sampling_ewoc_code != "cropland_unspecified")
-        # this only eliminates 29 points
-        & (df.sampling_ewoc_code != "cereals")
-    ]
+    df = df[~df.sampling_ewoc_code.isin(LABELS_TO_IGNORE)]
     print(f"After filtering {parquet_filepath}: {len(df)} instances.")
     df.valid_time = pd.to_datetime(df.valid_time)
     # so far, the 2 parquet files were both collected during short rains so
@@ -89,9 +103,19 @@ def collate_parquet_folders(parquet_folder: Path) -> gpd.GeoDataFrame:
 
     # check that our list is complete
     for val in df.sampling_ewoc_code.unique():
-        assert val in NON_TEMPORARY_CROPS + TEMPORARY_CROPS
+        assert val in NON_TEMPORARY_CROPS + TEMPORARY_CROPS, f"unexepected {val}"
 
     df["is_crop"] = df.apply(lambda x: x.sampling_ewoc_code in TEMPORARY_CROPS, axis=1)
+
+    def is_maize(sampling_ewoc_code: str) -> str:
+        if sampling_ewoc_code in MAYBE_MAIZE_MAYBE_NOT:
+            return "n/a"
+        elif sampling_ewoc_code == "maize":
+            return "maize"
+        else:
+            return "not_maize"
+
+    df["is_maize"] = df.apply(lambda x: is_maize(x.sampling_ewoc_code), axis=1)
     return df
 
 
@@ -111,6 +135,7 @@ def load_gabi_negatives(geojson_path: Path) -> gpd.GeoDataFrame:
         df = gpd.read_file(geojson_path / filename)
         df["sampling_ewoc_code"] = "non_cropland_incl_perennial"
         df["is_crop"] = False
+        df["is_maize"] = "not_maize"
         df["year"] = valid_date.year
         df["valid_time"] = pd.to_datetime(valid_date)
         df["filename"] = filename
@@ -119,7 +144,15 @@ def load_gabi_negatives(geojson_path: Path) -> gpd.GeoDataFrame:
 
     df = pd.concat(dfs)
     return df[
-        ["sampling_ewoc_code", "valid_time", "year", "geometry", "is_crop", "filename"]
+        [
+            "sampling_ewoc_code",
+            "valid_time",
+            "year",
+            "geometry",
+            "is_crop",
+            "is_maize",
+            "filename",
+        ]
     ]
 
 
