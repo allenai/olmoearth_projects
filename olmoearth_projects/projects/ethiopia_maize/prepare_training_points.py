@@ -131,7 +131,7 @@ def prepare_worldcereal_rdm(label_dir: Path) -> gpd.GeoDataFrame:
 if __name__ == "__main__":
     label_dir = Path("ethiopia_labels")
     use_ess: bool = True
-    use_rdm: bool = True
+    use_rdm: bool = False
 
     if not (use_ess or use_rdm):
         raise ValueError("We need to make labels using either ess or rdm (or both).")
@@ -142,9 +142,9 @@ if __name__ == "__main__":
                 [
                     # prepare_maize_data_csv(label_dir),
                     # prepare_maize_and_non_maize(label_dir),
-                    # prepare_selected_districts(label_dir),
-                    prepare_non_crop(label_dir),
-                    prepare_5crops(label_dir),
+                    prepare_selected_districts(label_dir),
+                    # prepare_non_crop(label_dir),
+                    # prepare_5crops(label_dir),
                 ]
             )
         )
