@@ -109,7 +109,7 @@ def prepare_worldcereal_rdm(label_dir: Path) -> gpd.GeoDataFrame:
 
 if __name__ == "__main__":
     label_dir = Path("ethiopia_labels")
-    use_ess: bool = True
+    use_ess: bool = False
     use_rdm: bool = True
 
     if not (use_ess or use_rdm):
@@ -139,4 +139,10 @@ if __name__ == "__main__":
     labels["end_time"] = labels.apply(
         lambda x: datetime(x.year, END_MONTH, END_DAY).strftime("%Y-%m-%d"), axis=1
     )
-    labels.to_file(label_dir / "labels.geojson", driver="GeoJSON")
+
+    file_prefix = "labels"
+    if use_ess:
+        file_prefix = f"{file_prefix}_ess"
+    if use_rdm:
+        file_prefix = f"{file_prefix}_rd"
+    labels.to_file(label_dir / f"{file_prefix}.geojson", driver="GeoJSON")
