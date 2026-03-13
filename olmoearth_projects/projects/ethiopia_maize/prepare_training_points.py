@@ -74,6 +74,27 @@ def prepare_non_crop(label_dir: Path) -> gpd.GeoDataFrame:
     return gdf[["geometry", "year", "maize_or_not"]]
 
 
+def prepare_5crops(label_dir: Path) -> gpd.GeoDataFrame:
+    """Prepare 5crops data."""
+    all_dfs = []
+    for filename in [
+        "Maize2022ESS.shp",
+        "ChickPeas2022ESS1.shp",
+        "SORGHUM2022ESS.shp",
+        "Teff2022ESS.shp",
+        "Wheat2022ESS.shp",
+    ]:
+        df = gpd.read_file(
+            label_dir
+            / "5Crops_Whole_Maize Production Woredas in Ethiopia2022"
+            / filename
+        )
+        df["year"] = 2022
+        df["maize_or_not"] = "maize" if "Maize" in filename else "non-maize"
+        all_dfs.append(df[["geometry", "year", "maize_or_not"]])
+    return pd.concat(all_dfs)
+
+
 def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     """Sample points from WorldCereal RDM files."""
     # which sampling_ewoc_code classes are negatives (basically just excluding maize & unspecified cropland)
@@ -109,7 +130,7 @@ def prepare_worldcereal_rdm(label_dir: Path) -> gpd.GeoDataFrame:
 
 if __name__ == "__main__":
     label_dir = Path("ethiopia_labels")
-    use_ess: bool = False
+    use_ess: bool = True
     use_rdm: bool = True
 
     if not (use_ess or use_rdm):
@@ -119,10 +140,11 @@ if __name__ == "__main__":
         gdfs.append(
             pd.concat(
                 [
-                    prepare_maize_data_csv(label_dir),
-                    prepare_maize_and_non_maize(label_dir),
-                    prepare_selected_districts(label_dir),
+                    # prepare_maize_data_csv(label_dir),
+                    # prepare_maize_and_non_maize(label_dir),
+                    # prepare_selected_districts(label_dir),
                     prepare_non_crop(label_dir),
+                    prepare_5crops(label_dir),
                 ]
             )
         )
@@ -144,5 +166,5 @@ if __name__ == "__main__":
     if use_ess:
         file_prefix = f"{file_prefix}_ess"
     if use_rdm:
-        file_prefix = f"{file_prefix}_rd"
+        file_prefix = f"{file_prefix}_rdm"
     labels.to_file(label_dir / f"{file_prefix}.geojson", driver="GeoJSON")
