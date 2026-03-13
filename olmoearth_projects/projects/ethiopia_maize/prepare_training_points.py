@@ -131,7 +131,7 @@ def prepare_worldcereal_rdm(label_dir: Path) -> gpd.GeoDataFrame:
 if __name__ == "__main__":
     label_dir = Path("ethiopia_labels")
     use_ess: bool = True
-    use_rdm: bool = False
+    use_rdm: bool = True
 
     if not (use_ess or use_rdm):
         raise ValueError("We need to make labels using either ess or rdm (or both).")
