@@ -51,8 +51,8 @@ def prepare_selected_districts(label_dir: Path) -> gpd.GeoDataFrame:
     """Maize and non maize data for 2022."""
     files_to_class = {
         "SelectedMaize2022ESS.shp": "maize",
-        "SelectedTeff2022ESS.shp": "non-maize",
-        "SelectedWheat2022ESS.shp": "non-maize",
+        "SelectedTeff2022ESS.shp": "non_maize",
+        "SelectedWheat2022ESS.shp": "non_maize",
     }
 
     all_dfs = []
@@ -67,10 +67,13 @@ def prepare_selected_districts(label_dir: Path) -> gpd.GeoDataFrame:
 
 def prepare_non_crop(label_dir: Path) -> gpd.GeoDataFrame:
     """Non crop data for 2022."""
-    gdf = gpd.read_file(label_dir / "Non_Crop")
-    gdf["maize_or_not"] = "non-maize"
+    gdf = gpd.read_file(label_dir / "NonCropin HighMaize Production Woredas")
+    gdf["maize_or_not"] = "non_maize"
     # this might be wrong
     gdf["year"] = 2022
+    print(
+        f"Adding {len(gdf)} non crop points from 'NonCropin HighMaize Production Woredas'"
+    )
     return gdf[["geometry", "year", "maize_or_not"]]
 
 
@@ -78,20 +81,19 @@ def prepare_5crops(label_dir: Path) -> gpd.GeoDataFrame:
     """Prepare 5crops data."""
     all_dfs = []
     for filename in [
-        "Maize2022ESS.shp",
-        "ChickPeas2022ESS1.shp",
-        "SORGHUM2022ESS.shp",
-        "Teff2022ESS.shp",
-        "Wheat2022ESS.shp",
+        "MaizeHPW_FV_Edited.shp",
+        "CheckPeas_Cleaned2022HMPZ.shp",
+        "Sorghum_Cleaned2022HMPZ.shp",
+        "Teff_Cleaned2022HMPZ.shp",
+        "Wheat_Cleaned2022HMPZ.shp",
     ]:
         df = gpd.read_file(
-            label_dir
-            / "5Crops_Whole_Maize Production Woredas in Ethiopia2022"
-            / filename
+            label_dir / "5CropsCleaned in High Maize Production Woredas" / filename
         )
         df["year"] = 2022
-        df["maize_or_not"] = "maize" if "Maize" in filename else "non-maize"
+        df["maize_or_not"] = "maize" if "Maize" in filename else "non_maize"
         all_dfs.append(df[["geometry", "year", "maize_or_not"]])
+        print(f"Adding {len(all_dfs[-1])} points from {filename}")
     return pd.concat(all_dfs)
 
 
@@ -107,7 +109,7 @@ def rdm_parquet_to_geojson(parquet_filepath: Path) -> gpd.GeoDataFrame:
     # we can just take the year
     df["year"] = df.valid_time.dt.year
     df["maize_or_not"] = df.apply(
-        lambda x: "maize" if x.sampling_ewoc_code == "maize" else "non-maize", axis=1
+        lambda x: "maize" if x.sampling_ewoc_code == "maize" else "non_maize", axis=1
     )
 
     df["geometry"] = df.geometry.centroid
@@ -143,8 +145,8 @@ if __name__ == "__main__":
                     # prepare_maize_data_csv(label_dir),
                     # prepare_maize_and_non_maize(label_dir),
                     prepare_selected_districts(label_dir),
-                    # prepare_non_crop(label_dir),
-                    # prepare_5crops(label_dir),
+                    prepare_non_crop(label_dir),
+                    prepare_5crops(label_dir),
                 ]
             )
         )
