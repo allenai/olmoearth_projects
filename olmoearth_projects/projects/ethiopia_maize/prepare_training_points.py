@@ -74,6 +74,9 @@ def prepare_non_crop(label_dir: Path) -> gpd.GeoDataFrame:
     print(
         f"Adding {len(gdf)} non crop points from 'NonCropin HighMaize Production Woredas'"
     )
+    # there are multipoints with repeated points.
+    gdf = gdf.explode()
+    gdf = gdf.drop_duplicates("geometry")
     return gdf[["geometry", "year", "maize_or_not"]]
 
 
