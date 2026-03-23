@@ -167,7 +167,7 @@ def start_studio_inference_jobs(run_id: str, run_paths: RunPaths) -> list[str]:
             f"Starting a prediction job with {len(chunk)} features named {chunk_name}"
         )
         json_request_data = {
-            "fine_tuned_model_id": MODEL_ID,
+            "model_id": MODEL_ID,
             "name": chunk_name,
             "project_id": PROJECT_ID,
             "geojson": {
