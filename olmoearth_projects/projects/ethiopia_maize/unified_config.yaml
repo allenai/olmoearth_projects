@@ -1,0 +1,128 @@
+data:
+  output:
+    fields:
+      maize_or_not:
+        field_type: segmentation
+        nodata_value: 2
+        allowed_values:
+          - color:
+              - 50
+              - 189
+              - 36
+              - 255
+            label: maize
+            value: 0
+          - color:
+              - 246
+              - 170
+              - 14
+              - 255
+            label: non_maize
+            value: 1
+    data_type: raster
+  modalities:
+    sentinel1_rtc: null
+    sentinel2_l2a:
+      sort_by: cloud_cover
+      space_mode: mosaic
+  temporality:
+    name: period
+    observation:
+      name: repeating_interval
+      num_periods: 11
+      period_duration_days: 30
+    allowed_start_month_constraints:
+      - February
+model:
+  tasks:
+    maize_or_not:
+      name: segmentation
+      decoder:
+        name: unet
+        num_channels: null
+        conv_layers_per_resolution: 1
+  encoder:
+    name: olmoearth
+    source:
+      name: registry
+      model_name: OlmoEarth-v1-Base
+      embedding_size: 768
+    patch_size: 4
+training:
+  optimizer:
+    lr: 0.00001
+    weight_decay: 0.01
+    name: adamw
+  scheduler:
+    name: plateau
+    factor: 0.2
+    min_lr: 0
+    cooldown: 10
+    patience: 2
+  batch_size: 8
+  max_epochs: 100
+  encoder_freezing:
+    unfreeze_at_epoch: 20
+    unfreeze_lr_factor: 10
+config_version: 0.3.1
+labeled_data_prep:
+  sampler:
+    name: noop
+  data_splitter:
+    name: spatial
+    val_prop: 0.2
+    grid_size: 256
+    test_prop: 0.1
+    train_prop: 0.7
+  annotation_type: point
+  window_preparer:
+    name: standard_raster
+    windowing_mode:
+      name: per_annotation
+      window_sizing:
+        name: buffered
+        buffer: 31
+transpiler_context: null
+input_preprocessing:
+  val: null
+  test: null
+  train:
+    sampler: null
+    input_mode: null
+    transforms: null
+    additional_transforms:
+      - x: true
+        'y': true
+        name: random_flip
+  default:
+    input_mode: single_random_crop
+    input_size: 32
+    transforms: []
+  predict:
+    transforms: null
+    overlap_pixels: 8
+    additional_transforms: null
+prediction_requests:
+  partitioners:
+    partition_to_windows:
+      clip: false
+      name: grid
+      grid_size: 1024
+      projection:
+        method: use_utm
+      overlap_size: 0
+    request_to_partitions:
+      clip: false
+      name: grid
+      grid_size: 1
+      projection: null
+      overlap_size: 0
+  postprocessors:
+    window:
+      name: noop
+    request:
+      name: combine_geotiff
+      max_pixels_per_dimension: 10000
+    partition:
+      name: combine_geotiff
+      max_pixels_per_dimension: 10000
