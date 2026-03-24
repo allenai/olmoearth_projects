@@ -3,6 +3,7 @@
 This script demonstrates how to prepare shapefiles for OlmoEarth.
 These labels have the following properties:
 
+```
 ┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┓
 ┃         Check name ┃ Metric       ┃               Value ┃
 ┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━┩
@@ -14,6 +15,7 @@ These labels have the following properties:
 │     spatial_extent │ maize        │  0.8004380118991101 │
 │     spatial_extent │ non_maize    │  0.9904858160033082 │
 └────────────────────┴──────────────┴─────────────────────┘
+```
 
 OlmoEarth accepts geojsons (or csvs) with the following columns:
 
