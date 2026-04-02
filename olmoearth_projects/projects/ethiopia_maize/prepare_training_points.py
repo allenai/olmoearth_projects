@@ -88,13 +88,15 @@ def prepare_5crops(label_dir: Path) -> gpd.GeoDataFrame:
     for filename in [
         # "MaizeHPW_FV_Edited.shp",
         "Maize_2022__Cleaned and refined_31 03 2026",
+        "Additional Maize_MPZ_Cleaned_2022 _ In Low and Medium Maize Production Woredas",
+        "Additional Maize_MPZ_Cleaned_2017 _ In Low and Medium Maize Production Woredas",
         f"{non_maize_prefix}/CheckPeas_Cleaned2022HMPZ.shp",
         f"{non_maize_prefix}/Sorghum_Cleaned2022HMPZ.shp",
         f"{non_maize_prefix}/Teff_Cleaned2022HMPZ.shp",
         f"{non_maize_prefix}/Wheat_Cleaned2022HMPZ.shp",
     ]:
         df = gpd.read_file(label_dir / filename)
-        df["year"] = 2022
+        df["year"] = 2022 if "2022" in filename else 2017
         df["maize_or_not"] = "maize" if "Maize" in filename else "non_maize"
         all_dfs.append(df[["geometry", "year", "maize_or_not"]])
         print(f"Adding {len(all_dfs[-1])} points from {filename}")
