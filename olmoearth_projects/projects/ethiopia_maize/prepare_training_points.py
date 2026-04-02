@@ -83,16 +83,17 @@ def prepare_non_crop(label_dir: Path) -> gpd.GeoDataFrame:
 def prepare_5crops(label_dir: Path) -> gpd.GeoDataFrame:
     """Prepare 5crops data."""
     all_dfs = []
+
+    non_maize_prefix = "5CropsCleaned in High Maize Production Woredas"
     for filename in [
-        "MaizeHPW_FV_Edited.shp",
-        "CheckPeas_Cleaned2022HMPZ.shp",
-        "Sorghum_Cleaned2022HMPZ.shp",
-        "Teff_Cleaned2022HMPZ.shp",
-        "Wheat_Cleaned2022HMPZ.shp",
+        # "MaizeHPW_FV_Edited.shp",
+        "Maize_2022__Cleaned and refined_31 03 2026",
+        f"{non_maize_prefix}/CheckPeas_Cleaned2022HMPZ.shp",
+        f"{non_maize_prefix}/Sorghum_Cleaned2022HMPZ.shp",
+        f"{non_maize_prefix}/Teff_Cleaned2022HMPZ.shp",
+        f"{non_maize_prefix}/Wheat_Cleaned2022HMPZ.shp",
     ]:
-        df = gpd.read_file(
-            label_dir / "5CropsCleaned in High Maize Production Woredas" / filename
-        )
+        df = gpd.read_file(label_dir / filename)
         df["year"] = 2022
         df["maize_or_not"] = "maize" if "Maize" in filename else "non_maize"
         all_dfs.append(df[["geometry", "year", "maize_or_not"]])
