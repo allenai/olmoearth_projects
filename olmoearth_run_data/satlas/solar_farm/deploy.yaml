@@ -1,0 +1,11 @@
+integrated_config:
+  application: SOLAR_FARM
+  model_id: "PLACEHOLDER_SOLAR_FARM_MODEL_ID"
+  project_id: "PLACEHOLDER_PROJECT_ID"
+  tile_size_degrees: 5
+  max_concurrent_jobs: 20
+  historical_path: "gs://ai2-satlas-data/historical/solar_farm"
+  publish_path: "gs://ai2-satlas-data/public/solar_farm"
+  weka_base_dir: "/weka/dfive-default/rslearn-eai/datasets/satlas"
+  smooth_workers: 16
+  # label: "2025-10"  # optional, defaults to most recent completed quarter

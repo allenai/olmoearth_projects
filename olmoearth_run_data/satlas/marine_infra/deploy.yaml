@@ -1,0 +1,10 @@
+integrated_config:
+  application: MARINE_INFRA
+  model_id: "fab1d326-6b3c-45a6-8872-c6ea042ca156"
+  project_id: "0bec20ce-ded5-4629-826c-eea8abe236ec"
+  tile_size_degrees: 20
+  max_concurrent_jobs: 50
+  publish_path: "gs://ai2-satlas-data/public/marine_infra"
+  weka_base_dir: "/weka/dfive-default/rslearn-eai/projects/olmoearth_projects_satlas/"
+  smooth_workers: 16
+  # label: "2025-10"  # optional, defaults to most recent completed quarter
