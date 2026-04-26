@@ -33,6 +33,12 @@ dev = [
     "ruff>=0.7",
 ]
 
+# Dependencies needed for Satlas prediction pipeline.
+satlas = [
+    "beaker-py>=2.0",
+    "global-land-mask>=1.0",
+]
+
 [project.urls]
 homepage = "https://github.com/allenai/olmoearth_projects"
 issues = "https://github.com/allenai/olmoearth_projects/issues"

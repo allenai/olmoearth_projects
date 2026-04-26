@@ -1,0 +1,52 @@
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 1.0
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 1024
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+postprocessing_strategies:
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
+    init_args:
+      geometry_source: "result"
+      include_request_properties: false
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
+    init_args:
+      geometry_source: "result"
+      include_request_properties: false
+
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
+    init_args:
+      geometry_source: "result"
+      include_request_properties: false
+
+inference_results_config:
+  data_type: vector
+  classification_fields:
+    - property_name: category
+      allowed_values:
+        - value: 1
+          label: platform
+          color: [255, 0, 0]
+        - value: 2
+          label: turbine
+          color: [255, 165, 0]
+  detection_objects:
+    - detected_object_name: platform
+    - detected_object_name: turbine
+  regression_fields: null

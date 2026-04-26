@@ -1,0 +1,11 @@
+integrated_config:
+  application: WIND_TURBINE
+  model_id: "PLACEHOLDER_WIND_TURBINE_MODEL_ID"
+  project_id: "PLACEHOLDER_PROJECT_ID"
+  tile_size_degrees: 5
+  max_concurrent_jobs: 20
+  historical_path: "gs://ai2-satlas-data/historical/wind_turbine"
+  publish_path: "gs://ai2-satlas-data/public/wind_turbine"
+  weka_base_dir: "/weka/dfive-default/rslearn-eai/datasets/satlas"
+  smooth_workers: 16
+  # label: "2025-10"  # optional, defaults to most recent completed quarter

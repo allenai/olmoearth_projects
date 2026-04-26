@@ -1,0 +1,56 @@
+{
+  "layers": {
+    "label": {
+      "type": "vector"
+    },
+    "output": {
+      "type": "vector",
+      "vector_format": {
+        "class_path": "rslearn.utils.vector_format.GeojsonVectorFormat",
+        "init_args": {
+          "coordinate_mode": "WGS84"
+        }
+      }
+    },
+    "sentinel2": {
+      "band_sets": [
+        {
+          "bands": [
+            "B01",
+            "B02",
+            "B03",
+            "B04",
+            "B05",
+            "B06",
+            "B07",
+            "B08",
+            "B8A",
+            "B09",
+            "B11",
+            "B12"
+          ],
+          "dtype": "uint16"
+        }
+      ],
+      "data_source": {
+        "class_path": "olmoearth_run.runner.tools.rslearn_data_sources.olmoearth_datasets.sentinel2_l2a.Sentinel2L2A",
+        "ingest": false,
+        "init_args": {
+          "cache_dir": "cache/olmoearth_datasets",
+          "harmonize": true,
+          "query": {
+            "sort_by": "CLOUD_COVER",
+            "sort_direction": "ASC"
+          }
+        },
+        "query_config": {
+          "max_matches": 4,
+          "min_matches": 4,
+          "period_duration": "30d",
+          "space_mode": "PER_PERIOD_MOSAIC"
+        }
+      },
+      "type": "raster"
+    }
+  }
+}
