@@ -1,0 +1,61 @@
+inference_results_config:
+  data_type: vector
+  classification_fields:
+    - property_name: class_name
+      band_index: 1
+      allowed_values:
+        - value: 0
+          label: nodata
+          color: [255, 255, 255]
+        - value: 1
+          label: mennonites_nonsoybean
+          color: [140, 86, 75]
+        - value: 2
+          label: soybean
+          color: [31, 119, 180]
+        - value: 3
+          label: oil_palm
+          color: [255, 127, 14]
+        - value: 4
+          label: other_agriculture
+          color: [188, 189, 34]
+        - value: 5
+          label: pastures
+          color: [44, 160, 44]
+        - value: 6
+          label: rice
+          color: [23, 190, 207]
+
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.chunk_partitioner.ChunkPartitioner
+    init_args:
+      num_geometries_per_partition: 5000
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.fixed_window_partitioner.FixedWindowPartitioner
+    init_args:
+      window_size: 128
+      # The model is trained on 128x128 windows in the UTM zone of the event at 10
+      # m/pixel. With use_utm, the CRS of output_projection is ignored (the UTM zone is
+      # picked based on the window centroid) but its resolution is used.
+      use_utm: true
+      output_projection:
+        class_path: rslearn.utils.Projection
+        init_args:
+          crs:
+            _module_: rasterio.crs
+            _callable_: CRS.from_epsg
+            code: 32718
+          x_resolution: 10
+          y_resolution: -10
+
+postprocessing_strategies:
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson
+
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geojson.CombineGeojson

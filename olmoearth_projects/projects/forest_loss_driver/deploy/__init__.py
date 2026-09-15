@@ -15,10 +15,8 @@ import requests
 import shapely
 import shapely.geometry
 import tqdm
-from rslearn.const import WGS84_PROJECTION
 from rslearn.utils.feature import Feature
 from rslearn.utils.fsspec import open_atomic
-from rslearn.utils.grid_index import GridIndex
 from rslearn.utils.mp import star_imap_unordered
 from rslearn.utils.vector_format import GeojsonCoordinateMode, GeojsonVectorFormat
 from upath import UPath
@@ -30,7 +28,13 @@ from olmoearth_projects.projects.forest_loss_driver.extract_alerts import (
 from olmoearth_projects.utils.logging import get_logger
 from olmoearth_projects.utils.studio_client import StudioClient
 
+from .centroid_index import CentroidIndex
 from .make_tiles import make_tiles
+from .monocrop import (
+    add_monoculture_predictions,
+    make_monocrop_request_features,
+    select_monocrop_events,
+)
 from .sentinel2 import get_sentinel2_assets
 
 logger = get_logger(__name__)
@@ -39,7 +43,11 @@ ORGANIZATION_ID = "f098bcba-b994-46ce-87fc-b90b14bb8338"  # Ai2 - Demo
 PROJECT_ID = (
     "2f3788b4-11bb-48ee-b379-eacccaf9734a"  # Forest Loss Driver Colombia 12 Demo
 )
+# The forest loss driver model, which classifies the driver of each forest loss event.
 MODEL_ID = "a3c3e819-7aa9-47e9-98fa-f72449a56263"
+# The monoculture model (see olmoearth_run_data/forest_loss_driver_monocrop/), which
+# classifies the type of agriculture for large-scale agriculture events.
+MONOCROP_MODEL_ID = "d840f45d-3428-4ce6-b24a-67132977fa20"
 
 # Timeout (seconds) for downloading prediction results.
 REQUEST_TIMEOUT = 30
@@ -47,8 +55,10 @@ REQUEST_TIMEOUT = 30
 # Seconds to wait between polling for job status.
 POLL_SLEEP_TIME = 10
 
-# How many forest loss events to include in each Studio job.
-EVENTS_PER_STUDIO_JOB = 10000
+# Some forest loss events will not be successful in Studio due to not having enough
+# Sentinel-2 images (e.g. recent events, or cloudy months for the monoculture model).
+# So we lower the threshold to 50% of windows needing to succeed.
+MIN_WINDOW_SUCCESS_RATE = 0.5
 
 
 @dataclass
@@ -80,11 +90,18 @@ class RunPaths:
 
     # Initial alerts extracted from GLAD.
     initial_alerts_fname: UPath
-    # Filename to store job IDs.
+    # Filename to store Studio job IDs (keyed by job name).
     job_ids_fname: UPath
-    # Outputs from Studio jobs.
+    # Outputs from the forest loss driver Studio job.
     raw_studio_outputs_fname: UPath
-    # Filename to write all events.
+    # Forest loss events after merging with previous events, but before adding
+    # monoculture predictions.
+    merged_events_fname: UPath
+    # Request geometry (event centroids) for the monoculture Studio job.
+    monocrop_request_fname: UPath
+    # Outputs from the monoculture Studio job.
+    monocrop_raw_outputs_fname: UPath
+    # Filename to write all events (including monoculture predictions).
     all_events_fname: UPath
     # Directory to write per-country/month GeoJSON files.
     per_country_month_dir: UPath
@@ -125,16 +142,72 @@ def simplify_features_to_centroids(
     return simplified
 
 
-def start_studio_inference_jobs(
+def start_studio_inference_job(
+    client: StudioClient,
+    job_name: str,
+    model_id: str,
+    features: list[dict],
+    job_ids_fname: UPath,
+) -> str:
+    """Start an inference job on Studio, or return the already started job.
+
+    The job IDs are cached in job_ids_fname keyed by the job name, so if a job with
+    this name was previously started for this run, then the previous job ID is returned
+    instead of starting a new job.
+
+    Args:
+        client: the Studio client to use.
+        job_name: the name of the job, which must be unique within the run.
+        model_id: the Studio model ID to run.
+        features: the GeoJSON feature dicts (in WGS84) to run inference on.
+        job_ids_fname: the filename caching the job IDs for this run.
+
+    Returns:
+        the Studio job ID.
+    """
+    # See if existing filename caching the job IDs exists.
+    # If so, we load those already started jobs.
+    if job_ids_fname.exists():
+        with job_ids_fname.open() as f:
+            job_ids_by_name = json.load(f)
+    else:
+        job_ids_by_name = {}
+
+    if job_name in job_ids_by_name:
+        logger.info(
+            f"Found previously started job {job_ids_by_name[job_name]} named {job_name} in {job_ids_fname}"
+        )
+        return job_ids_by_name[job_name]  # type: ignore[no-any-return]
+
+    # API request to run the model.
+    logger.info(
+        f"Starting a prediction job with {len(features)} features named {job_name}"
+    )
+    job_id = client.create_prediction(
+        project_id=PROJECT_ID,
+        model_id=model_id,
+        name=job_name,
+        geojson={
+            "type": "FeatureCollection",
+            "properties": {},
+            "features": features,
+        },
+        min_window_success_rate=MIN_WINDOW_SUCCESS_RATE,
+    )
+
+    job_ids_by_name[job_name] = job_id
+    with open_atomic(job_ids_fname, "w") as f:
+        json.dump(job_ids_by_name, f)
+
+    return job_id
+
+
+def start_driver_inference_job(
     client: StudioClient, run_id: str, run_paths: RunPaths
-) -> list[str]:
-    """Starts inference jobs on Studio.
+) -> str:
+    """Start the forest loss driver inference job on Studio.
 
-    There is one job for each EVENTS_PER_STUDIO_JOB forest loss events. This is because
-    the job seems to be stuck in pending state if there are too many events.
-
-    If inference jobs were previously started for this run, then the previous job IDs
-    are returned.
+    All of the forest loss events extracted from GLAD are submitted in one job.
 
     Args:
         client: the Studio client to use.
@@ -142,7 +215,7 @@ def start_studio_inference_jobs(
         run_paths: the paths to use for this run.
 
     Returns:
-        the Studio job IDs.
+        the Studio job ID.
     """
     # Read the GeoJSON, we will put it into the request.
     with run_paths.initial_alerts_fname.open() as f:
@@ -150,57 +223,15 @@ def start_studio_inference_jobs(
 
     # Simplify geometries to centroid points to avoid Studio failures due to
     # complex polygon geometries. The model only uses the centroid anyway.
-    all_features = simplify_features_to_centroids(geojson_data["features"])
+    features = simplify_features_to_centroids(geojson_data["features"])
 
-    # Determine the chunks of alerts, we will create one job per chunk.
-    chunks = []
-    for i in range(0, len(all_features), EVENTS_PER_STUDIO_JOB):
-        chunk = all_features[i : i + EVENTS_PER_STUDIO_JOB]
-        chunks.append(chunk)
-    logger.info(f"Got {len(chunks)} chunks with {len(all_features)} total features")
-
-    # See if existing filename caching the job IDs exists.
-    # If so, we load those already started jobs.
-    if run_paths.job_ids_fname.exists():
-        with run_paths.job_ids_fname.open() as f:
-            job_ids_by_chunk = json.load(f)
-            logger.info(
-                f"Found existing job file {run_paths.job_ids_fname} with {len(job_ids_by_chunk)} jobs started already"
-            )
-    else:
-        job_ids_by_chunk = {}
-
-    # Start the jobs that haven't been started yet.
-    for chunk_idx, chunk in enumerate(chunks):
-        chunk_name = f"run_{run_id}_chunk_{chunk_idx}"
-        if chunk_name in job_ids_by_chunk:
-            continue
-
-        # API request to run the model.
-        logger.info(
-            f"Starting a prediction job with {len(chunk)} features named {chunk_name}"
-        )
-        job_id = client.create_prediction(
-            project_id=PROJECT_ID,
-            model_id=MODEL_ID,
-            name=chunk_name,
-            geojson={
-                "type": "FeatureCollection",
-                "properties": {},
-                "features": chunk,
-            },
-            # Some recent forest loss events will not be successful due to not having
-            # enough Sentinel-2 images after the event. So we lower the threshold to
-            # 50% of windows needing to succeed.
-            min_window_success_rate=0.5,
-        )
-
-        job_ids_by_chunk[chunk_name] = job_id
-
-        with open_atomic(run_paths.job_ids_fname, "w") as f:
-            json.dump(job_ids_by_chunk, f)
-
-    return list(job_ids_by_chunk.values())
+    return start_studio_inference_job(
+        client=client,
+        job_name=f"run_{run_id}",
+        model_id=MODEL_ID,
+        features=features,
+        job_ids_fname=run_paths.job_ids_fname,
+    )
 
 
 def wait_for_studio_job(
@@ -278,35 +309,33 @@ def get_prediction_result(client: StudioClient, job_id: str) -> list[Feature]:
         return GeojsonVectorFormat().decode_from_file(tmp_fname)
 
 
-def get_prediction_results(
-    client: StudioClient, job_ids: list[str], run_paths: RunPaths
+def get_cached_prediction_result(
+    client: StudioClient, job_id: str, cache_fname: UPath
 ) -> list[Feature]:
-    """Get and cache prediction results across many Studio jobs.
+    """Get the prediction result from a Studio job, caching it in cache_fname.
 
     Args:
         client: the Studio client to use.
-        job_ids: list of Studio job IDs to get results for.
-        run_paths: paths to use for this run.
+        job_id: the Studio job ID to get results for.
+        cache_fname: the filename to cache the downloaded result in.
 
     Returns:
-        list of output features concatenated across jobs.
+        list of output features.
     """
     # See if this operation has been completed already.
     vector_format = GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84)
-    if run_paths.raw_studio_outputs_fname.exists():
+    if cache_fname.exists():
         logger.info(
-            f"Loading previously downloaded Studio job outputs from {run_paths.raw_studio_outputs_fname}"
+            f"Loading previously downloaded Studio job outputs from {cache_fname}"
         )
-        return vector_format.decode_from_file(run_paths.raw_studio_outputs_fname)
+        return vector_format.decode_from_file(cache_fname)
 
-    forest_loss_events: list[Feature] = []
-    for job_id in job_ids:
-        logger.info(f"Getting forest loss event outputs from job {job_id}")
-        forest_loss_events.extend(get_prediction_result(client, job_id))
+    logger.info(f"Getting outputs from job {job_id}")
+    output_features = get_prediction_result(client, job_id)
 
-    # Cache and return the events.
-    vector_format.encode_to_file(run_paths.raw_studio_outputs_fname, forest_loss_events)
-    return forest_loss_events
+    # Cache and return the features.
+    vector_format.encode_to_file(cache_fname, output_features)
+    return output_features
 
 
 def add_input_properties_to_output_features(
@@ -326,41 +355,11 @@ def add_input_properties_to_output_features(
         input_features: the original input features (superset of outputs).
         output_features: the output features from Studio to enrich.
     """
-    # 0.01 should give a reasonable number of grid cells (~100 pixels).
-    grid_index = GridIndex(0.01)
-
-    # Insert input features into the grid index, keyed by their centroid.
-    for input_feat in input_features:
-        wgs84_geom = input_feat.geometry.to_projection(WGS84_PROJECTION)
-        centroid = wgs84_geom.shp.centroid
-        # Use centroid point as both the bounds key and the stored value.
-        grid_index.insert(centroid.bounds, (centroid, input_feat))
+    centroid_index = CentroidIndex(input_features)
 
     # Match each output feature to the closest input feature by centroid distance.
     for output_feat in output_features:
-        output_wgs84_geom = output_feat.geometry.to_projection(WGS84_PROJECTION)
-        output_centroid = output_wgs84_geom.shp.centroid
-
-        # Query a small region around the output centroid.
-        search_buffer = 0.01  # ~1km in WGS84 degrees
-        search_bounds = (
-            output_centroid.x - search_buffer,
-            output_centroid.y - search_buffer,
-            output_centroid.x + search_buffer,
-            output_centroid.y + search_buffer,
-        )
-        candidates: list[tuple[shapely.Point, Feature]] = grid_index.query(
-            search_bounds
-        )
-
-        best_input_feat: Feature | None = None
-        best_distance: float | None = None
-        for input_centroid, input_feat in candidates:
-            distance = output_centroid.distance(input_centroid)
-            if best_distance is None or distance < best_distance:
-                best_input_feat = input_feat
-                best_distance = distance
-
+        best_input_feat = centroid_index.find_closest(output_feat)
         if best_input_feat is None:
             raise ValueError(f"found no input feature for output feature {output_feat}")
 
@@ -370,7 +369,7 @@ def add_input_properties_to_output_features(
 
 def merge_forest_loss_events(
     client: StudioClient,
-    inference_job_ids: list[str],
+    inference_job_id: str,
     asset_workers: int,
     run_paths: RunPaths,
 ) -> list[Feature]:
@@ -384,7 +383,7 @@ def merge_forest_loss_events(
 
     Args:
         client: the Studio client to use.
-        inference_job_ids: the Studio job IDs for this run.
+        inference_job_id: the forest loss driver Studio job ID for this run.
         asset_workers: number of workers for getting Sentinel-2 assets.
         run_paths: paths to use for this run.
 
@@ -393,14 +392,16 @@ def merge_forest_loss_events(
     """
     # See if this operation has been completed already.
     vector_format = GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84)
-    if run_paths.all_events_fname.exists():
+    if run_paths.merged_events_fname.exists():
         logger.info(
-            f"Loading previously computed merged events from {run_paths.all_events_fname}"
+            f"Loading previously computed merged events from {run_paths.merged_events_fname}"
         )
-        return vector_format.decode_from_file(run_paths.all_events_fname)
+        return vector_format.decode_from_file(run_paths.merged_events_fname)
 
     # Get prediction result from Studio.
-    forest_loss_events = get_prediction_results(client, inference_job_ids, run_paths)
+    forest_loss_events = get_cached_prediction_result(
+        client, inference_job_id, run_paths.raw_studio_outputs_fname
+    )
 
     # Add back properties we had on our original features, like "country".
     # Also restore the original polygon geometries (Studio outputs have simplified
@@ -459,8 +460,79 @@ def merge_forest_loss_events(
         event.properties["index"] = index
 
     # Cache and return the events.
-    vector_format.encode_to_file(run_paths.all_events_fname, forest_loss_events)
+    vector_format.encode_to_file(run_paths.merged_events_fname, forest_loss_events)
     return forest_loss_events
+
+
+def add_monoculture_predictions_from_studio(
+    client: StudioClient,
+    run_id: str,
+    run_time: datetime,
+    forest_loss_events: list[Feature],
+    run_paths: RunPaths,
+) -> None:
+    """Run the monoculture model on large-scale agriculture events and tag the events.
+
+    The events that qualify (see select_monocrop_events) are submitted to Studio as
+    centroids with time ranges covering the 12 monthly periods that the monoculture
+    model expects. The predicted class is then added to the events as the
+    monoculture_category property.
+
+    The request geometry, job ID, and raw outputs are cached so the operation can be
+    resumed if the pipeline restarts.
+
+    Args:
+        client: the Studio client to use.
+        run_id: the run ID.
+        run_time: the reference time of this run, used to compute event ages.
+        forest_loss_events: the merged forest loss events, which are modified
+            in-place.
+        run_paths: paths to use for this run.
+    """
+    selected_events = select_monocrop_events(forest_loss_events, run_time)
+    logger.info(
+        f"Selected {len(selected_events)} of {len(forest_loss_events)} events for monoculture classification"
+    )
+    if len(selected_events) == 0:
+        logger.info("No events qualify for monoculture classification, skipping")
+        return
+
+    # Create (or load) the request geometry, cached for reproducibility.
+    if run_paths.monocrop_request_fname.exists():
+        logger.info(
+            f"Using existing monoculture request geometry at {run_paths.monocrop_request_fname}"
+        )
+        with run_paths.monocrop_request_fname.open() as f:
+            request_features = json.load(f)["features"]
+    else:
+        request_features = make_monocrop_request_features(selected_events, run_time)
+        with open_atomic(run_paths.monocrop_request_fname, "w") as f:
+            json.dump(
+                {
+                    "type": "FeatureCollection",
+                    "properties": {},
+                    "features": request_features,
+                },
+                f,
+            )
+
+    job_id = start_studio_inference_job(
+        client=client,
+        job_name=f"run_{run_id}_monocrop",
+        model_id=MONOCROP_MODEL_ID,
+        features=request_features,
+        job_ids_fname=run_paths.job_ids_fname,
+    )
+    logger.info(f"Got monoculture Studio job ID: {job_id}")
+    wait_for_studio_job(client, job_id)
+
+    output_features = get_cached_prediction_result(
+        client, job_id, run_paths.monocrop_raw_outputs_fname
+    )
+    num_tagged = add_monoculture_predictions(selected_events, output_features)
+    logger.info(
+        f"Added monoculture predictions to {num_tagged} of {len(selected_events)} selected events"
+    )
 
 
 def write_individual_event(fname: UPath, event: Feature) -> None:
@@ -508,21 +580,34 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
 
     1. Process GLAD alerts to get prediction request geometry for recent forest loss
        events.
-    2. Make OlmoEarth API request to run inference.
+    2. Make OlmoEarth API request to run forest loss driver inference.
     3. Merge the new events with existing ones.
     4. Get metadata for Planetary Computer scenes that can be used to visualize the
        before and after images for each forest loss event.
-    5. Use tippecanoe to make tiles, and upload those tiles along with GeoJSON files to
+    5. Make a second OlmoEarth API request to run the monoculture model on large-scale
+       agriculture events from the last 12 months, and tag those events with the
+       predicted monoculture category.
+    6. Use tippecanoe to make tiles, and upload those tiles along with GeoJSON files to
        GCS so the website can access it.
 
     Args:
         integrated_config: the integrated configuration for all inference pipeline
             steps.
     """
+    if MONOCROP_MODEL_ID is None:
+        raise ValueError(
+            "MONOCROP_MODEL_ID must be set to the Studio model ID of the monoculture model"
+        )
+
     # Make run ID based on the current time.
     # We check the most recent Friday since that is when GLAD alerts are released, and
     # this way we will have the same run ID in case of restarts.
-    run_id = _get_most_recent_friday().strftime("%Y%m%d")
+    # The run time (midnight UTC on that Friday) is also the reference time for
+    # computing the age of forest loss events.
+    run_time = _get_most_recent_friday().replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    run_id = run_time.strftime("%Y%m%d")
     weka_ds_root = UPath(integrated_config.weka_base_dir) / f"dataset_{run_id}"
     gcs_ds_root = UPath(integrated_config.gcs_base_dir) / f"dataset_{run_id}"
 
@@ -530,6 +615,9 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
         initial_alerts_fname=weka_ds_root / "prediction_request_geometry.geojson",
         job_ids_fname=weka_ds_root / "job_id.json",
         raw_studio_outputs_fname=weka_ds_root / "events_from_studio_jobs.geojson",
+        merged_events_fname=weka_ds_root / "merged_events.geojson",
+        monocrop_request_fname=weka_ds_root / "monocrop_request_geometry.geojson",
+        monocrop_raw_outputs_fname=weka_ds_root / "monocrop_events_from_studio.geojson",
         all_events_fname=gcs_ds_root / "all_events.geojson",
         per_country_month_dir=gcs_ds_root,
         global_latest_fname=gcs_ds_root.parent / "latest.geojson",
@@ -550,34 +638,49 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
             f"Using existing prediction request geometry at {run_paths.initial_alerts_fname}"
         )
 
-    # Start the Studio inference job.
+    vector_format = GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84)
     client = StudioClient.from_env()
-    inference_job_ids = start_studio_inference_jobs(client, run_id, run_paths)
-    logger.info(f"Got Studio inference job IDs: {inference_job_ids}")
 
-    # Check job status.
-    for job_id in inference_job_ids:
-        wait_for_studio_job(client, job_id)
+    if run_paths.all_events_fname.exists():
+        logger.info(
+            f"Loading previously computed events from {run_paths.all_events_fname}"
+        )
+        forest_loss_events = vector_format.decode_from_file(run_paths.all_events_fname)
+    else:
+        # Start the forest loss driver Studio inference job and wait for it.
+        inference_job_id = start_driver_inference_job(client, run_id, run_paths)
+        logger.info(f"Got forest loss driver Studio job ID: {inference_job_id}")
+        wait_for_studio_job(client, inference_job_id)
 
-    # Get forest loss events from Studio, identify Sentinel-2 assets for visualization
-    # for each event, and merge in previous events before the time window we are
-    # processing.
-    # This function will also save all_events.geojson in gcs_ds_root.
-    forest_loss_events = merge_forest_loss_events(
-        client=client,
-        inference_job_ids=inference_job_ids,
-        asset_workers=integrated_config.asset_workers,
-        run_paths=run_paths,
-    )
+        # Get forest loss events from Studio, identify Sentinel-2 assets for
+        # visualization for each event, and merge in previous events before the time
+        # window we are processing.
+        forest_loss_events = merge_forest_loss_events(
+            client=client,
+            inference_job_id=inference_job_id,
+            asset_workers=integrated_config.asset_workers,
+            run_paths=run_paths,
+        )
+
+        # Run the monoculture model on the large-scale agriculture events.
+        add_monoculture_predictions_from_studio(
+            client=client,
+            run_id=run_id,
+            run_time=run_time,
+            forest_loss_events=forest_loss_events,
+            run_paths=run_paths,
+        )
+
+        # Save all_events.geojson in gcs_ds_root.
+        vector_format.encode_to_file(run_paths.all_events_fname, forest_loss_events)
 
     # Write latest.geojson (used for merging) and per-country/month files.
-    # We write latest.geojson here instead of in merge_forest_loss_events since it is a
+    # We write latest.geojson here instead of when computing the events since it is a
     # cleaner way to ensure we always have completed this step (we don't want to write
     # all_events_fname and then job crashes and we don't write latest_events_fname).
     logger.info(
         f"Got {len(forest_loss_events)} after merging, writing latest.geojson and per-country/month files to GCS"
     )
-    vector_format = GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84)
     vector_format.encode_to_file(run_paths.global_latest_fname, forest_loss_events)
 
     events_by_country_month: dict[tuple[str, str], list[Feature]] = {}
