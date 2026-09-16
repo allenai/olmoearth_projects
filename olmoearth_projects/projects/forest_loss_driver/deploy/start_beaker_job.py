@@ -92,7 +92,11 @@ if __name__ == "__main__":
             command=command,
             env_vars=env_vars,
             datasets=datasets,
-            preemptible=False,
+            # The job is preemptible, but protected from preemption for the first
+            # 8 hours (the maximum allowed on most clusters). If it is preempted
+            # after that, it is re-queued and the pipeline restarts from scratch.
+            min_runtime="8h",
+            auto_resume=True,
         )
         logger.info(f"Creating experiment: {task_name}")
         beaker.experiment.create(name=task_name, spec=experiment_spec)

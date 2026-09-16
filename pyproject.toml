@@ -35,7 +35,7 @@ dev = [
 
 # Dependencies needed for forest loss driver inference pipeline.
 forest_loss_driver = [
-    "beaker-py>=2.0",
+    "beaker-py>=2.6",
 ]
 
 [project.urls]

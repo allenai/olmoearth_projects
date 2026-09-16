@@ -10,9 +10,11 @@ request geometry for them, and to add the predictions back onto the events.
 """
 
 import copy
+import multiprocessing
 from datetime import datetime, timedelta
 
 import shapely.geometry
+import tqdm
 from rslearn.const import WGS84_PROJECTION
 from rslearn.utils.feature import Feature
 from rslearn.utils.geometry import Projection, STGeometry
@@ -39,6 +41,9 @@ MIN_AGE_DAYS = 30
 
 # Events must be younger than this (in days), i.e. from the most recent 12 months.
 MAX_AGE_DAYS = 365
+
+# Number of geometries to send to a worker at a time when computing areas in parallel.
+AREA_CHUNKSIZE = 64
 
 # The monoculture model inputs NUM_PERIODS monthly mosaics with PERIOD_DAYS days per
 # period. The model is trained on (NUM_PERIODS - m) pre-loss periods followed by m
@@ -77,21 +82,28 @@ def get_area_ha(geometry: STGeometry) -> float:
     return utm_geometry.shp.area / 10000
 
 
-def select_monocrop_events(events: list[Feature], run_time: datetime) -> list[Feature]:
+def select_monocrop_events(
+    events: list[Feature], run_time: datetime, workers: int = 1
+) -> list[Feature]:
     """Select the forest loss events to run through the monoculture model.
 
     These are events that the forest loss driver model classified as agriculture, that
     are larger than MIN_AREA_HA, and that are between MIN_AGE_DAYS and MAX_AGE_DAYS old
     relative to run_time.
 
+    The cheap category and age filters are applied first. The area computation is
+    slow (tens of milliseconds per event, dominated by the UTM zone lookup), so it is
+    only applied to the remaining candidates, in parallel across workers.
+
     Args:
         events: the merged forest loss events.
         run_time: the reference time of this run.
+        workers: number of worker processes for computing event areas.
 
     Returns:
-        the subset of events to process.
+        the subset of events to process, in the same order as in events.
     """
-    selected = []
+    candidates = []
     for event in events:
         if event.properties.get("category") != AGRICULTURE_CATEGORY:
             continue
@@ -99,9 +111,24 @@ def select_monocrop_events(events: list[Feature], run_time: datetime) -> list[Fe
         age_days = (run_time - event_time).days
         if age_days < MIN_AGE_DAYS or age_days >= MAX_AGE_DAYS:
             continue
-        if get_area_ha(event.geometry) <= MIN_AREA_HA:
+        candidates.append(event)
+
+    geometries = [event.geometry for event in candidates]
+    p = multiprocessing.Pool(workers)
+    areas = p.imap(get_area_ha, geometries, chunksize=AREA_CHUNKSIZE)
+
+    selected = []
+    for event, area_ha in zip(
+        candidates,
+        tqdm.tqdm(areas, desc="Computing event areas", total=len(candidates)),
+    ):
+        if area_ha <= MIN_AREA_HA:
             continue
         selected.append(event)
+
+    p.close()
+    p.join()
+
     return selected
 
 

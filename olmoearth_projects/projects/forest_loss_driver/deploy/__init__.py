@@ -35,6 +35,7 @@ from .monocrop import (
     make_monocrop_request_features,
     select_monocrop_events,
 )
+from .overlap_dedup import filter_overlapping_previous_events
 from .sentinel2 import get_sentinel2_assets
 
 logger = get_logger(__name__)
@@ -82,6 +83,9 @@ class IntegratedConfig:
     make_tiles_workers: int
     # Number of workers to use for writing individual events.
     write_individual_events_workers: int
+    # Number of workers to use for computing event areas when selecting events for
+    # monoculture classification.
+    monocrop_select_workers: int = 32
 
 
 @dataclass
@@ -375,6 +379,10 @@ def merge_forest_loss_events(
 ) -> list[Feature]:
     """Get the forest loss events from Studio and merge them with previous events.
 
+    Previous events are dropped if they start within the time window covered by the
+    new events, or if more than OVERLAP_DEDUP_THRESHOLD of their area is covered by a
+    new event (see filter_overlapping_previous_events).
+
     We also determine Sentinel-2 assets to display for the new events, and add an index
     property to all events.
 
@@ -444,10 +452,24 @@ def merge_forest_loss_events(
             f"Merging in a subset of the {len(previous_events)} previously computed events from {run_paths.global_latest_fname}, currently this run has {len(forest_loss_events)} events"
         )
 
-        for event in previous_events:
-            if event.properties["oe_start_time"] >= earliest_start_time:
-                continue
-            forest_loss_events.append(event)
+        # First drop previous events within the time window covered by the new
+        # events, since the new events supersede them.
+        candidate_previous_events = [
+            event
+            for event in previous_events
+            if event.properties["oe_start_time"] < earliest_start_time
+        ]
+        logger.info(
+            f"Dropped {len(previous_events) - len(candidate_previous_events)} previous events with start time >= {earliest_start_time}"
+        )
+
+        # Then drop previous events that are mostly covered by a new event, since
+        # those are most likely the same forest loss event detected again.
+        kept_previous_events = filter_overlapping_previous_events(
+            previous_events=candidate_previous_events,
+            new_events=forest_loss_events,
+        )
+        forest_loss_events.extend(kept_previous_events)
 
         logger.info(f"After merging, this run has {len(forest_loss_events)} events")
     else:
@@ -470,6 +492,7 @@ def add_monoculture_predictions_from_studio(
     run_time: datetime,
     forest_loss_events: list[Feature],
     run_paths: RunPaths,
+    select_workers: int,
 ) -> None:
     """Run the monoculture model on large-scale agriculture events and tag the events.
 
@@ -488,8 +511,13 @@ def add_monoculture_predictions_from_studio(
         forest_loss_events: the merged forest loss events, which are modified
             in-place.
         run_paths: paths to use for this run.
+        select_workers: number of worker processes for computing event areas when
+            selecting events.
     """
-    selected_events = select_monocrop_events(forest_loss_events, run_time)
+    logger.info("Selecting events for monoculture classification")
+    selected_events = select_monocrop_events(
+        forest_loss_events, run_time, workers=select_workers
+    )
     logger.info(
         f"Selected {len(selected_events)} of {len(forest_loss_events)} events for monoculture classification"
     )
@@ -581,7 +609,8 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
     1. Process GLAD alerts to get prediction request geometry for recent forest loss
        events.
     2. Make OlmoEarth API request to run forest loss driver inference.
-    3. Merge the new events with existing ones.
+    3. Merge the new events with existing ones, dropping existing events that are
+       within the new time window or that mostly overlap with a new event.
     4. Get metadata for Planetary Computer scenes that can be used to visualize the
        before and after images for each forest loss event.
     5. Make a second OlmoEarth API request to run the monoculture model on large-scale
@@ -669,6 +698,7 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
             run_time=run_time,
             forest_loss_events=forest_loss_events,
             run_paths=run_paths,
+            select_workers=integrated_config.monocrop_select_workers,
         )
 
         # Save all_events.geojson in gcs_ds_root.
