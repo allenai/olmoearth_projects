@@ -69,6 +69,16 @@ data:
     num_workers: ${NUM_WORKERS}
     default_config:
       transforms:
+        # Ensure every input is exactly 128x128 so the batch can be stacked. Windows
+        # centered just north of the equator can come out one pixel short in older
+        # versions of olmoearth_run (the window bounds straddle y=0 in the UTM pixel
+        # coordinate system and truncate in opposite directions).
+        - class_path: rslearn.train.transforms.pad.Pad
+          init_args:
+            mode: center
+            size: 128
+            image_selectors:
+              - sentinel2_l2a
         - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
           init_args:
             band_names:

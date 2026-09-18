@@ -48,7 +48,7 @@ PROJECT_ID = (
 MODEL_ID = "a3c3e819-7aa9-47e9-98fa-f72449a56263"
 # The monoculture model (see olmoearth_run_data/forest_loss_driver_monocrop/), which
 # classifies the type of agriculture for large-scale agriculture events.
-MONOCROP_MODEL_ID = "83c62d51-bff2-46e6-beda-eb8af6bde97c"
+MONOCROP_MODEL_ID = "522c3aa3-77aa-49d3-a215-a3bfed8dac55"
 
 # Timeout (seconds) for downloading prediction results.
 REQUEST_TIMEOUT = 30
