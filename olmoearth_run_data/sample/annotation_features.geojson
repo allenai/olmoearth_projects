@@ -13,10 +13,12 @@
       },
       "id": null,
       "properties": {
-        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
-        "es_end_time": "2024-02-24 05:57:00+00:00",
-        "es_label": 1,
-        "es_start_time": "2024-02-24 05:57:00+00:00"
+        "oe_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "oe_end_time": "2024-02-24 05:57:00+00:00",
+        "oe_labels": {
+          "category": 1
+        },
+        "oe_start_time": "2024-02-24 05:57:00+00:00"
       },
       "type": "Feature"
     },
@@ -32,10 +34,12 @@
       },
       "id": null,
       "properties": {
-        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
-        "es_end_time": "2024-02-24 05:57:00+00:00",
-        "es_label": 3,
-        "es_start_time": "2024-02-24 05:57:00+00:00"
+        "oe_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "oe_end_time": "2024-02-24 05:57:00+00:00",
+        "oe_labels": {
+          "category": 3
+        },
+        "oe_start_time": "2024-02-24 05:57:00+00:00"
       },
       "type": "Feature"
     },
@@ -51,10 +55,12 @@
       },
       "id": null,
       "properties": {
-        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
-        "es_end_time": "2024-02-24 05:57:00+00:00",
-        "es_label": 1,
-        "es_start_time": "2024-02-24 05:57:00+00:00"
+        "oe_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "oe_end_time": "2024-02-24 05:57:00+00:00",
+        "oe_labels": {
+          "category": 1
+        },
+        "oe_start_time": "2024-02-24 05:57:00+00:00"
       },
       "type": "Feature"
     },
@@ -70,10 +76,12 @@
       },
       "id": null,
       "properties": {
-        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
-        "es_end_time": "2024-02-24 05:57:00+00:00",
-        "es_label": 4,
-        "es_start_time": "2024-02-24 05:57:00+00:00"
+        "oe_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "oe_end_time": "2024-02-24 05:57:00+00:00",
+        "oe_labels": {
+          "category": 4
+        },
+        "oe_start_time": "2024-02-24 05:57:00+00:00"
       },
       "type": "Feature"
     },
@@ -89,10 +97,12 @@
       },
       "id": null,
       "properties": {
-        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
-        "es_end_time": "2024-02-24 05:57:00+00:00",
-        "es_label": 3,
-        "es_start_time": "2024-02-24 05:57:00+00:00"
+        "oe_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "oe_end_time": "2024-02-24 05:57:00+00:00",
+        "oe_labels": {
+          "category": 3
+        },
+        "oe_start_time": "2024-02-24 05:57:00+00:00"
       },
       "type": "Feature"
     },
@@ -108,10 +118,12 @@
       },
       "id": null,
       "properties": {
-        "es_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
-        "es_end_time": "2024-02-24 05:57:00+00:00",
-        "es_label": 4,
-        "es_start_time": "2024-02-24 05:57:00+00:00"
+        "oe_annotations_task_id": "164679b9-04ed-5b35-b438-9677104067fc",
+        "oe_end_time": "2024-02-24 05:57:00+00:00",
+        "oe_labels": {
+          "category": 4
+        },
+        "oe_start_time": "2024-02-24 05:57:00+00:00"
       },
       "type": "Feature"
     }
