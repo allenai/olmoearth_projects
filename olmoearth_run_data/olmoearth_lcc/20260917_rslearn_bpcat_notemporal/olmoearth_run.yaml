@@ -1,0 +1,82 @@
+# The model writes the post_change head only (see model.yaml): a single uint8 band with
+# the argmax fine-grained "what appeared" change category. 0 (nodata) and 1 (none, i.e.
+# no post-change category) are rendered transparent.
+inference_results_config:
+  data_type: RASTER
+  classification_fields:
+    - property_name: post_change
+      band_index: 1
+      allowed_values:
+        - value: 0
+          label: nodata
+          color: [0, 0, 0, 0]
+        - value: 1
+          label: none
+          color: [220, 220, 220, 0]
+        - value: 2
+          label: vegetation_growth
+          color: [173, 255, 47]
+        - value: 3
+          label: new_building
+          color: [228, 26, 28]
+        - value: 4
+          label: new_road
+          color: [255, 255, 51]
+        - value: 5
+          label: new_infrastructure
+          color: [152, 78, 163]
+        - value: 6
+          label: new_crop_field
+          color: [77, 175, 74]
+        - value: 7
+          label: new_aquafarm
+          color: [0, 206, 209]
+        - value: 8
+          label: site_clearing
+          color: [255, 127, 0]
+        - value: 9
+          label: water_expand
+          color: [55, 126, 184]
+        - value: 10
+          label: mining
+          color: [166, 86, 40]
+        - value: 11
+          label: new_crop_structure
+          color: [247, 129, 191]
+        - value: 12
+          label: selective_logging
+          color: [141, 211, 199]
+        - value: 13
+          label: landslide
+          color: [128, 64, 0]
+        - value: 14
+          label: settlement
+          color: [255, 0, 255]
+
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 1.0 # 1x1 degree partitions (lat/lon)
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 2048 # 2048x2048 px windows at 10 m/pixel
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+postprocessing_strategies:
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.noop_raster.NoopRaster
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
