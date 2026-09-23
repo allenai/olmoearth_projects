@@ -229,7 +229,7 @@ data:
             init_args:
               num_classes: 20
     batch_size: 8
-    num_workers: ${NUM_WORKERS}
+    num_workers: 4
     predict_config:
       crop_size: 64
       load_all_crops: true
@@ -272,3 +272,4 @@ trainer:
         init_args:
           overlap_pixels: 16
 # unused: ${EXTRA_FILES_PATH}
+# unused: ${NUM_WORKERS}

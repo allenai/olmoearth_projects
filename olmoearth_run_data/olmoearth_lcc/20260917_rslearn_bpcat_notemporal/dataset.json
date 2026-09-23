@@ -4,7 +4,7 @@
       "band_sets": [
         {
           "bands": [
-            "post_change"
+            "output"
           ],
           "dtype": "uint8"
         }
