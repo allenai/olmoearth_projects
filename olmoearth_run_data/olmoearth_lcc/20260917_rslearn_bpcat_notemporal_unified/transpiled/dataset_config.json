@@ -1,0 +1,233 @@
+{
+  "layers": {
+    "labels": {
+      "band_sets": [
+        {
+          "bands": [
+            "binary"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        },
+        {
+          "bands": [
+            "pre_change"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        },
+        {
+          "bands": [
+            "post_change"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        },
+        {
+          "bands": [
+            "src"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        },
+        {
+          "bands": [
+            "dst"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        },
+        {
+          "bands": [
+            "ts_start"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        },
+        {
+          "bands": [
+            "ts_end"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        }
+      ],
+      "compositing_method": "FIRST_VALID",
+      "resampling_method": "bilinear",
+      "type": "raster",
+      "vector_format": {
+        "class_path": "rslearn.utils.vector_format.GeojsonVectorFormat"
+      }
+    },
+    "output": {
+      "band_sets": [
+        {
+          "bands": [
+            "binary",
+            "pre_change",
+            "post_change",
+            "src",
+            "dst",
+            "ts_start",
+            "ts_end"
+          ],
+          "dtype": "uint8",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.GeotiffRasterFormat"
+          },
+          "zoom_offset": 0
+        }
+      ],
+      "compositing_method": "FIRST_VALID",
+      "resampling_method": "bilinear",
+      "type": "raster",
+      "vector_format": {
+        "class_path": "rslearn.utils.vector_format.GeojsonVectorFormat"
+      }
+    },
+    "sentinel2_l2a_lookbehind_0": {
+      "band_sets": [
+        {
+          "bands": [
+            "B02",
+            "B03",
+            "B04",
+            "B08",
+            "B05",
+            "B06",
+            "B07",
+            "B8A",
+            "B11",
+            "B12",
+            "B01",
+            "B09"
+          ],
+          "dtype": "uint16",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        }
+      ],
+      "compositing_method": "FIRST_VALID",
+      "data_source": {
+        "class_path": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "duration": "155520000.0s",
+        "ingest": false,
+        "init_args": {
+          "cache_dir": "cache/planetary_computer",
+          "harmonize": true,
+          "query": {
+            "eo:cloud_cover": {
+              "gte": 0
+            }
+          },
+          "sort_by": "eo:cloud_cover",
+          "timeout": "0:0:10"
+        },
+        "query_config": {
+          "max_matches": 16,
+          "min_matches": 16,
+          "mosaic_compositing_overlaps": 1,
+          "per_period_mosaic_reverse_time_order": false,
+          "period_duration": "7776000.0s",
+          "space_mode": "MOSAIC"
+        },
+        "time_offset": "-163296000.0s"
+      },
+      "resampling_method": "bilinear",
+      "type": "raster",
+      "vector_format": {
+        "class_path": "rslearn.utils.vector_format.GeojsonVectorFormat"
+      }
+    },
+    "sentinel2_l2a_lookbehind_1": {
+      "band_sets": [
+        {
+          "bands": [
+            "B02",
+            "B03",
+            "B04",
+            "B08",
+            "B05",
+            "B06",
+            "B07",
+            "B8A",
+            "B11",
+            "B12",
+            "B01",
+            "B09"
+          ],
+          "dtype": "uint16",
+          "format": {
+            "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
+          },
+          "zoom_offset": 0
+        }
+      ],
+      "compositing_method": "FIRST_VALID",
+      "data_source": {
+        "class_path": "rslearn.data_sources.planetary_computer.Sentinel2",
+        "duration": "7862400.0s",
+        "ingest": false,
+        "init_args": {
+          "cache_dir": "cache/planetary_computer",
+          "harmonize": true,
+          "query": {
+            "eo:cloud_cover": {
+              "gte": 0
+            }
+          },
+          "sort_by": "eo:cloud_cover",
+          "timeout": "0:0:10"
+        },
+        "query_config": {
+          "max_matches": 6,
+          "min_matches": 6,
+          "mosaic_compositing_overlaps": 1,
+          "per_period_mosaic_reverse_time_order": false,
+          "period_duration": "604800.0s",
+          "space_mode": "MOSAIC"
+        },
+        "time_offset": "-7862400.0s"
+      },
+      "resampling_method": "bilinear",
+      "type": "raster",
+      "vector_format": {
+        "class_path": "rslearn.utils.vector_format.GeojsonVectorFormat"
+      }
+    }
+  },
+  "storage": {
+    "class_path": "rslearn.dataset.storage.file.FileWindowStorageFactory",
+    "init_args": {}
+  },
+  "tile_store": {
+    "class_path": "rslearn.tile_stores.default.DefaultTileStore"
+  },
+  "window_data_storage": {
+    "class_path": "rslearn.dataset.window_data_storage.per_layer.PerLayerStorageFactory",
+    "init_args": {}
+  }
+}
