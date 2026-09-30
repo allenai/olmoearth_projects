@@ -1,0 +1,1037 @@
+{
+  "classification_fields": [
+    {
+      "allowed_values": [
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "nodata",
+          "value": 0
+        },
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "no_change",
+          "value": 1
+        },
+        {
+          "color": [
+            255,
+            65,
+            54,
+            255
+          ],
+          "label": "change",
+          "value": 2
+        }
+      ],
+      "band_index": 1,
+      "property_name": "binary"
+    },
+    {
+      "allowed_values": [
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "nodata",
+          "value": 0
+        },
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "none",
+          "value": 1
+        },
+        {
+          "color": [
+            139,
+            69,
+            19,
+            255
+          ],
+          "label": "deforestation",
+          "value": 2
+        },
+        {
+          "color": [
+            112,
+            128,
+            144,
+            255
+          ],
+          "label": "urban_erosion",
+          "value": 3
+        },
+        {
+          "color": [
+            32,
+            178,
+            170,
+            255
+          ],
+          "label": "wetland_loss",
+          "value": 4
+        },
+        {
+          "color": [
+            70,
+            130,
+            180,
+            255
+          ],
+          "label": "water_contract",
+          "value": 5
+        },
+        {
+          "color": [
+            218,
+            165,
+            32,
+            255
+          ],
+          "label": "removed_crop_structure",
+          "value": 6
+        },
+        {
+          "color": [
+            184,
+            134,
+            11,
+            255
+          ],
+          "label": "agricultural_activity",
+          "value": 7
+        },
+        {
+          "color": [
+            226,
+            88,
+            34,
+            255
+          ],
+          "label": "wildfire",
+          "value": 8
+        },
+        {
+          "color": [
+            127,
+            219,
+            255,
+            255
+          ],
+          "label": "ice_motion",
+          "value": 9
+        },
+        {
+          "color": [
+            0,
+            31,
+            63,
+            255
+          ],
+          "label": "flooding",
+          "value": 10
+        }
+      ],
+      "band_index": 2,
+      "property_name": "pre_change"
+    },
+    {
+      "allowed_values": [
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "nodata",
+          "value": 0
+        },
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "none",
+          "value": 1
+        },
+        {
+          "color": [
+            46,
+            204,
+            64,
+            255
+          ],
+          "label": "vegetation_growth",
+          "value": 2
+        },
+        {
+          "color": [
+            255,
+            65,
+            54,
+            255
+          ],
+          "label": "new_building",
+          "value": 3
+        },
+        {
+          "color": [
+            85,
+            85,
+            85,
+            255
+          ],
+          "label": "new_road",
+          "value": 4
+        },
+        {
+          "color": [
+            255,
+            133,
+            27,
+            255
+          ],
+          "label": "new_infrastructure",
+          "value": 5
+        },
+        {
+          "color": [
+            154,
+            205,
+            50,
+            255
+          ],
+          "label": "new_crop_field",
+          "value": 6
+        },
+        {
+          "color": [
+            0,
+            188,
+            212,
+            255
+          ],
+          "label": "new_aquafarm",
+          "value": 7
+        },
+        {
+          "color": [
+            210,
+            180,
+            140,
+            255
+          ],
+          "label": "site_clearing",
+          "value": 8
+        },
+        {
+          "color": [
+            0,
+            116,
+            217,
+            255
+          ],
+          "label": "water_expand",
+          "value": 9
+        },
+        {
+          "color": [
+            177,
+            13,
+            201,
+            255
+          ],
+          "label": "mining",
+          "value": 10
+        },
+        {
+          "color": [
+            255,
+            220,
+            0,
+            255
+          ],
+          "label": "new_crop_structure",
+          "value": 11
+        },
+        {
+          "color": [
+            61,
+            153,
+            112,
+            255
+          ],
+          "label": "selective_logging",
+          "value": 12
+        },
+        {
+          "color": [
+            133,
+            20,
+            75,
+            255
+          ],
+          "label": "landslide",
+          "value": 13
+        },
+        {
+          "color": [
+            240,
+            18,
+            190,
+            255
+          ],
+          "label": "settlement",
+          "value": 14
+        }
+      ],
+      "band_index": 3,
+      "property_name": "post_change"
+    },
+    {
+      "allowed_values": [
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "nodata",
+          "value": 0
+        },
+        {
+          "color": [
+            180,
+            180,
+            180,
+            255
+          ],
+          "label": "bare",
+          "value": 1
+        },
+        {
+          "color": [
+            139,
+            0,
+            0,
+            255
+          ],
+          "label": "burnt",
+          "value": 2
+        },
+        {
+          "color": [
+            240,
+            150,
+            255,
+            255
+          ],
+          "label": "crops",
+          "value": 3
+        },
+        {
+          "color": [
+            209,
+            163,
+            61,
+            255
+          ],
+          "label": "fallow/shifting cultivation",
+          "value": 4
+        },
+        {
+          "color": [
+            255,
+            255,
+            76,
+            255
+          ],
+          "label": "grassland",
+          "value": 5
+        },
+        {
+          "color": [
+            250,
+            230,
+            160,
+            255
+          ],
+          "label": "Lichen and moss",
+          "value": 6
+        },
+        {
+          "color": [
+            255,
+            187,
+            34,
+            255
+          ],
+          "label": "shrub",
+          "value": 7
+        },
+        {
+          "color": [
+            240,
+            240,
+            240,
+            255
+          ],
+          "label": "snow and ice",
+          "value": 8
+        },
+        {
+          "color": [
+            0,
+            100,
+            0,
+            255
+          ],
+          "label": "tree",
+          "value": 9
+        },
+        {
+          "color": [
+            250,
+            0,
+            0,
+            255
+          ],
+          "label": "urban/built-up",
+          "value": 10
+        },
+        {
+          "color": [
+            0,
+            100,
+            200,
+            255
+          ],
+          "label": "water",
+          "value": 11
+        },
+        {
+          "color": [
+            0,
+            150,
+            160,
+            255
+          ],
+          "label": "wetland (herbaceous)",
+          "value": 12
+        }
+      ],
+      "band_index": 4,
+      "property_name": "src"
+    },
+    {
+      "allowed_values": [
+        {
+          "color": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "nodata",
+          "value": 0
+        },
+        {
+          "color": [
+            180,
+            180,
+            180,
+            255
+          ],
+          "label": "bare",
+          "value": 1
+        },
+        {
+          "color": [
+            139,
+            0,
+            0,
+            255
+          ],
+          "label": "burnt",
+          "value": 2
+        },
+        {
+          "color": [
+            240,
+            150,
+            255,
+            255
+          ],
+          "label": "crops",
+          "value": 3
+        },
+        {
+          "color": [
+            209,
+            163,
+            61,
+            255
+          ],
+          "label": "fallow/shifting cultivation",
+          "value": 4
+        },
+        {
+          "color": [
+            255,
+            255,
+            76,
+            255
+          ],
+          "label": "grassland",
+          "value": 5
+        },
+        {
+          "color": [
+            250,
+            230,
+            160,
+            255
+          ],
+          "label": "Lichen and moss",
+          "value": 6
+        },
+        {
+          "color": [
+            255,
+            187,
+            34,
+            255
+          ],
+          "label": "shrub",
+          "value": 7
+        },
+        {
+          "color": [
+            240,
+            240,
+            240,
+            255
+          ],
+          "label": "snow and ice",
+          "value": 8
+        },
+        {
+          "color": [
+            0,
+            100,
+            0,
+            255
+          ],
+          "label": "tree",
+          "value": 9
+        },
+        {
+          "color": [
+            250,
+            0,
+            0,
+            255
+          ],
+          "label": "urban/built-up",
+          "value": 10
+        },
+        {
+          "color": [
+            0,
+            100,
+            200,
+            255
+          ],
+          "label": "water",
+          "value": 11
+        },
+        {
+          "color": [
+            0,
+            150,
+            160,
+            255
+          ],
+          "label": "wetland (herbaceous)",
+          "value": 12
+        }
+      ],
+      "band_index": 5,
+      "property_name": "dst"
+    },
+    {
+      "allowed_values": [
+        {
+          "color": [
+            45,
+            53,
+            229,
+            255
+          ],
+          "label": "image 0 (quarterly 1)",
+          "value": 0
+        },
+        {
+          "color": [
+            45,
+            79,
+            229,
+            255
+          ],
+          "label": "image 1 (quarterly 2)",
+          "value": 1
+        },
+        {
+          "color": [
+            45,
+            105,
+            229,
+            255
+          ],
+          "label": "image 2 (quarterly 3)",
+          "value": 2
+        },
+        {
+          "color": [
+            45,
+            131,
+            229,
+            255
+          ],
+          "label": "image 3 (quarterly 4)",
+          "value": 3
+        },
+        {
+          "color": [
+            45,
+            158,
+            229,
+            255
+          ],
+          "label": "image 4 (quarterly 5)",
+          "value": 4
+        },
+        {
+          "color": [
+            45,
+            184,
+            229,
+            255
+          ],
+          "label": "image 5 (quarterly 6)",
+          "value": 5
+        },
+        {
+          "color": [
+            45,
+            210,
+            229,
+            255
+          ],
+          "label": "image 6 (quarterly 7)",
+          "value": 6
+        },
+        {
+          "color": [
+            45,
+            229,
+            222,
+            255
+          ],
+          "label": "image 7 (quarterly 8)",
+          "value": 7
+        },
+        {
+          "color": [
+            45,
+            229,
+            195,
+            255
+          ],
+          "label": "image 8 (quarterly 9)",
+          "value": 8
+        },
+        {
+          "color": [
+            45,
+            229,
+            169,
+            255
+          ],
+          "label": "image 9 (quarterly 10)",
+          "value": 9
+        },
+        {
+          "color": [
+            45,
+            229,
+            143,
+            255
+          ],
+          "label": "image 10 (quarterly 11)",
+          "value": 10
+        },
+        {
+          "color": [
+            45,
+            229,
+            117,
+            255
+          ],
+          "label": "image 11 (quarterly 12)",
+          "value": 11
+        },
+        {
+          "color": [
+            45,
+            229,
+            91,
+            255
+          ],
+          "label": "image 12 (quarterly 13)",
+          "value": 12
+        },
+        {
+          "color": [
+            45,
+            229,
+            64,
+            255
+          ],
+          "label": "image 13 (quarterly 14)",
+          "value": 13
+        },
+        {
+          "color": [
+            53,
+            229,
+            45,
+            255
+          ],
+          "label": "image 14 (quarterly 15)",
+          "value": 14
+        },
+        {
+          "color": [
+            79,
+            229,
+            45,
+            255
+          ],
+          "label": "image 15 (quarterly 16)",
+          "value": 15
+        },
+        {
+          "color": [
+            105,
+            229,
+            45,
+            255
+          ],
+          "label": "image 16 (recent 1)",
+          "value": 16
+        },
+        {
+          "color": [
+            131,
+            229,
+            45,
+            255
+          ],
+          "label": "image 17 (recent 2)",
+          "value": 17
+        },
+        {
+          "color": [
+            158,
+            229,
+            45,
+            255
+          ],
+          "label": "image 18 (recent 3)",
+          "value": 18
+        },
+        {
+          "color": [
+            184,
+            229,
+            45,
+            255
+          ],
+          "label": "image 19 (recent 4)",
+          "value": 19
+        },
+        {
+          "color": [
+            210,
+            229,
+            45,
+            255
+          ],
+          "label": "image 20 (recent 5)",
+          "value": 20
+        },
+        {
+          "color": [
+            229,
+            222,
+            45,
+            255
+          ],
+          "label": "image 21 (recent 6)",
+          "value": 21
+        }
+      ],
+      "band_index": 6,
+      "property_name": "ts_start"
+    },
+    {
+      "allowed_values": [
+        {
+          "color": [
+            45,
+            53,
+            229,
+            255
+          ],
+          "label": "image 0 (quarterly 1)",
+          "value": 0
+        },
+        {
+          "color": [
+            45,
+            79,
+            229,
+            255
+          ],
+          "label": "image 1 (quarterly 2)",
+          "value": 1
+        },
+        {
+          "color": [
+            45,
+            105,
+            229,
+            255
+          ],
+          "label": "image 2 (quarterly 3)",
+          "value": 2
+        },
+        {
+          "color": [
+            45,
+            131,
+            229,
+            255
+          ],
+          "label": "image 3 (quarterly 4)",
+          "value": 3
+        },
+        {
+          "color": [
+            45,
+            158,
+            229,
+            255
+          ],
+          "label": "image 4 (quarterly 5)",
+          "value": 4
+        },
+        {
+          "color": [
+            45,
+            184,
+            229,
+            255
+          ],
+          "label": "image 5 (quarterly 6)",
+          "value": 5
+        },
+        {
+          "color": [
+            45,
+            210,
+            229,
+            255
+          ],
+          "label": "image 6 (quarterly 7)",
+          "value": 6
+        },
+        {
+          "color": [
+            45,
+            229,
+            222,
+            255
+          ],
+          "label": "image 7 (quarterly 8)",
+          "value": 7
+        },
+        {
+          "color": [
+            45,
+            229,
+            195,
+            255
+          ],
+          "label": "image 8 (quarterly 9)",
+          "value": 8
+        },
+        {
+          "color": [
+            45,
+            229,
+            169,
+            255
+          ],
+          "label": "image 9 (quarterly 10)",
+          "value": 9
+        },
+        {
+          "color": [
+            45,
+            229,
+            143,
+            255
+          ],
+          "label": "image 10 (quarterly 11)",
+          "value": 10
+        },
+        {
+          "color": [
+            45,
+            229,
+            117,
+            255
+          ],
+          "label": "image 11 (quarterly 12)",
+          "value": 11
+        },
+        {
+          "color": [
+            45,
+            229,
+            91,
+            255
+          ],
+          "label": "image 12 (quarterly 13)",
+          "value": 12
+        },
+        {
+          "color": [
+            45,
+            229,
+            64,
+            255
+          ],
+          "label": "image 13 (quarterly 14)",
+          "value": 13
+        },
+        {
+          "color": [
+            53,
+            229,
+            45,
+            255
+          ],
+          "label": "image 14 (quarterly 15)",
+          "value": 14
+        },
+        {
+          "color": [
+            79,
+            229,
+            45,
+            255
+          ],
+          "label": "image 15 (quarterly 16)",
+          "value": 15
+        },
+        {
+          "color": [
+            105,
+            229,
+            45,
+            255
+          ],
+          "label": "image 16 (recent 1)",
+          "value": 16
+        },
+        {
+          "color": [
+            131,
+            229,
+            45,
+            255
+          ],
+          "label": "image 17 (recent 2)",
+          "value": 17
+        },
+        {
+          "color": [
+            158,
+            229,
+            45,
+            255
+          ],
+          "label": "image 18 (recent 3)",
+          "value": 18
+        },
+        {
+          "color": [
+            184,
+            229,
+            45,
+            255
+          ],
+          "label": "image 19 (recent 4)",
+          "value": 19
+        },
+        {
+          "color": [
+            210,
+            229,
+            45,
+            255
+          ],
+          "label": "image 20 (recent 5)",
+          "value": 20
+        },
+        {
+          "color": [
+            229,
+            222,
+            45,
+            255
+          ],
+          "label": "image 21 (recent 6)",
+          "value": 21
+        }
+      ],
+      "band_index": 7,
+      "property_name": "ts_end"
+    }
+  ],
+  "data_type": "RASTER"
+}
