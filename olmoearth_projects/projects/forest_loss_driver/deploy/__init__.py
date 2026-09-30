@@ -40,15 +40,18 @@ from .sentinel2 import get_sentinel2_assets
 
 logger = get_logger(__name__)
 
-ORGANIZATION_ID = "f098bcba-b994-46ce-87fc-b90b14bb8338"  # Ai2 - Demo
-PROJECT_ID = (
-    "2f3788b4-11bb-48ee-b379-eacccaf9734a"  # Forest Loss Driver Colombia 12 Demo
+ORGANIZATION_ID = (
+    "73c31b7f-af83-4da8-8b61-7c7accd03864"  # Amazon Conservation Association
 )
-# The forest loss driver model, which classifies the driver of each forest loss event.
-MODEL_ID = "a3c3e819-7aa9-47e9-98fa-f72449a56263"
+# The forest loss driver model, which classifies the driver of each forest loss event
+# (see olmoearth_run_data/forest_loss_driver/). Prediction jobs are created in the
+# Studio project that contains the model.
+PROJECT_ID = "b4e2fdb0-f99d-468f-b103-5dd312b80124"  # Forest Loss Driver Model
+MODEL_ID = "d3db659a-fe9e-4749-9c14-d7088d18bbb8"  # 20260924_forest_loss_driver_utm
 # The monoculture model (see olmoearth_run_data/forest_loss_driver_monocrop/), which
 # classifies the type of agriculture for large-scale agriculture events.
-MONOCROP_MODEL_ID = "522c3aa3-77aa-49d3-a215-a3bfed8dac55"
+MONOCROP_PROJECT_ID = "68466e02-ea88-425d-b109-b7ac9b3a7d17"  # Monoculture Model
+MONOCROP_MODEL_ID = "15805a96-04ce-466e-881c-65bd2e269b1c"
 
 # Timeout (seconds) for downloading prediction results.
 REQUEST_TIMEOUT = 30
@@ -149,6 +152,7 @@ def simplify_features_to_centroids(
 def start_studio_inference_job(
     client: StudioClient,
     job_name: str,
+    project_id: str,
     model_id: str,
     features: list[dict],
     job_ids_fname: UPath,
@@ -162,6 +166,8 @@ def start_studio_inference_job(
     Args:
         client: the Studio client to use.
         job_name: the name of the job, which must be unique within the run.
+        project_id: the Studio project to create the job in (the one containing
+            the model).
         model_id: the Studio model ID to run.
         features: the GeoJSON feature dicts (in WGS84) to run inference on.
         job_ids_fname: the filename caching the job IDs for this run.
@@ -188,7 +194,7 @@ def start_studio_inference_job(
         f"Starting a prediction job with {len(features)} features named {job_name}"
     )
     job_id = client.create_prediction(
-        project_id=PROJECT_ID,
+        project_id=project_id,
         model_id=model_id,
         name=job_name,
         geojson={
@@ -232,6 +238,7 @@ def start_driver_inference_job(
     return start_studio_inference_job(
         client=client,
         job_name=f"run_{run_id}",
+        project_id=PROJECT_ID,
         model_id=MODEL_ID,
         features=features,
         job_ids_fname=run_paths.job_ids_fname,
@@ -547,6 +554,7 @@ def add_monoculture_predictions_from_studio(
     job_id = start_studio_inference_job(
         client=client,
         job_name=f"run_{run_id}_monocrop",
+        project_id=MONOCROP_PROJECT_ID,
         model_id=MONOCROP_MODEL_ID,
         features=request_features,
         job_ids_fname=run_paths.job_ids_fname,

@@ -55,6 +55,9 @@ python -m olmoearth_projects.main olmoearth_run olmoearth_run \
 History
 -------
 
+- 2026-09-25: The deploy pipeline now runs Studio model
+  `15805a96-04ce-466e-881c-65bd2e269b1c` in the "Monoculture Model" project
+  (Amazon Conservation Association organization).
 - 2026-09-15: Initial version using the window classification model
   `20260914_monocrop_classifier/olmoearth_v1_2_base_classify_pool` from
   rslearn_projects (`data/forest_loss_driver/monocrop_classifier/model_classify_pool.yaml`).

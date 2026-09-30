@@ -45,15 +45,19 @@ partition_strategies:
     class_path: olmoearth_run.runner.tools.partitioners.fixed_window_partitioner.FixedWindowPartitioner
     init_args:
       window_size: 128
+      # The model is trained on 128x128 windows in the UTM zone of the event at 10
+      # m/pixel. With use_utm, the CRS of output_projection is ignored (the UTM zone is
+      # picked based on the window centroid) but its resolution is used.
+      use_utm: true
       output_projection:
         class_path: rslearn.utils.Projection
         init_args:
           crs:
             _module_: rasterio.crs
             _callable_: CRS.from_epsg
-            code: 3857
-          x_resolution: 9.554628535647032  # PIXEL_SIZE in rslp/forest_loss_driver/extract_dataset/extract_alerts.py
-          y_resolution: -9.554628535647032
+            code: 32718
+          x_resolution: 10
+          y_resolution: -10
 
 postprocessing_strategies:
   process_window:

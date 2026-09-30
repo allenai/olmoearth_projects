@@ -44,7 +44,10 @@ which is an older version of the dataset.
 
 ### Forest Loss Driver
 
-- Dataset used for training: `/weka/dfive-default/rslearn-eai/datasets/forest_loss_driver/dataset_v1/combined/`
+- Dataset used for training: `/weka/dfive-default/rslearn-eai/datasets/forest_loss_driver/dataset_v1/20260924_utm/`
+  (built from Studio labels by `rslp.forest_loss_driver.create_dataset` in rslearn_projects).
+  OlmoEarth-v1-FT-ForestLossDriver-Base on Hugging Face was trained on the older Web
+  Mercator dataset `/weka/dfive-default/rslearn-eai/datasets/forest_loss_driver/dataset_v1/combined/`.
 
 ### Mangrove Classification
 

@@ -117,6 +117,12 @@ python -m olmoearth_projects.main projects.forest_loss_driver extract_alerts \
 
 To run inference:
 
+Note: `olmoearth_run_data/forest_loss_driver/` now holds the configuration for the newer
+internal model (OlmoEarth-v1.2-Base, UTM windows), which is not compatible with the
+OlmoEarth-v1-FT-ForestLossDriver-Base checkpoint below. To run the released checkpoint,
+use the configuration files from `olmoearth_run_data/forest_loss_driver/` at commit
+`fd3f491`.
+
 ```
 mv prediction_request_geometry.geojson olmoearth_run_data/forest_loss_driver/prediction_request_geometry.geojson
 mkdir -p ./checkpoints

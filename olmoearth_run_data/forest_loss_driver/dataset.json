@@ -3,47 +3,17 @@
     "label": {
       "class_names": [
         "agriculture",
-        "agriculture-generic",
-        "agriculture-mennonite",
-        "agriculture-rice",
-        "agriculture-small",
-        "airstrip",
-        "burned",
-        "coca",
-        "flood",
-        "human",
-        "hurricane",
-        "landslide",
-        "logging",
         "mining",
-        "natural",
-        "none",
-        "river",
+        "airstrip",
         "road",
-        "unknown",
-        "unlabeled"
+        "logging",
+        "burned",
+        "landslide",
+        "hurricane",
+        "river",
+        "none"
       ],
       "class_property_name": "new_label",
-      "type": "vector"
-    },
-    "mask": {
-      "band_sets": [
-        {
-          "bands": [
-            "mask"
-          ],
-          "dtype": "uint8",
-          "format": {
-            "class_path": "rslearn.utils.raster_format.SingleImageRasterFormat",
-            "init_args": {
-              "format": "png"
-            }
-          }
-        }
-      ],
-      "type": "raster"
-    },
-    "mask_vector": {
       "type": "vector"
     },
     "output": {
