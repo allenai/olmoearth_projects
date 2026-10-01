@@ -25,8 +25,11 @@ def make_tiles(workers: int, in_fname: str, gcs_ds_root: str) -> None:
 
     # Add a tippecanoe dict to the GeoJSON features that tells tippecanoe to put the
     # forest loss events for each driver category into a separate layer.
-    # Here we also remove properties we don't need in the tiles. And rename
-    # oe_start_time to date which is used for time filter in the web app.
+    # Here we also remove properties we don't need in the tiles (we keep
+    # monoculture_category since the web app styles the monoculture predictions
+    # layer by it, but drop the monoculture_probs since they are only needed on the
+    # per-event GeoJSON files). And rename oe_start_time to date which is used for
+    # time filter in the web app.
     with UPath(in_fname).open() as f:
         fc = json.load(f)
 
@@ -43,6 +46,7 @@ def make_tiles(workers: int, in_fname: str, gcs_ds_root: str) -> None:
             "post_assets",
             "category",
             "probs",
+            "monoculture_probs",
             "oe_start_time",
             "oe_end_time",
             "country",

@@ -1,0 +1,61 @@
+{
+  "layers": {
+    "label_vector": {
+      "class_names": [
+        "nodata",
+        "mennonites_nonsoybean",
+        "soybean",
+        "oil_palm",
+        "other_agriculture",
+        "pastures",
+        "rice"
+      ],
+      "class_property_name": "class_name",
+      "type": "vector"
+    },
+    "output": {
+      "type": "vector"
+    },
+    "sentinel2_l2a": {
+      "band_sets": [
+        {
+          "bands": [
+            "B01",
+            "B02",
+            "B03",
+            "B04",
+            "B05",
+            "B06",
+            "B07",
+            "B08",
+            "B8A",
+            "B09",
+            "B11",
+            "B12"
+          ],
+          "dtype": "uint16"
+        }
+      ],
+      "data_source": {
+        "class_path": "olmoearth_run.runner.tools.rslearn_data_sources.olmoearth_datasets.sentinel2_l2a.Sentinel2L2A",
+        "ingest": false,
+        "init_args": {
+          "cache_dir": "cache/olmoearth_datasets",
+          "harmonize": true,
+          "query": {
+            "sort_by": "CLOUD_COVER",
+            "sort_direction": "ASC"
+          }
+        },
+        "query_config": {
+          "max_matches": 12,
+          "min_matches": 12,
+          "per_period_mosaic_reverse_time_order": false,
+          "period_duration": "30d",
+          "space_mode": "MOSAIC"
+        }
+      },
+      "type": "raster"
+    }
+  }
+}

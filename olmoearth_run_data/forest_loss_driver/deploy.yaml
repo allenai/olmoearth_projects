@@ -29,3 +29,4 @@ integrated_config:
   asset_workers: 128
   make_tiles_workers: 128
   write_individual_events_workers: 128
+  monocrop_select_workers: 128
