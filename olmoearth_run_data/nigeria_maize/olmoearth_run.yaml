@@ -1,0 +1,65 @@
+inference_results_config:
+  data_type: RASTER
+  classification_fields:
+    - property_name: segment
+      band_index: 1
+      allowed_values:
+        - value: 1
+          label: not_maize
+          color: [136, 33, 233]
+        - value: 2
+          label: maize
+          color: [124, 67, 18]
+
+window_prep:
+  sampler:
+    class_path: olmoearth_run.runner.tools.samplers.noop_sampler.NoopSampler
+  labeled_window_preparer:
+    class_path: olmoearth_run.runner.tools.labeled_window_preparers.point_to_raster_window_preparer.PointToRasterWindowPreparer
+    init_args:
+      window_buffer: 31  # in pixels
+      window_resolution: 10.0
+      dtype: INT32
+      nodata_value: 255
+  data_splitter:
+    class_path: olmoearth_run.runner.tools.data_splitters.spatial_data_splitter.SpatialDataSplitter
+    init_args:
+      train_prop: 0.75
+      val_prop: 0.25
+      test_prop: 0.0
+      grid_size: 128 # in pixels
+  label_layer: "label"
+  group_name: "nigeria_maize"
+  split_property: "split"
+
+partition_strategies:
+  partition_request_geometry:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 0.25
+
+  prepare_window_geometries:
+    class_path: olmoearth_run.runner.tools.partitioners.grid_partitioner.GridPartitioner
+    init_args:
+      grid_size: 1024
+      output_projection:
+        class_path: rslearn.utils.geometry.Projection
+        init_args:
+          crs: EPSG:3857
+          x_resolution: 10
+          y_resolution: -10
+      use_utm: true
+
+postprocessing_strategies:
+  process_dataset:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+    init_args:
+      nodata_value: 255
+
+  process_partition:
+    class_path: olmoearth_run.runner.tools.postprocessors.combine_geotiff.CombineGeotiff
+    init_args:
+      nodata_value: 255
+
+  process_window:
+    class_path: olmoearth_run.runner.tools.postprocessors.noop_raster.NoopRaster
