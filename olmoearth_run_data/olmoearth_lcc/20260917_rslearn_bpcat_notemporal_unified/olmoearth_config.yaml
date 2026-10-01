@@ -1,0 +1,986 @@
+config_version: 0.13.0
+data:
+  temporality:
+    name: framed_point_in_time
+    lookbehind_observations:
+    - offset_days: 90
+      observation:
+        name: repeating_interval
+        num_periods: 16
+        period_duration_days: 90
+        recovery_periods: 4
+    - offset_days: 0
+      observation:
+        name: repeating_interval
+        num_periods: 6
+        period_duration_days: 7
+        recovery_periods: 7
+  modalities:
+    sentinel2_l2a:
+      space_mode: mosaic
+      sort_by: cloud_cover
+  output:
+    data_type: raster
+    fields:
+    - name: binary
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: nodata
+        color: &id001
+        - 0
+        - 0
+        - 0
+        - 0
+      - value: 1
+        label: no_change
+        color: *id001
+      - value: 2
+        label: change
+        color:
+        - 255
+        - 65
+        - 54
+        - 255
+    - name: pre_change
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: nodata
+        color: *id001
+      - value: 1
+        label: none
+        color: *id001
+      - value: 2
+        label: deforestation
+        color:
+        - 139
+        - 69
+        - 19
+        - 255
+      - value: 3
+        label: urban_erosion
+        color:
+        - 112
+        - 128
+        - 144
+        - 255
+      - value: 4
+        label: wetland_loss
+        color:
+        - 32
+        - 178
+        - 170
+        - 255
+      - value: 5
+        label: water_contract
+        color:
+        - 70
+        - 130
+        - 180
+        - 255
+      - value: 6
+        label: removed_crop_structure
+        color:
+        - 218
+        - 165
+        - 32
+        - 255
+      - value: 7
+        label: agricultural_activity
+        color:
+        - 184
+        - 134
+        - 11
+        - 255
+      - value: 8
+        label: wildfire
+        color:
+        - 226
+        - 88
+        - 34
+        - 255
+      - value: 9
+        label: ice_motion
+        color:
+        - 127
+        - 219
+        - 255
+        - 255
+      - value: 10
+        label: flooding
+        color:
+        - 0
+        - 31
+        - 63
+        - 255
+    - name: post_change
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: nodata
+        color: *id001
+      - value: 1
+        label: none
+        color: *id001
+      - value: 2
+        label: vegetation_growth
+        color:
+        - 46
+        - 204
+        - 64
+        - 255
+      - value: 3
+        label: new_building
+        color:
+        - 255
+        - 65
+        - 54
+        - 255
+      - value: 4
+        label: new_road
+        color:
+        - 85
+        - 85
+        - 85
+        - 255
+      - value: 5
+        label: new_infrastructure
+        color:
+        - 255
+        - 133
+        - 27
+        - 255
+      - value: 6
+        label: new_crop_field
+        color:
+        - 154
+        - 205
+        - 50
+        - 255
+      - value: 7
+        label: new_aquafarm
+        color:
+        - 0
+        - 188
+        - 212
+        - 255
+      - value: 8
+        label: site_clearing
+        color:
+        - 210
+        - 180
+        - 140
+        - 255
+      - value: 9
+        label: water_expand
+        color:
+        - 0
+        - 116
+        - 217
+        - 255
+      - value: 10
+        label: mining
+        color:
+        - 177
+        - 13
+        - 201
+        - 255
+      - value: 11
+        label: new_crop_structure
+        color:
+        - 255
+        - 220
+        - 0
+        - 255
+      - value: 12
+        label: selective_logging
+        color:
+        - 61
+        - 153
+        - 112
+        - 255
+      - value: 13
+        label: landslide
+        color:
+        - 133
+        - 20
+        - 75
+        - 255
+      - value: 14
+        label: settlement
+        color:
+        - 240
+        - 18
+        - 190
+        - 255
+    - name: src
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: nodata
+        color: *id001
+      - value: 1
+        label: bare
+        color:
+        - 180
+        - 180
+        - 180
+        - 255
+      - value: 2
+        label: burnt
+        color:
+        - 139
+        - 0
+        - 0
+        - 255
+      - value: 3
+        label: crops
+        color:
+        - 240
+        - 150
+        - 255
+        - 255
+      - value: 4
+        label: fallow/shifting cultivation
+        color:
+        - 209
+        - 163
+        - 61
+        - 255
+      - value: 5
+        label: grassland
+        color:
+        - 255
+        - 255
+        - 76
+        - 255
+      - value: 6
+        label: Lichen and moss
+        color:
+        - 250
+        - 230
+        - 160
+        - 255
+      - value: 7
+        label: shrub
+        color:
+        - 255
+        - 187
+        - 34
+        - 255
+      - value: 8
+        label: snow and ice
+        color:
+        - 240
+        - 240
+        - 240
+        - 255
+      - value: 9
+        label: tree
+        color:
+        - 0
+        - 100
+        - 0
+        - 255
+      - value: 10
+        label: urban/built-up
+        color:
+        - 250
+        - 0
+        - 0
+        - 255
+      - value: 11
+        label: water
+        color:
+        - 0
+        - 100
+        - 200
+        - 255
+      - value: 12
+        label: wetland (herbaceous)
+        color:
+        - 0
+        - 150
+        - 160
+        - 255
+    - name: dst
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: nodata
+        color: *id001
+      - value: 1
+        label: bare
+        color:
+        - 180
+        - 180
+        - 180
+        - 255
+      - value: 2
+        label: burnt
+        color:
+        - 139
+        - 0
+        - 0
+        - 255
+      - value: 3
+        label: crops
+        color:
+        - 240
+        - 150
+        - 255
+        - 255
+      - value: 4
+        label: fallow/shifting cultivation
+        color:
+        - 209
+        - 163
+        - 61
+        - 255
+      - value: 5
+        label: grassland
+        color:
+        - 255
+        - 255
+        - 76
+        - 255
+      - value: 6
+        label: Lichen and moss
+        color:
+        - 250
+        - 230
+        - 160
+        - 255
+      - value: 7
+        label: shrub
+        color:
+        - 255
+        - 187
+        - 34
+        - 255
+      - value: 8
+        label: snow and ice
+        color:
+        - 240
+        - 240
+        - 240
+        - 255
+      - value: 9
+        label: tree
+        color:
+        - 0
+        - 100
+        - 0
+        - 255
+      - value: 10
+        label: urban/built-up
+        color:
+        - 250
+        - 0
+        - 0
+        - 255
+      - value: 11
+        label: water
+        color:
+        - 0
+        - 100
+        - 200
+        - 255
+      - value: 12
+        label: wetland (herbaceous)
+        color:
+        - 0
+        - 150
+        - 160
+        - 255
+    - name: ts_start
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: image 0 (quarterly 1)
+        color:
+        - 45
+        - 53
+        - 229
+        - 255
+      - value: 1
+        label: image 1 (quarterly 2)
+        color:
+        - 45
+        - 79
+        - 229
+        - 255
+      - value: 2
+        label: image 2 (quarterly 3)
+        color:
+        - 45
+        - 105
+        - 229
+        - 255
+      - value: 3
+        label: image 3 (quarterly 4)
+        color:
+        - 45
+        - 131
+        - 229
+        - 255
+      - value: 4
+        label: image 4 (quarterly 5)
+        color:
+        - 45
+        - 158
+        - 229
+        - 255
+      - value: 5
+        label: image 5 (quarterly 6)
+        color:
+        - 45
+        - 184
+        - 229
+        - 255
+      - value: 6
+        label: image 6 (quarterly 7)
+        color:
+        - 45
+        - 210
+        - 229
+        - 255
+      - value: 7
+        label: image 7 (quarterly 8)
+        color:
+        - 45
+        - 229
+        - 222
+        - 255
+      - value: 8
+        label: image 8 (quarterly 9)
+        color:
+        - 45
+        - 229
+        - 195
+        - 255
+      - value: 9
+        label: image 9 (quarterly 10)
+        color:
+        - 45
+        - 229
+        - 169
+        - 255
+      - value: 10
+        label: image 10 (quarterly 11)
+        color:
+        - 45
+        - 229
+        - 143
+        - 255
+      - value: 11
+        label: image 11 (quarterly 12)
+        color:
+        - 45
+        - 229
+        - 117
+        - 255
+      - value: 12
+        label: image 12 (quarterly 13)
+        color:
+        - 45
+        - 229
+        - 91
+        - 255
+      - value: 13
+        label: image 13 (quarterly 14)
+        color:
+        - 45
+        - 229
+        - 64
+        - 255
+      - value: 14
+        label: image 14 (quarterly 15)
+        color:
+        - 53
+        - 229
+        - 45
+        - 255
+      - value: 15
+        label: image 15 (quarterly 16)
+        color:
+        - 79
+        - 229
+        - 45
+        - 255
+      - value: 16
+        label: image 16 (recent 1)
+        color:
+        - 105
+        - 229
+        - 45
+        - 255
+      - value: 17
+        label: image 17 (recent 2)
+        color:
+        - 131
+        - 229
+        - 45
+        - 255
+      - value: 18
+        label: image 18 (recent 3)
+        color:
+        - 158
+        - 229
+        - 45
+        - 255
+      - value: 19
+        label: image 19 (recent 4)
+        color:
+        - 184
+        - 229
+        - 45
+        - 255
+      - value: 20
+        label: image 20 (recent 5)
+        color:
+        - 210
+        - 229
+        - 45
+        - 255
+      - value: 21
+        label: image 21 (recent 6)
+        color:
+        - 229
+        - 222
+        - 45
+        - 255
+    - name: ts_end
+      field_type: segmentation
+      nodata_value: 0
+      allowed_values:
+      - value: 0
+        label: image 0 (quarterly 1)
+        color:
+        - 45
+        - 53
+        - 229
+        - 255
+      - value: 1
+        label: image 1 (quarterly 2)
+        color:
+        - 45
+        - 79
+        - 229
+        - 255
+      - value: 2
+        label: image 2 (quarterly 3)
+        color:
+        - 45
+        - 105
+        - 229
+        - 255
+      - value: 3
+        label: image 3 (quarterly 4)
+        color:
+        - 45
+        - 131
+        - 229
+        - 255
+      - value: 4
+        label: image 4 (quarterly 5)
+        color:
+        - 45
+        - 158
+        - 229
+        - 255
+      - value: 5
+        label: image 5 (quarterly 6)
+        color:
+        - 45
+        - 184
+        - 229
+        - 255
+      - value: 6
+        label: image 6 (quarterly 7)
+        color:
+        - 45
+        - 210
+        - 229
+        - 255
+      - value: 7
+        label: image 7 (quarterly 8)
+        color:
+        - 45
+        - 229
+        - 222
+        - 255
+      - value: 8
+        label: image 8 (quarterly 9)
+        color:
+        - 45
+        - 229
+        - 195
+        - 255
+      - value: 9
+        label: image 9 (quarterly 10)
+        color:
+        - 45
+        - 229
+        - 169
+        - 255
+      - value: 10
+        label: image 10 (quarterly 11)
+        color:
+        - 45
+        - 229
+        - 143
+        - 255
+      - value: 11
+        label: image 11 (quarterly 12)
+        color:
+        - 45
+        - 229
+        - 117
+        - 255
+      - value: 12
+        label: image 12 (quarterly 13)
+        color:
+        - 45
+        - 229
+        - 91
+        - 255
+      - value: 13
+        label: image 13 (quarterly 14)
+        color:
+        - 45
+        - 229
+        - 64
+        - 255
+      - value: 14
+        label: image 14 (quarterly 15)
+        color:
+        - 53
+        - 229
+        - 45
+        - 255
+      - value: 15
+        label: image 15 (quarterly 16)
+        color:
+        - 79
+        - 229
+        - 45
+        - 255
+      - value: 16
+        label: image 16 (recent 1)
+        color:
+        - 105
+        - 229
+        - 45
+        - 255
+      - value: 17
+        label: image 17 (recent 2)
+        color:
+        - 131
+        - 229
+        - 45
+        - 255
+      - value: 18
+        label: image 18 (recent 3)
+        color:
+        - 158
+        - 229
+        - 45
+        - 255
+      - value: 19
+        label: image 19 (recent 4)
+        color:
+        - 184
+        - 229
+        - 45
+        - 255
+      - value: 20
+        label: image 20 (recent 5)
+        color:
+        - 210
+        - 229
+        - 45
+        - 255
+      - value: 21
+        label: image 21 (recent 6)
+        color:
+        - 229
+        - 222
+        - 45
+        - 255
+model:
+  encoder:
+    name: olmoearth
+    patch_size: 4
+    output: patch_tokens
+    use_legacy_timestamps: false
+    token_pooling: false
+    source:
+      name: huggingface
+      model_id: OLMOEARTH_V1_2_BASE
+  tasks:
+    binary:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.breakpoint_scan.BreakpointScan
+        init_args:
+          in_dim: 768
+          output: EVIDENCE
+          hidden: 256
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 256
+          out_channels: 256
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 256
+          out_channels: 128
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 128
+          out_channels: 64
+          kernel_size: 3
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 64
+          out_channels: 3
+          kernel_size: 1
+          activation:
+            class_path: torch.nn.Identity
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 3
+    pre_change:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.breakpoint_scan.BreakpointScan
+        init_args:
+          in_dim: 768
+          output: BEFORE_AFTER
+          hidden: 256
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 1536
+          out_channels: 768
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 768
+          out_channels: 256
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 256
+          out_channels: 128
+          kernel_size: 3
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 128
+          out_channels: 11
+          kernel_size: 1
+          activation:
+            class_path: torch.nn.Identity
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 11
+    post_change:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.breakpoint_scan.BreakpointScan
+        init_args:
+          in_dim: 768
+          output: BEFORE_AFTER
+          hidden: 256
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 1536
+          out_channels: 768
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 768
+          out_channels: 256
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 256
+          out_channels: 128
+          kernel_size: 3
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 128
+          out_channels: 15
+          kernel_size: 1
+          activation:
+            class_path: torch.nn.Identity
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 15
+    src:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.breakpoint_scan.BreakpointScan
+        init_args:
+          in_dim: 768
+          output: BEFORE
+          hidden: 256
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 768
+          out_channels: 768
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 768
+          out_channels: 256
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 256
+          out_channels: 128
+          kernel_size: 3
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 128
+          out_channels: 13
+          kernel_size: 1
+          activation:
+            class_path: torch.nn.Identity
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 13
+    dst:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.breakpoint_scan.BreakpointScan
+        init_args:
+          in_dim: 768
+          output: AFTER
+          hidden: 256
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 768
+          out_channels: 768
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 768
+          out_channels: 256
+          kernel_size: 3
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 2
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 256
+          out_channels: 128
+          kernel_size: 3
+      - class_path: rslearn.models.conv.Conv
+        init_args:
+          in_channels: 128
+          out_channels: 13
+          kernel_size: 1
+          activation:
+            class_path: torch.nn.Identity
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 13
+    ts_start:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.tokens_to_channels.TokensToChannels
+        init_args:
+          in_dim: 768
+          out_dim: 1
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 4
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 22
+    ts_end:
+      name: manual
+      decoder_layers:
+      - class_path: rslearn.models.tokens_to_channels.TokensToChannels
+        init_args:
+          in_dim: 768
+          out_dim: 1
+      - class_path: rslearn.models.upsample.Upsample
+        init_args:
+          scale_factor: 4
+      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      task:
+        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        init_args:
+          num_classes: 22
+input_preprocessing:
+  default:
+    input_size: 64
+    input_mode: all_tiles
+  predict:
+    overlap_pixels: 16
+prediction_requests:
+  partitioners:
+    request_to_partitions:
+      name: grid
+      grid_size: 1.0
+      overlap_size: 0.0
+      projection: null
+    partition_to_windows:
+      name: grid
+      grid_size: 2048
+      overlap_size: 0.0
+      projection:
+        method: use_utm
+  postprocessors:
+    additional_steps: []
+transpiler_context:
+  downsample_factor: 1

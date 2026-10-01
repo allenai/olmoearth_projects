@@ -53,3 +53,12 @@ which is an older version of the dataset.
 ### Solar Farm Segmentation
 
 - Dataset used for training: `/weka/dfive-default/rslearn-eai/datasets/solar_farm/dataset_v1/20250605/`
+
+### OlmoEarth LCC (Land Cover Change)
+
+- Dataset used for training: `/weka/dfive-default/rslearn-eai/datasets/change_finder/lcc_model_dataset_20260811/`
+- Checkpoint (run `2026_09_17_lcc/rslearn_bpcat_notemporal`):
+  `/weka/dfive-default/rslearn-eai/projects/2026_09_17_lcc/rslearn_bpcat_notemporal/best.ckpt`,
+  copied to `gs://ai2-rslearn-projects-data/projects/2026_09_17_lcc/rslearn_bpcat_notemporal/best.ckpt`
+- Studio configs: `olmoearth_run_data/olmoearth_lcc/` (see its README for the
+  single-output limitation and time range semantics).
