@@ -166,6 +166,7 @@ def one_stage(
             fn = runner.run_inference
         elif stage == OlmoEarthRunStage.POSTPROCESS:
             fn = runner.postprocess
+            runner.inference_results_data_type = "RASTER" # Needs to be set before postprocessing
         else:
             assert False
 
@@ -178,4 +179,5 @@ def one_stage(
                 fn(partition_id)
 
     elif stage == OlmoEarthRunStage.COMBINE:
+        runner.inference_results_data_type = "RASTER" # Needs to be set before combining
         runner.combine(partitions)
