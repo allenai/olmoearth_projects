@@ -271,6 +271,15 @@ def main(
                         "name": "vectorize",
                         "field": "post_change",
                         "skip_label_ids": [0, 1],
+                        # Percentiles rather than min/max so a few outlier pixels don't set the dates.
+                        "auxiliary_fields": {
+                            "binary": {"aggregation": "mode"},
+                            "pre_change": {"aggregation": "mode"},
+                            "src": {"aggregation": "mode"},
+                            "dst": {"aggregation": "mode"},
+                            "ts_start": {"aggregation": "percentile", "percentile": 10},
+                            "ts_end": {"aggregation": "percentile", "percentile": 90},
+                        },
                     }
                 ]
             },

@@ -987,5 +987,20 @@ prediction_requests:
       skip_label_ids:
       - 0
       - 1
+      auxiliary_fields:
+        binary:
+          aggregation: mode
+        pre_change:
+          aggregation: mode
+        src:
+          aggregation: mode
+        dst:
+          aggregation: mode
+        ts_start:
+          aggregation: percentile
+          percentile: 10
+        ts_end:
+          aggregation: percentile
+          percentile: 90
 transpiler_context:
   downsample_factor: 1
