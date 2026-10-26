@@ -981,6 +981,11 @@ prediction_requests:
       projection:
         method: use_utm
   postprocessors:
-    additional_steps: []
+    additional_steps:
+    - name: vectorize
+      field: post_change
+      skip_label_ids:
+      - 0
+      - 1
 transpiler_context:
   downsample_factor: 1

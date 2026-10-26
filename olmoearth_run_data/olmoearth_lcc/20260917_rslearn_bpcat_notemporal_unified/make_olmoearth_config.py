@@ -264,7 +264,16 @@ def main(
                     "projection": {"method": "use_utm"},
                 },
             },
-            "postprocessors": {"additional_steps": []},
+            "postprocessors": {
+                "additional_steps": [
+                    # 0 is nodata and 1 is "none", so only actual changes become polygons.
+                    {
+                        "name": "vectorize",
+                        "field": "post_change",
+                        "skip_label_ids": [0, 1],
+                    }
+                ]
+            },
         },
         "transpiler_context": {"downsample_factor": 1},
     }
