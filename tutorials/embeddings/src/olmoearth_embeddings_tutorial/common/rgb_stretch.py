@@ -40,6 +40,8 @@ def stretch_rgb(
     """
     out = rgb_hwc.astype(np.float32).copy()
     nans = np.isnan(out).any(axis=-1) | (out.sum(axis=-1) == 0)
+    if nans.all():
+        return np.full_like(out, NODATA_FILL)
 
     if mode == "fixed":
         out = np.clip(out / FIXED_MAX_REFLECTANCE, 0.0, 1.0)

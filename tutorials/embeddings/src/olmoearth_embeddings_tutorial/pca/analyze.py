@@ -99,7 +99,7 @@ def compute_pca_rgb(
         lo, hi = np.percentile(vals, [2, 98])
         pca_rgb[:, :, ch] = (pca_rgb[:, :, ch] - lo) / max(float(hi - lo), 1e-6)
     pca_rgb = np.clip(pca_rgb, 0, 1)
-    pca_rgb[~valid] = 0.15
+    pca_rgb[~valid] = 1.0
 
     return PCAResult(
         pca_rgb=pca_rgb,
@@ -122,10 +122,22 @@ def make_pca_figure(
     var = result.variance_pct
     has_s2 = s2_rgb is not None
     ncols = 2 if has_s2 else 1
-    fig, axes = plt.subplots(1, ncols, figsize=(6.0 * ncols, 5.0))
+    # Size each panel to the raster's aspect ratio, plus room for the titles
+    # above and the variance note below.
+    panel_h = 5.0
+    panel_w = panel_h * result.width / result.height
+    fig_w = panel_w * ncols * 1.06
+    fig_h = panel_h + 1.1
+    fig, axes = plt.subplots(1, ncols, figsize=(fig_w, fig_h))
     if ncols == 1:
         axes = [axes]
-    fig.subplots_adjust(left=0.02, right=0.98, top=0.88, bottom=0.03, wspace=0.06)
+    fig.subplots_adjust(
+        left=0.02,
+        right=0.98,
+        top=1 - 0.8 / fig_h,
+        bottom=0.35 / fig_h,
+        wspace=0.06,
+    )
 
     col = 0
     if has_s2:

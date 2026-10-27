@@ -263,8 +263,13 @@ def make_heatmap_figure(
     Returns the matplotlib Figure (caller decides whether to save or show).
     """
     rgb_display = _global_stretch(result.rgb_raw, mode=result.stretch)
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    fig.subplots_adjust(left=0.02, right=0.98, wspace=0.06)
+    # Size the panels to the raster's aspect ratio, plus room for the colorbar.
+    height, width = result.sim.shape
+    panel_h = 6.0
+    panel_w = panel_h * width / height
+    fig, axes = plt.subplots(
+        1, 2, figsize=(2 * panel_w + 1.2, panel_h + 0.6), layout="constrained"
+    )
 
     axes[0].imshow(rgb_display, interpolation="nearest")
     axes[0].plot(

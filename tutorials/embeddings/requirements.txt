@@ -1,9 +1,13 @@
 matplotlib>=3.10
 numpy>=1.26
+obstore>=0.6
 planetary-computer>=1.0
+pyproj>=3.6
 pystac-client>=0.9
 rasterio>=1.4
 requests>=2.32
 rioxarray>=0.19
 scikit-learn>=1.8
+shapely>=2.0
 stackstac>=0.5.1
+zarr>=3.1
