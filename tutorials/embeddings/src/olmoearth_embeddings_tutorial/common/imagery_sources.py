@@ -7,17 +7,47 @@ so that pixel indices align 1:1 between embeddings and imagery.
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import planetary_computer
+import pystac
 import pystac_client
+import pystac_client.exceptions
 import rasterio
 import rasterio.fill
 import rioxarray  # noqa: F401 (registers .rio accessor)
 import stackstac
 from rasterio.merge import merge
 from rasterio.warp import Resampling, reproject, transform_bounds
+
+STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
+STAC_ATTEMPTS = 4
+STAC_RETRY_DELAY_S = 15.0
+
+
+def _search_items(**search_kwargs: Any) -> list[Any]:
+    """Search Planetary Computer, retrying transient API errors.
+
+    Planetary Computer occasionally fails with "upstream request timeout" or
+    "Service is unavailable" (raised as a STACError when opening the catalog),
+    so each search is retried a few times with a growing delay.
+    """
+    for attempt in range(1, STAC_ATTEMPTS + 1):
+        try:
+            catalog = pystac_client.Client.open(
+                STAC_URL, modifier=planetary_computer.sign_inplace
+            )
+            return list(catalog.search(**search_kwargs).item_collection())
+        except (pystac_client.exceptions.APIError, pystac.STACError) as exc:
+            if attempt == STAC_ATTEMPTS:
+                raise
+            delay = STAC_RETRY_DELAY_S * attempt
+            print(f"  STAC search failed ({exc}); retrying in {delay:.0f}s")
+            time.sleep(delay)
+    raise AssertionError("unreachable")
 
 
 def _wgs84_bounds(embed_path: Path) -> tuple[float, float, float, float]:
@@ -64,17 +94,12 @@ def download_s2_rgb(
     west, south, east, north = _wgs84_bounds(embed_path)
     print(f"S2 RGB: WGS 84 bbox ({west:.4f}, {south:.4f}, {east:.4f}, {north:.4f})")
 
-    catalog = pystac_client.Client.open(
-        "https://planetarycomputer.microsoft.com/api/stac/v1",
-        modifier=planetary_computer.sign_inplace,
-    )
-    search = catalog.search(
+    items = _search_items(
         collections=["sentinel-2-l2a"],
         bbox=(west, south, east, north),
         datetime=datetime_range,
         query={"eo:cloud_cover": {"lt": cloud_max}},
     )
-    items = list(search.item_collection())
     if not items:
         raise RuntimeError(
             "No Sentinel-2 items found. Widen the datetime range or raise cloud_max."
@@ -104,8 +129,11 @@ def download_s2_rgb(
     median = median.assign_coords(band=["B04", "B03", "B02"])
     median = median.rio.write_crs(f"EPSG:{epsg}")
 
-    ref_da = rioxarray.open_rasterio(embed_path).isel(band=0, drop=True)
-    aligned = median.rio.reproject_match(ref_da).astype("float32")
+    # Close the reference raster explicitly: an unclosed rioxarray dataset can
+    # crash the interpreter at exit.
+    with rioxarray.open_rasterio(embed_path) as ref_raster:
+        ref_da = ref_raster.isel(band=0, drop=True)
+        aligned = median.rio.reproject_match(ref_da).astype("float32")
 
     if fill_holes_pixels > 0:
         print(f"S2 RGB: filling nodata holes (max {fill_holes_pixels} px)...")
@@ -157,15 +185,10 @@ def download_worldcover(
 
     print(f"WorldCover: WGS 84 bbox ({west:.4f}, {south:.4f}, {east:.4f}, {north:.4f})")
 
-    catalog = pystac_client.Client.open(
-        "https://planetarycomputer.microsoft.com/api/stac/v1",
-        modifier=planetary_computer.sign_inplace,
-    )
-    search = catalog.search(
+    items = _search_items(
         collections=["esa-worldcover"],
         bbox=(west, south, east, north),
     )
-    items = list(search.item_collection())
     if not items:
         raise RuntimeError("No WorldCover items found for this extent.")
     print(f"WorldCover: {len(items)} tiles")

@@ -8,8 +8,8 @@ similar colors.
 ## Usage
 
 ```bash
-# 1. Compute embeddings and download imagery
-PYTHONPATH=src python -m olmoearth_embeddings_tutorial.pca.compute --config config.json
+# 1. Download embeddings and imagery
+PYTHONPATH=src python -m olmoearth_embeddings_tutorial.pca.download
 
 # 2. Analyze and generate figure
 PYTHONPATH=src python -m olmoearth_embeddings_tutorial.pca.analyze \

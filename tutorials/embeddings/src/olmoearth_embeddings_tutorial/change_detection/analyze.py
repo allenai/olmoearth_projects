@@ -6,8 +6,8 @@ change magnitude heatmap.
 
 Example:
     $ PYTHONPATH=src python -m olmoearth_embeddings_tutorial.change_detection.analyze \
-        --before-dir data/change_detection/sept_2023 \
-        --after-dir data/change_detection/sept_2024 \
+        --before-dir data/change_detection/2023 \
+        --after-dir data/change_detection/2025 \
         --out figures/
 """
 
@@ -71,8 +71,8 @@ class ChangeResult:
 def compute_change(
     before_dir: Path,
     after_dir: Path,
-    before_label: str = "September 2023 (before)",
-    after_label: str = "September 2024 (after)",
+    before_label: str = "2023 (before)",
+    after_label: str = "2025 (after)",
     stretch: StretchMode = "percentile",
 ) -> ChangeResult:
     """Compute per-pixel cosine distance between two embedding sets.
@@ -206,12 +206,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--before-label",
-        default="September 2023 (before)",
+        default="2023 (before)",
         help="Label for the before panel.",
     )
     parser.add_argument(
         "--after-label",
-        default="September 2024 (after)",
+        default="2025 (after)",
         help="Label for the after panel.",
     )
     parser.add_argument(
