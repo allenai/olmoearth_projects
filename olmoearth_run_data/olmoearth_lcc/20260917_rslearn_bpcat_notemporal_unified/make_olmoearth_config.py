@@ -8,7 +8,6 @@ Favyen's config_predict_rslearn.json.
 Usage (from this directory): python make_olmoearth_config.py > olmoearth_config.yaml
 """
 
-import colorsys
 import re
 import sys
 from pathlib import Path
@@ -140,30 +139,14 @@ def categorical(labels: list[str], colors: dict[str, str]) -> list[dict]:
     ]
 
 
-def timesteps() -> list[dict]:
-    """One class per input image, oldest first, on a blue-to-yellow ramp."""
-    values = []
-    for i in range(NUM_TIMESTEPS):
-        r, g, b = colorsys.hsv_to_rgb(0.66 - 0.5 * i / (NUM_TIMESTEPS - 1), 0.8, 0.9)
-        kind = f"quarterly {i + 1}" if i < 16 else f"recent {i - 15}"
-        values.append(
-            {
-                "value": i,
-                "label": f"image {i} ({kind})",
-                "color": [int(r * 255), int(g * 255), int(b * 255), 255],
-            }
-        )
-    return values
-
-
 def field(name: str, allowed_values: list[dict]) -> dict:
-    """A segmentation output field with nodata 0."""
-    return {
-        "name": name,
-        "field_type": "segmentation",
-        "nodata_value": 0,
-        "allowed_values": allowed_values,
-    }
+    """A segmentation output field."""
+    return {"name": name, "field_type": "segmentation", "allowed_values": allowed_values}
+
+
+def date_field(name: str) -> dict:
+    """A per-pixel date field: uint16 days since 1970-01-01, vectorized as ISO dates."""
+    return {"name": name, "field_type": "per_pixel_date"}
 
 
 # Band order follows Favyen's published summary raster where it can (argmax bands only for now).
@@ -173,9 +156,32 @@ FIELDS = [
     field("post_change", categorical(POST_CLASSES, POST_COLORS)),
     field("src", categorical(LC_CLASSES, LC_COLORS)),
     field("dst", categorical(LC_CLASSES, LC_COLORS)),
-    field("ts_start", timesteps()),
-    field("ts_end", timesteps()),
+    date_field("ts_start"),
+    date_field("ts_end"),
 ]
+DATE_FIELDS = {"ts_start", "ts_end"}
+
+
+def timestep_task(task: dict, decoder_layers: list[dict]) -> tuple[dict, list[dict]]:
+    """The legacy timestep head as rslearn's per-pixel timestep task.
+
+    The head still classifies each pixel into one of the input images, so the checkpoint
+    loads unchanged, but the task writes the midpoint date of the chosen image (the
+    mosaic's period) instead of its index.
+    """
+    assert decoder_layers[-1]["class_path"].endswith("SegmentationHead")
+    head = {
+        "class_path": "rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead",
+        # mode maps labeled dates to images, so it only matters for training.
+        "init_args": {"input_key": "sentinel2_l2a", "mode": "AFTER"},
+    }
+    task = {
+        "class_path": "rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask",
+        # Studio's legacy model.yaml says 20 timestep classes; the model was trained on 22 images.
+        "init_args": {**task["init_args"], "num_classes": NUM_TIMESTEPS},
+    }
+    return task, [*decoder_layers[:-1], head]
+
 
 
 def main(
@@ -192,17 +198,20 @@ def main(
     tasks = {}
     for f in FIELDS:
         task = legacy_tasks[f["name"]]
-        num_classes = len(f["allowed_values"])
-        # Studio's legacy model.yaml says 20 timestep classes; the model was trained on 22 images.
-        task = {**task, "init_args": {**task["init_args"], "num_classes": num_classes}}
+        decoder_layers = mtm["decoders"][f["name"]]
+        if f["name"] in DATE_FIELDS:
+            task, decoder_layers = timestep_task(task, decoder_layers)
+        else:
+            num_classes = len(f["allowed_values"])
+            task = {**task, "init_args": {**task["init_args"], "num_classes": num_classes}}
         tasks[f["name"]] = {
             "name": "manual",
-            "decoder_layers": mtm["decoders"][f["name"]],
+            "decoder_layers": decoder_layers,
             "task": task,
         }
 
     config = {
-        "config_version": "0.13.0",
+        "config_version": "0.15.0",
         "data": {
             "temporality": {
                 "name": "framed_point_in_time",
@@ -264,7 +273,25 @@ def main(
                     "projection": {"method": "use_utm"},
                 },
             },
-            "postprocessors": {"additional_steps": []},
+            "postprocessors": {
+                "additional_steps": [
+                    # 0 is nodata and 1 is "none", so only actual changes become polygons.
+                    {
+                        "name": "vectorize",
+                        "field": "post_change",
+                        "skip_label_ids": [0, 1],
+                        # Percentiles rather than min/max so a few outlier pixels don't set the dates.
+                        "auxiliary_fields": {
+                            "binary": {"aggregation": "mode"},
+                            "pre_change": {"aggregation": "mode"},
+                            "src": {"aggregation": "mode"},
+                            "dst": {"aggregation": "mode"},
+                            "ts_start": {"aggregation": "percentile", "percentile": 10},
+                            "ts_end": {"aggregation": "percentile", "percentile": 90},
+                        },
+                    }
+                ]
+            },
         },
         "transpiler_context": {"downsample_factor": 1},
     }
