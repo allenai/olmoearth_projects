@@ -1,4 +1,4 @@
-config_version: 0.13.0
+config_version: 0.15.0
 data:
   temporality:
     name: framed_point_in_time
@@ -24,7 +24,6 @@ data:
     fields:
     - name: binary
       field_type: segmentation
-      nodata_value: 0
       allowed_values:
       - value: 0
         label: nodata
@@ -45,7 +44,6 @@ data:
         - 255
     - name: pre_change
       field_type: segmentation
-      nodata_value: 0
       allowed_values:
       - value: 0
         label: nodata
@@ -118,7 +116,6 @@ data:
         - 255
     - name: post_change
       field_type: segmentation
-      nodata_value: 0
       allowed_values:
       - value: 0
         label: nodata
@@ -219,7 +216,6 @@ data:
         - 255
     - name: src
       field_type: segmentation
-      nodata_value: 0
       allowed_values:
       - value: 0
         label: nodata
@@ -310,7 +306,6 @@ data:
         - 255
     - name: dst
       field_type: segmentation
-      nodata_value: 0
       allowed_values:
       - value: 0
         label: nodata
@@ -400,321 +395,9 @@ data:
         - 160
         - 255
     - name: ts_start
-      field_type: segmentation
-      nodata_value: 0
-      allowed_values:
-      - value: 0
-        label: image 0 (quarterly 1)
-        color:
-        - 45
-        - 53
-        - 229
-        - 255
-      - value: 1
-        label: image 1 (quarterly 2)
-        color:
-        - 45
-        - 79
-        - 229
-        - 255
-      - value: 2
-        label: image 2 (quarterly 3)
-        color:
-        - 45
-        - 105
-        - 229
-        - 255
-      - value: 3
-        label: image 3 (quarterly 4)
-        color:
-        - 45
-        - 131
-        - 229
-        - 255
-      - value: 4
-        label: image 4 (quarterly 5)
-        color:
-        - 45
-        - 158
-        - 229
-        - 255
-      - value: 5
-        label: image 5 (quarterly 6)
-        color:
-        - 45
-        - 184
-        - 229
-        - 255
-      - value: 6
-        label: image 6 (quarterly 7)
-        color:
-        - 45
-        - 210
-        - 229
-        - 255
-      - value: 7
-        label: image 7 (quarterly 8)
-        color:
-        - 45
-        - 229
-        - 222
-        - 255
-      - value: 8
-        label: image 8 (quarterly 9)
-        color:
-        - 45
-        - 229
-        - 195
-        - 255
-      - value: 9
-        label: image 9 (quarterly 10)
-        color:
-        - 45
-        - 229
-        - 169
-        - 255
-      - value: 10
-        label: image 10 (quarterly 11)
-        color:
-        - 45
-        - 229
-        - 143
-        - 255
-      - value: 11
-        label: image 11 (quarterly 12)
-        color:
-        - 45
-        - 229
-        - 117
-        - 255
-      - value: 12
-        label: image 12 (quarterly 13)
-        color:
-        - 45
-        - 229
-        - 91
-        - 255
-      - value: 13
-        label: image 13 (quarterly 14)
-        color:
-        - 45
-        - 229
-        - 64
-        - 255
-      - value: 14
-        label: image 14 (quarterly 15)
-        color:
-        - 53
-        - 229
-        - 45
-        - 255
-      - value: 15
-        label: image 15 (quarterly 16)
-        color:
-        - 79
-        - 229
-        - 45
-        - 255
-      - value: 16
-        label: image 16 (recent 1)
-        color:
-        - 105
-        - 229
-        - 45
-        - 255
-      - value: 17
-        label: image 17 (recent 2)
-        color:
-        - 131
-        - 229
-        - 45
-        - 255
-      - value: 18
-        label: image 18 (recent 3)
-        color:
-        - 158
-        - 229
-        - 45
-        - 255
-      - value: 19
-        label: image 19 (recent 4)
-        color:
-        - 184
-        - 229
-        - 45
-        - 255
-      - value: 20
-        label: image 20 (recent 5)
-        color:
-        - 210
-        - 229
-        - 45
-        - 255
-      - value: 21
-        label: image 21 (recent 6)
-        color:
-        - 229
-        - 222
-        - 45
-        - 255
+      field_type: per_pixel_date
     - name: ts_end
-      field_type: segmentation
-      nodata_value: 0
-      allowed_values:
-      - value: 0
-        label: image 0 (quarterly 1)
-        color:
-        - 45
-        - 53
-        - 229
-        - 255
-      - value: 1
-        label: image 1 (quarterly 2)
-        color:
-        - 45
-        - 79
-        - 229
-        - 255
-      - value: 2
-        label: image 2 (quarterly 3)
-        color:
-        - 45
-        - 105
-        - 229
-        - 255
-      - value: 3
-        label: image 3 (quarterly 4)
-        color:
-        - 45
-        - 131
-        - 229
-        - 255
-      - value: 4
-        label: image 4 (quarterly 5)
-        color:
-        - 45
-        - 158
-        - 229
-        - 255
-      - value: 5
-        label: image 5 (quarterly 6)
-        color:
-        - 45
-        - 184
-        - 229
-        - 255
-      - value: 6
-        label: image 6 (quarterly 7)
-        color:
-        - 45
-        - 210
-        - 229
-        - 255
-      - value: 7
-        label: image 7 (quarterly 8)
-        color:
-        - 45
-        - 229
-        - 222
-        - 255
-      - value: 8
-        label: image 8 (quarterly 9)
-        color:
-        - 45
-        - 229
-        - 195
-        - 255
-      - value: 9
-        label: image 9 (quarterly 10)
-        color:
-        - 45
-        - 229
-        - 169
-        - 255
-      - value: 10
-        label: image 10 (quarterly 11)
-        color:
-        - 45
-        - 229
-        - 143
-        - 255
-      - value: 11
-        label: image 11 (quarterly 12)
-        color:
-        - 45
-        - 229
-        - 117
-        - 255
-      - value: 12
-        label: image 12 (quarterly 13)
-        color:
-        - 45
-        - 229
-        - 91
-        - 255
-      - value: 13
-        label: image 13 (quarterly 14)
-        color:
-        - 45
-        - 229
-        - 64
-        - 255
-      - value: 14
-        label: image 14 (quarterly 15)
-        color:
-        - 53
-        - 229
-        - 45
-        - 255
-      - value: 15
-        label: image 15 (quarterly 16)
-        color:
-        - 79
-        - 229
-        - 45
-        - 255
-      - value: 16
-        label: image 16 (recent 1)
-        color:
-        - 105
-        - 229
-        - 45
-        - 255
-      - value: 17
-        label: image 17 (recent 2)
-        color:
-        - 131
-        - 229
-        - 45
-        - 255
-      - value: 18
-        label: image 18 (recent 3)
-        color:
-        - 158
-        - 229
-        - 45
-        - 255
-      - value: 19
-        label: image 19 (recent 4)
-        color:
-        - 184
-        - 229
-        - 45
-        - 255
-      - value: 20
-        label: image 20 (recent 5)
-        color:
-        - 210
-        - 229
-        - 45
-        - 255
-      - value: 21
-        label: image 21 (recent 6)
-        color:
-        - 229
-        - 222
-        - 45
-        - 255
+      field_type: per_pixel_date
 model:
   encoder:
     name: olmoearth
@@ -941,9 +624,12 @@ model:
       - class_path: rslearn.models.upsample.Upsample
         init_args:
           scale_factor: 4
-      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      - class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead
+        init_args:
+          input_key: sentinel2_l2a
+          mode: AFTER
       task:
-        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask
         init_args:
           num_classes: 22
     ts_end:
@@ -956,9 +642,12 @@ model:
       - class_path: rslearn.models.upsample.Upsample
         init_args:
           scale_factor: 4
-      - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+      - class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead
+        init_args:
+          input_key: sentinel2_l2a
+          mode: AFTER
       task:
-        class_path: rslearn.train.tasks.segmentation.SegmentationTask
+        class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask
         init_args:
           num_classes: 22
 input_preprocessing:
