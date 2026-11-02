@@ -141,7 +141,11 @@ def categorical(labels: list[str], colors: dict[str, str]) -> list[dict]:
 
 def field(name: str, allowed_values: list[dict]) -> dict:
     """A segmentation output field."""
-    return {"name": name, "field_type": "segmentation", "allowed_values": allowed_values}
+    return {
+        "name": name,
+        "field_type": "segmentation",
+        "allowed_values": allowed_values,
+    }
 
 
 def date_field(name: str) -> dict:
@@ -183,7 +187,6 @@ def timestep_task(task: dict, decoder_layers: list[dict]) -> tuple[dict, list[di
     return task, [*decoder_layers[:-1], head]
 
 
-
 def main(
     model_yaml: Path = Path(__file__).parent.parent
     / "20260917_rslearn_bpcat_notemporal"
@@ -203,7 +206,10 @@ def main(
             task, decoder_layers = timestep_task(task, decoder_layers)
         else:
             num_classes = len(f["allowed_values"])
-            task = {**task, "init_args": {**task["init_args"], "num_classes": num_classes}}
+            task = {
+                **task,
+                "init_args": {**task["init_args"], "num_classes": num_classes},
+            }
         tasks[f["name"]] = {
             "name": "manual",
             "decoder_layers": decoder_layers,
