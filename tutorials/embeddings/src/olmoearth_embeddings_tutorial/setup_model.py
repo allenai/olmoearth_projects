@@ -1,6 +1,6 @@
 """One-time setup: create a Studio project and embeddings models.
 
-Creates a project and two OlmoEarth-v1-Tiny embeddings models:
+Creates a project and two OlmoEarth-v1.3-Base embeddings models:
   1. Annual (12 monthly periods) -- used by similarity, segmentation, and PCA.
   2. Monthly (1 period) -- used by change detection.
 
@@ -52,15 +52,22 @@ def parse_args() -> argparse.Namespace:
         help="Name for the new Studio project.",
     )
     parser.add_argument(
+        "--organization-id",
+        default=None,
+        help=(
+            "Organization to create the project in. Required if you belong "
+            "to more than one organization."
+        ),
+    )
+    parser.add_argument(
         "--model-name",
-        default="blog-embeddings-tiny-40m-s2",
+        default="blog-embeddings-v1-3-40m-s2",
         help="Name for the embeddings model.",
     )
     parser.add_argument(
-        "--encoder-variant",
-        default="tiny",
-        choices=("nano", "tiny", "base"),
-        help="OlmoEarth encoder variant. Default: %(default)s.",
+        "--foundation-model-version",
+        default="v1.3",
+        help="OlmoEarth foundation model version. Default: %(default)s.",
     )
     parser.add_argument(
         "--resolution",
@@ -82,7 +89,7 @@ def main() -> None:
     client = client_from_args(args.api_key, args.base_url)
 
     print(f"Creating project '{args.project_name}'...")
-    project = client.create_project(args.project_name)
+    project = client.create_project(args.project_name, args.organization_id)
     project_id = project["id"]
     print(f"  project_id: {project_id}")
 
@@ -91,7 +98,7 @@ def main() -> None:
     annual_model = client.create_embeddings_model(
         project_id=project_id,
         model_name=annual_name,
-        encoder_variant=args.encoder_variant,
+        foundation_model_version=args.foundation_model_version,
         resolution=args.resolution,
         num_periods=args.num_periods,
         imagery_sources=["sentinel2_l2a"],
@@ -104,7 +111,7 @@ def main() -> None:
     monthly_model = client.create_embeddings_model(
         project_id=project_id,
         model_name=monthly_name,
-        encoder_variant=args.encoder_variant,
+        foundation_model_version=args.foundation_model_version,
         resolution=args.resolution,
         num_periods=1,
         imagery_sources=["sentinel2_l2a"],
@@ -118,7 +125,7 @@ def main() -> None:
             "project_id": project_id,
             "model_id": model_id,
             "monthly_model_id": monthly_model_id,
-            "encoder_variant": args.encoder_variant,
+            "foundation_model_version": args.foundation_model_version,
             "resolution": args.resolution,
             "num_periods": args.num_periods,
         },
