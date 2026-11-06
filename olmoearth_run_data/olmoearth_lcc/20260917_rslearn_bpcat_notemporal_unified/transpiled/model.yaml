@@ -11,9 +11,9 @@ model:
             model_id: OLMOEARTH_V1_2_BASE
             embedding_size: 768
             autocast_dtype: float32
-            use_register_bottleneck_output: false
-            use_legacy_timestamps: false
+            use_location_token_output: false
             token_pooling: false
+            use_legacy_timestamps: false
         decoders:
           binary:
           - class_path: rslearn.models.breakpoint_scan.BreakpointScan
@@ -198,7 +198,10 @@ model:
           - class_path: rslearn.models.upsample.Upsample
             init_args:
               scale_factor: 4
-          - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+          - class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead
+            init_args:
+              input_key: sentinel2_l2a
+              mode: BEFORE
           ts_end:
           - class_path: rslearn.models.tokens_to_channels.TokensToChannels
             init_args:
@@ -207,7 +210,10 @@ model:
           - class_path: rslearn.models.upsample.Upsample
             init_args:
               scale_factor: 4
-          - class_path: rslearn.train.tasks.segmentation.SegmentationHead
+          - class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead
+            init_args:
+              input_key: sentinel2_l2a
+              mode: AFTER
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
@@ -265,38 +271,50 @@ data:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
               num_classes: 3
+              nodata_value: 255
           pre_change:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
               num_classes: 11
+              nodata_value: 255
           post_change:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
               num_classes: 15
+              nodata_value: 255
           src:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
               num_classes: 13
+              nodata_value: 255
           dst:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
               num_classes: 13
+              nodata_value: 255
           ts_start:
-            class_path: rslearn.train.tasks.segmentation.SegmentationTask
+            class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask
             init_args:
               num_classes: 22
           ts_end:
-            class_path: rslearn.train.tasks.segmentation.SegmentationTask
+            class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask
             init_args:
               num_classes: 22
         input_mapping:
-          binary: {}
-          pre_change: {}
-          post_change: {}
-          src: {}
-          dst: {}
-          ts_start: {}
-          ts_end: {}
+          binary:
+            targets_binary: targets
+          pre_change:
+            targets_pre_change: targets
+          post_change:
+            targets_post_change: targets
+          src:
+            targets_src: targets
+          dst:
+            targets_dst: targets
+          ts_start:
+            targets_ts_start: targets
+          ts_end:
+            targets_ts_end: targets
     default_config:
       crop_size: 64
       transforms:

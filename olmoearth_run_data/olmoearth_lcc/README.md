@@ -71,6 +71,26 @@ switch the config to Unified, paste `olmoearth_config.yaml`, keep the checkpoint
 pick a container image with the release above. Run copies the checkpoint into the new
 model's stage, so the legacy model is unchanged.
 
+To train it in Studio instead, paste `olmoearth_config.yaml` into the training wizard's
+advanced config. The config also carries what training needs: `nodata_value: 255` on the
+class tasks (the value olmoearth_run fills unlabeled pixels with), `val_loss` as the
+checkpoint metric, and Studio's guided `labeled_data_prep` and `training` defaults for
+64-pixel polygon labels. The project has to match it:
+
+- Seven annotation fields named exactly `binary`, `pre_change`, `post_change`, `src`,
+  `dst`, `ts_start` and `ts_end`.
+- The five class fields are labelsets. Studio exports a label as its position in the
+  labelset, ordered by when the label was created, so create each labelset's labels in
+  the order of that field's `allowed_values`, including `nodata` (and `none`) at the start.
+  Nothing checks this; a different order trains pixels as the wrong class.
+- `ts_start` and `ts_end` are number fields holding whole days since 1970-01-01. Leave
+  them empty where there is no change.
+- Each annotation's date is the reference date R, since both image windows look back
+  from it.
+
+Training needs an olmoearth_run release with run #651 and #669, and a Studio release with
+studio #3343.
+
 ### Prediction Request Geometry
 
 The model predicts change as of a reference date R. Set `oe_start_time` on each

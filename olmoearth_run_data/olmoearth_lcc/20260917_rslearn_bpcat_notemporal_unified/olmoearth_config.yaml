@@ -450,6 +450,7 @@ model:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
           num_classes: 3
+          nodata_value: 255
     pre_change:
       name: manual
       decoder_layers:
@@ -491,6 +492,7 @@ model:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
           num_classes: 11
+          nodata_value: 255
     post_change:
       name: manual
       decoder_layers:
@@ -532,6 +534,7 @@ model:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
           num_classes: 15
+          nodata_value: 255
     src:
       name: manual
       decoder_layers:
@@ -573,6 +576,7 @@ model:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
           num_classes: 13
+          nodata_value: 255
     dst:
       name: manual
       decoder_layers:
@@ -614,6 +618,7 @@ model:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
           num_classes: 13
+          nodata_value: 255
     ts_start:
       name: manual
       decoder_layers:
@@ -627,7 +632,7 @@ model:
       - class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead
         init_args:
           input_key: sentinel2_l2a
-          mode: AFTER
+          mode: BEFORE
       task:
         class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask
         init_args:
@@ -654,8 +659,50 @@ input_preprocessing:
   default:
     input_size: 64
     input_mode: all_tiles
+  train:
+    input_mode: single_random_crop
+    additional_transforms:
+    - name: random_flip
+      x: true
+      y: true
   predict:
     overlap_pixels: 16
+labeled_data_prep:
+  geometry_preparation:
+    line_string_policy: centroid
+  sampler:
+    name: noop
+  window_preparer:
+    name: standard_raster
+    windowing_mode:
+      name: per_group
+      gridding_strategy:
+        name: pad_to_fill
+        grid_size: 128
+  data_splitter:
+    name: spatial
+    grid_size: 512
+    train_prop: 0.75
+    val_prop: 0.25
+    test_prop: 0.0
+training:
+  max_epochs: 100
+  batch_size: 8
+  optimizer:
+    name: adamw
+    lr: 0.0001
+  scheduler:
+    name: plateau
+    factor: 0.2
+    patience: 2
+    min_lr: 0.0
+    cooldown: 10
+  encoder_training_strategy:
+    name: layer_wise_lr_decay
+    decay_factor: 0.65
+    num_layers: 12
+  early_stopping:
+    patience: 15
 prediction_requests:
   partitioners:
     request_to_partitions:
@@ -693,3 +740,5 @@ prediction_requests:
           percentile: 90
 transpiler_context:
   downsample_factor: 1
+  checkpoint_monitor: val_loss
+  checkpoint_mode: min

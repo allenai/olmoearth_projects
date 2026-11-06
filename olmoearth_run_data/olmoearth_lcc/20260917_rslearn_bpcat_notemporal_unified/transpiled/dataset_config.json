@@ -56,7 +56,7 @@
           "bands": [
             "ts_start"
           ],
-          "dtype": "uint8",
+          "dtype": "uint16",
           "format": {
             "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
           },
@@ -66,7 +66,7 @@
           "bands": [
             "ts_end"
           ],
-          "dtype": "uint8",
+          "dtype": "uint16",
           "format": {
             "class_path": "rslearn.utils.raster_format.NumpyRasterFormat"
           },
@@ -92,9 +92,14 @@
             "ts_start",
             "ts_end"
           ],
-          "dtype": "uint8",
+          "dtype": "uint16",
           "format": {
-            "class_path": "rslearn.utils.raster_format.GeotiffRasterFormat"
+            "class_path": "rslearn.utils.raster_format.GeotiffRasterFormat",
+            "init_args": {
+              "geotiff_options": {
+                "photometric": "MINISBLACK"
+              }
+            }
           },
           "zoom_offset": 0
         }
@@ -138,11 +143,6 @@
         "init_args": {
           "cache_dir": "cache/planetary_computer",
           "harmonize": true,
-          "query": {
-            "eo:cloud_cover": {
-              "gte": 0
-            }
-          },
           "sort_by": "eo:cloud_cover",
           "timeout": "0:0:10"
         },
@@ -194,11 +194,6 @@
         "init_args": {
           "cache_dir": "cache/planetary_computer",
           "harmonize": true,
-          "query": {
-            "eo:cloud_cover": {
-              "gte": 0
-            }
-          },
           "sort_by": "eo:cloud_cover",
           "timeout": "0:0:10"
         },
