@@ -24,6 +24,8 @@ RECENT_PERIODS, RECENT_PERIOD_DAYS, RECENT_RECOVERY_PERIODS, RECENT_WINDOW_DAYS 
     90,
 )
 NUM_TIMESTEPS = 16 + RECENT_PERIODS
+# olmoearth_run fills unlabeled pixels of a segmentation label with 255 (SegmentationField.label_nodata).
+SEGMENTATION_LABEL_NODATA = 255
 
 LC_CLASSES = [
     "nodata",
@@ -208,7 +210,11 @@ def main(
             num_classes = len(f["allowed_values"])
             task = {
                 **task,
-                "init_args": {**task["init_args"], "num_classes": num_classes},
+                "init_args": {
+                    **task["init_args"],
+                    "num_classes": num_classes,
+                    "nodata_value": SEGMENTATION_LABEL_NODATA,
+                },
             }
         tasks[f["name"]] = {
             "name": "manual",
@@ -262,7 +268,51 @@ def main(
         },
         "input_preprocessing": {
             "default": {"input_size": 64, "input_mode": "all_tiles"},
+            # Studio's defaults for fine-tuning a per-pixel model; olmoearth_run flips the date targets too.
+            "train": {
+                "input_mode": "single_random_crop",
+                "additional_transforms": [
+                    {"name": "random_flip", "x": True, "y": True}
+                ],
+            },
             "predict": {"overlap_pixels": 16},
+        },
+        # Studio's guided defaults for 64-pixel polygon labels; prediction ignores these two sections.
+        "labeled_data_prep": {
+            "geometry_preparation": {"line_string_policy": "centroid"},
+            "sampler": {"name": "noop"},
+            "window_preparer": {
+                "name": "standard_raster",
+                "windowing_mode": {
+                    "name": "per_group",
+                    "gridding_strategy": {"name": "pad_to_fill", "grid_size": 128},
+                },
+            },
+            "data_splitter": {
+                "name": "spatial",
+                "grid_size": 512,
+                "train_prop": 0.75,
+                "val_prop": 0.25,
+                "test_prop": 0.0,
+            },
+        },
+        "training": {
+            "max_epochs": 100,
+            "batch_size": 8,
+            "optimizer": {"name": "adamw", "lr": 0.0001},
+            "scheduler": {
+                "name": "plateau",
+                "factor": 0.2,
+                "patience": 2,
+                "min_lr": 0.0,
+                "cooldown": 10,
+            },
+            "encoder_training_strategy": {
+                "name": "layer_wise_lr_decay",
+                "decay_factor": 0.65,
+                "num_layers": 12,
+            },
+            "early_stopping": {"patience": 15},
         },
         "prediction_requests": {
             "partitioners": {
@@ -299,7 +349,12 @@ def main(
                 ]
             },
         },
-        "transpiler_context": {"downsample_factor": 1},
+        # Manual tasks name no metric to checkpoint on, so olmoearth_run needs one for training.
+        "transpiler_context": {
+            "downsample_factor": 1,
+            "checkpoint_monitor": "val_loss",
+            "checkpoint_mode": "min",
+        },
     }
     yaml.safe_dump(config, sys.stdout, sort_keys=False, width=120)
 
