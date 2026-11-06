@@ -23,7 +23,7 @@ PYTHONPATH=src python -m olmoearth_embeddings_tutorial.segmentation.analyze \
 **Few-shot segmentation** (`figures/fewshot_60labels.png`)
 
 Left: Sentinel-2 RGB with 60 labeled pixels (magenta dots). Center:
-WorldCover reference. Right: predicted segmentation (weighted F1 ~ 0.84;
+WorldCover reference. Right: predicted segmentation (weighted F1 ~ 0.80;
 exact score depends on which pixels are sampled).
 
 ![few-shot segmentation](figures/fewshot_60labels.png)
