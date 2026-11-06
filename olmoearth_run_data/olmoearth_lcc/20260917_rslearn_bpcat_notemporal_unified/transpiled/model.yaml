@@ -201,7 +201,7 @@ model:
           - class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead
             init_args:
               input_key: sentinel2_l2a
-              mode: AFTER
+              mode: BEFORE
           ts_end:
           - class_path: rslearn.models.tokens_to_channels.TokensToChannels
             init_args:

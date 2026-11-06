@@ -165,10 +165,15 @@ FIELDS = [
     date_field("ts_start"),
     date_field("ts_end"),
 ]
-DATE_FIELDS = {"ts_start", "ts_end"}
+# How each labeled date maps to an input image in training (Favyen's training config).
+# ts_start is the last date with no change yet, so it takes the image just before it,
+# which can't show the change; ts_end is when the change is clear, so it takes the next image.
+TIMESTEP_MODES = {"ts_start": "BEFORE", "ts_end": "AFTER"}
 
 
-def timestep_task(task: dict, decoder_layers: list[dict]) -> tuple[dict, list[dict]]:
+def timestep_task(
+    name: str, task: dict, decoder_layers: list[dict]
+) -> tuple[dict, list[dict]]:
     """The legacy timestep head as rslearn's per-pixel timestep task.
 
     The head still classifies each pixel into one of the input images, so the checkpoint
@@ -179,7 +184,7 @@ def timestep_task(task: dict, decoder_layers: list[dict]) -> tuple[dict, list[di
     head = {
         "class_path": "rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepHead",
         # mode maps labeled dates to images, so it only matters for training.
-        "init_args": {"input_key": "sentinel2_l2a", "mode": "AFTER"},
+        "init_args": {"input_key": "sentinel2_l2a", "mode": TIMESTEP_MODES[name]},
     }
     task = {
         "class_path": "rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask",
@@ -204,8 +209,8 @@ def main(
     for f in FIELDS:
         task = legacy_tasks[f["name"]]
         decoder_layers = mtm["decoders"][f["name"]]
-        if f["name"] in DATE_FIELDS:
-            task, decoder_layers = timestep_task(task, decoder_layers)
+        if f["name"] in TIMESTEP_MODES:
+            task, decoder_layers = timestep_task(f["name"], task, decoder_layers)
         else:
             num_classes = len(f["allowed_values"])
             task = {
