@@ -13,7 +13,7 @@ via the Studio API. These scripts reproduce the use cases from the
 4. **PCA exploration** -- false-color RGB from the first three principal
    components of Flevoland (Netherlands) embeddings.
 
-Examples 1, 2, and 4 use **OlmoEarth-v1-Tiny** (192-dim, 6.2M parameters)
+Examples 1, 2, and 4 use **OlmoEarth-v1.3-Base** (128-dim embeddings)
 at 40-meter resolution with 12 monthly periods (annual composites) of
 Sentinel-2 L2A imagery. Example 3 uses the same encoder at 1 monthly period.
 
@@ -54,7 +54,9 @@ PYTHONPATH=src python -m olmoearth_embeddings_tutorial.setup_model
 ```
 
 This writes `config.json` with `project_id`, `model_id` (annual), and
-`monthly_model_id` that subsequent scripts read automatically.
+`monthly_model_id` that subsequent scripts read automatically. If you belong
+to more than one Studio organization, pass `--organization-id` to choose where
+the project is created.
 
 ### 2. Similarity search
 

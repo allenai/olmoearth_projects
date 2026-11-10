@@ -96,10 +96,10 @@ def main() -> None:
     print("Polling for completion...")
     result = client.poll_prediction(prediction_id)
 
-    results = result.get("prediction_results", [])
-    if not results:
+    prediction_result = result.get("result")
+    if not prediction_result:
         raise RuntimeError("No prediction results returned.")
-    download_token = results[0]["download_token"]
+    download_token = prediction_result["download_token"]
 
     print("Downloading embedding COG...")
     embed_path = client.download_prediction_result(download_token, args.out_dir)

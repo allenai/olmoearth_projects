@@ -106,10 +106,10 @@ def _poll_and_download(
     """Poll a prediction until complete, then download the embedding COG."""
     print(f"Polling prediction {prediction_id}...")
     result = client.poll_prediction(prediction_id)
-    results = result.get("prediction_results", [])
-    if not results:
+    prediction_result = result.get("result")
+    if not prediction_result:
         raise RuntimeError(f"No results for prediction {prediction_id}")
-    download_token = results[0]["download_token"]
+    download_token = prediction_result["download_token"]
 
     print("Downloading embedding COG...")
     return client.download_prediction_result(download_token, out_dir)
