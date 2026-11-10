@@ -39,12 +39,31 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
 
-      # Setup Beaker CLI.
+      # Setup Beaker CLI. We install it manually instead of using allenai/setup-beaker
+      # since that action detects the architecture with `uname -p`, which returns
+      # "unknown" on newer Ubuntu runner images.
       - name: Setup Beaker
-        uses: allenai/setup-beaker@v2
-        with:
-          token: ${{ env.BEAKER_TOKEN }}
-          workspace: "ai2/earth-systems"
+        run: |
+          set -euo pipefail
+          if [[ "$(uname -s)" != "Linux" || "$(uname -m)" != "x86_64" ]]; then
+            echo "Unsupported platform: $(uname -s) $(uname -m)"
+            exit 1
+          fi
+          mkdir -p "$HOME/bin"
+          VERSION=$(curl --silent https://beaker.org/api/v3/release | jq -r '.version')
+          echo "Downloading Beaker CLI version $VERSION."
+          curl --silent --fail \
+            --connect-timeout 5 \
+            --max-time 60 \
+            --retry 5 \
+            --output "$RUNNER_TEMP/beaker.tar.gz" \
+            "https://beaker.org/api/v3/release/cli?os=linux&arch=amd64"
+          tar -zxf "$RUNNER_TEMP/beaker.tar.gz" -C "$HOME/bin" ./beaker
+          "$HOME/bin/beaker" --version
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+          "$HOME/bin/beaker" config set user_token "$BEAKER_TOKEN"
+          "$HOME/bin/beaker" config set default_workspace "ai2/earth-systems"
+          "$HOME/bin/beaker" config test > /dev/null
 
       # Build Docker image.
       - name: Build Docker image
