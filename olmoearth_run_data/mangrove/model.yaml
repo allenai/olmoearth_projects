@@ -9,7 +9,8 @@ model:
         encoder:
         - class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
           init_args:
-              model_id: OLMOEARTH_V1_BASE
+              model_path: ${EXTRA_FILES_PATH}
+              embedding_size: 768
               patch_size: 2
         decoders:
           mangrove_classification:
