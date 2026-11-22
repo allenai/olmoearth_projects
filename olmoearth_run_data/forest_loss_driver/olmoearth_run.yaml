@@ -1,39 +1,78 @@
 inference_results_config:
   data_type: vector
   classification_fields:
-    - property_name: new_label
+    # The leaves of the ACA label hierarchy (see README.md). The pipeline also writes
+    # the legacy category (the old 10-class categorization) derived from the leaf
+    # probabilities.
+    - property_name: driver
       band_index: 1
       allowed_values:
         - value: 0
-          label: agriculture
-          color: [137, 243, 54]
+          label: agriculture_small_scale
+          color: [124, 252, 0]
         - value: 1
-          label: mining
-          color: [255, 222, 33]
+          label: agriculture_pasture
+          color: [154, 205, 50]
         - value: 2
-          label: airstrip
-          color: [255, 192, 203]
+          label: agriculture_soybean
+          color: [0, 128, 0]
         - value: 3
-          label: road
-          color: [255, 165, 0]
+          label: agriculture_oil_palm
+          color: [0, 100, 0]
         - value: 4
-          label: logging
-          color: [128, 0, 128]
+          label: agriculture_rice
+          color: [143, 188, 143]
         - value: 5
-          label: burned
-          color: [255, 140, 0]
+          label: agriculture_other
+          color: [50, 205, 50]
         - value: 6
-          label: landslide
-          color: [255, 0, 0]
+          label: mining_terrace
+          color: [255, 215, 0]
         - value: 7
-          label: hurricane
-          color: [245, 245, 220]
+          label: mining_riverine
+          color: [218, 165, 32]
         - value: 8
-          label: river
-          color: [0, 255, 255]
+          label: airstrip
+          color: [255, 105, 180]
         - value: 9
-          label: none
+          label: road
+          color: [255, 140, 0]
+        - value: 10
+          label: infrastructure_other
+          color: [255, 99, 71]
+        - value: 11
+          label: logging_road
+          color: [186, 85, 211]
+        - value: 12
+          label: selective_logging
+          color: [128, 0, 128]
+        - value: 13
+          label: burned_area
+          color: [220, 20, 60]
+        - value: 14
+          label: human_other
+          color: [128, 128, 128]
+        - value: 15
+          label: landslide
+          color: [139, 69, 19]
+        - value: 16
+          label: blowdown
+          color: [245, 222, 179]
+        - value: 17
+          label: river_dynamics
+          color: [0, 255, 255]
+        - value: 18
+          label: flooding
+          color: [30, 144, 255]
+        - value: 19
+          label: natural_other
+          color: [210, 180, 140]
+        - value: 20
+          label: no_change
           color: [255, 255, 255]
+        - value: 21
+          label: already_altered
+          color: [211, 211, 211]
 
 partition_strategies:
   partition_request_geometry:
@@ -45,15 +84,20 @@ partition_strategies:
     class_path: olmoearth_run.runner.tools.partitioners.fixed_window_partitioner.FixedWindowPartitioner
     init_args:
       window_size: 128
+      # The model is trained on 128x128 windows in the UTM zone of the event at 10
+      # m/pixel (center-cropped to 64x64 by the Pad transform). With use_utm, the CRS
+      # of output_projection is ignored (the UTM zone is picked based on the window
+      # centroid) but its resolution is used.
+      use_utm: true
       output_projection:
         class_path: rslearn.utils.Projection
         init_args:
           crs:
             _module_: rasterio.crs
             _callable_: CRS.from_epsg
-            code: 3857
-          x_resolution: 9.554628535647032  # PIXEL_SIZE in rslp/forest_loss_driver/extract_dataset/extract_alerts.py
-          y_resolution: -9.554628535647032
+            code: 32718
+          x_resolution: 10
+          y_resolution: -10
 
 postprocessing_strategies:
   process_window:

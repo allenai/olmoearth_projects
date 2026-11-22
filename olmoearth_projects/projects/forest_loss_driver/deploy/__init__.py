@@ -29,12 +29,8 @@ from olmoearth_projects.utils.logging import get_logger
 from olmoearth_projects.utils.studio_client import StudioClient
 
 from .centroid_index import CentroidIndex
+from .hierarchy import set_event_categories
 from .make_tiles import make_tiles
-from .monocrop import (
-    add_monoculture_predictions,
-    make_monocrop_request_features,
-    select_monocrop_events,
-)
 from .overlap_dedup import filter_overlapping_previous_events
 from .sentinel2 import get_sentinel2_assets
 
@@ -44,11 +40,9 @@ ORGANIZATION_ID = "f098bcba-b994-46ce-87fc-b90b14bb8338"  # Ai2 - Demo
 PROJECT_ID = (
     "2f3788b4-11bb-48ee-b379-eacccaf9734a"  # Forest Loss Driver Colombia 12 Demo
 )
-# The forest loss driver model, which classifies the driver of each forest loss event.
-MODEL_ID = "a3c3e819-7aa9-47e9-98fa-f72449a56263"
-# The monoculture model (see olmoearth_run_data/forest_loss_driver_monocrop/), which
-# classifies the type of agriculture for large-scale agriculture events.
-MONOCROP_MODEL_ID = "522c3aa3-77aa-49d3-a215-a3bfed8dac55"
+# The forest loss driver model, which classifies the driver of each forest loss event
+# into the leaves of the label hierarchy (see olmoearth_run_data/forest_loss_driver/).
+MODEL_ID = "7606e593-ba70-48cb-b5f9-f032771a155f"
 
 # Timeout (seconds) for downloading prediction results.
 REQUEST_TIMEOUT = 30
@@ -57,7 +51,7 @@ REQUEST_TIMEOUT = 30
 POLL_SLEEP_TIME = 10
 
 # Some forest loss events will not be successful in Studio due to not having enough
-# Sentinel-2 images (e.g. recent events, or cloudy months for the monoculture model).
+# Sentinel-2 images (e.g. recent events, or cloudy periods).
 # So we lower the threshold to 50% of windows needing to succeed.
 MIN_WINDOW_SUCCESS_RATE = 0.5
 
@@ -83,9 +77,6 @@ class IntegratedConfig:
     make_tiles_workers: int
     # Number of workers to use for writing individual events.
     write_individual_events_workers: int
-    # Number of workers to use for computing event areas when selecting events for
-    # monoculture classification.
-    monocrop_select_workers: int = 32
 
 
 @dataclass
@@ -98,14 +89,9 @@ class RunPaths:
     job_ids_fname: UPath
     # Outputs from the forest loss driver Studio job.
     raw_studio_outputs_fname: UPath
-    # Forest loss events after merging with previous events, but before adding
-    # monoculture predictions.
+    # Forest loss events after merging with previous events.
     merged_events_fname: UPath
-    # Request geometry (event centroids) for the monoculture Studio job.
-    monocrop_request_fname: UPath
-    # Outputs from the monoculture Studio job.
-    monocrop_raw_outputs_fname: UPath
-    # Filename to write all events (including monoculture predictions).
+    # Filename to write all events.
     all_events_fname: UPath
     # Directory to write per-country/month GeoJSON files.
     per_country_month_dir: UPath
@@ -417,11 +403,12 @@ def merge_forest_loss_events(
     input_features = vector_format.decode_from_file(run_paths.initial_alerts_fname)
     add_input_properties_to_output_features(input_features, forest_loss_events)
 
-    # Rename new_label to category in the feature properties.
+    # Replace the model outputs (top leaf and leaf probabilities) with the leaf, the
+    # Level 1/2 nodes, and the legacy category (used by the web app's driver legend,
+    # and the only categorization that previous events have).
     # Also delete some excess properties.
     for event in forest_loss_events:
-        event.properties["category"] = event.properties["new_label"]
-        del event.properties["new_label"]
+        set_event_categories(event)
         for prop_name in [
             "oe_prediction_result_id",
             "oe_prediction_result_file_id",
@@ -486,83 +473,6 @@ def merge_forest_loss_events(
     return forest_loss_events
 
 
-def add_monoculture_predictions_from_studio(
-    client: StudioClient,
-    run_id: str,
-    run_time: datetime,
-    forest_loss_events: list[Feature],
-    run_paths: RunPaths,
-    select_workers: int,
-) -> None:
-    """Run the monoculture model on large-scale agriculture events and tag the events.
-
-    The events that qualify (see select_monocrop_events) are submitted to Studio as
-    centroids with time ranges covering the 12 monthly periods that the monoculture
-    model expects. The predicted class is then added to the events as the
-    monoculture_category property.
-
-    The request geometry, job ID, and raw outputs are cached so the operation can be
-    resumed if the pipeline restarts.
-
-    Args:
-        client: the Studio client to use.
-        run_id: the run ID.
-        run_time: the reference time of this run, used to compute event ages.
-        forest_loss_events: the merged forest loss events, which are modified
-            in-place.
-        run_paths: paths to use for this run.
-        select_workers: number of worker processes for computing event areas when
-            selecting events.
-    """
-    logger.info("Selecting events for monoculture classification")
-    selected_events = select_monocrop_events(
-        forest_loss_events, run_time, workers=select_workers
-    )
-    logger.info(
-        f"Selected {len(selected_events)} of {len(forest_loss_events)} events for monoculture classification"
-    )
-    if len(selected_events) == 0:
-        logger.info("No events qualify for monoculture classification, skipping")
-        return
-
-    # Create (or load) the request geometry, cached for reproducibility.
-    if run_paths.monocrop_request_fname.exists():
-        logger.info(
-            f"Using existing monoculture request geometry at {run_paths.monocrop_request_fname}"
-        )
-        with run_paths.monocrop_request_fname.open() as f:
-            request_features = json.load(f)["features"]
-    else:
-        request_features = make_monocrop_request_features(selected_events, run_time)
-        with open_atomic(run_paths.monocrop_request_fname, "w") as f:
-            json.dump(
-                {
-                    "type": "FeatureCollection",
-                    "properties": {},
-                    "features": request_features,
-                },
-                f,
-            )
-
-    job_id = start_studio_inference_job(
-        client=client,
-        job_name=f"run_{run_id}_monocrop",
-        model_id=MONOCROP_MODEL_ID,
-        features=request_features,
-        job_ids_fname=run_paths.job_ids_fname,
-    )
-    logger.info(f"Got monoculture Studio job ID: {job_id}")
-    wait_for_studio_job(client, job_id)
-
-    output_features = get_cached_prediction_result(
-        client, job_id, run_paths.monocrop_raw_outputs_fname
-    )
-    num_tagged = add_monoculture_predictions(selected_events, output_features)
-    logger.info(
-        f"Added monoculture predictions to {num_tagged} of {len(selected_events)} selected events"
-    )
-
-
 def write_individual_event(fname: UPath, event: Feature) -> None:
     """Write an event to the specified file."""
     GeojsonVectorFormat(coordinate_mode=GeojsonCoordinateMode.WGS84).encode_to_file(
@@ -613,26 +523,16 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
        within the new time window or that mostly overlap with a new event.
     4. Get metadata for Planetary Computer scenes that can be used to visualize the
        before and after images for each forest loss event.
-    5. Make a second OlmoEarth API request to run the monoculture model on large-scale
-       agriculture events from the last 12 months, and tag those events with the
-       predicted monoculture category.
-    6. Use tippecanoe to make tiles, and upload those tiles along with GeoJSON files to
+    5. Use tippecanoe to make tiles, and upload those tiles along with GeoJSON files to
        GCS so the website can access it.
 
     Args:
         integrated_config: the integrated configuration for all inference pipeline
             steps.
     """
-    if MONOCROP_MODEL_ID is None:
-        raise ValueError(
-            "MONOCROP_MODEL_ID must be set to the Studio model ID of the monoculture model"
-        )
-
     # Make run ID based on the current time.
     # We check the most recent Friday since that is when GLAD alerts are released, and
     # this way we will have the same run ID in case of restarts.
-    # The run time (midnight UTC on that Friday) is also the reference time for
-    # computing the age of forest loss events.
     run_time = _get_most_recent_friday().replace(
         hour=0, minute=0, second=0, microsecond=0
     )
@@ -645,8 +545,6 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
         job_ids_fname=weka_ds_root / "job_id.json",
         raw_studio_outputs_fname=weka_ds_root / "events_from_studio_jobs.geojson",
         merged_events_fname=weka_ds_root / "merged_events.geojson",
-        monocrop_request_fname=weka_ds_root / "monocrop_request_geometry.geojson",
-        monocrop_raw_outputs_fname=weka_ds_root / "monocrop_events_from_studio.geojson",
         all_events_fname=gcs_ds_root / "all_events.geojson",
         per_country_month_dir=gcs_ds_root,
         global_latest_fname=gcs_ds_root.parent / "latest.geojson",
@@ -689,16 +587,6 @@ def integrated_pipeline(integrated_config: IntegratedConfig) -> None:
             inference_job_id=inference_job_id,
             asset_workers=integrated_config.asset_workers,
             run_paths=run_paths,
-        )
-
-        # Run the monoculture model on the large-scale agriculture events.
-        add_monoculture_predictions_from_studio(
-            client=client,
-            run_id=run_id,
-            run_time=run_time,
-            forest_loss_events=forest_loss_events,
-            run_paths=run_paths,
-            select_workers=integrated_config.monocrop_select_workers,
         )
 
         # Save all_events.geojson in gcs_ds_root.

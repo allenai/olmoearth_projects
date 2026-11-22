@@ -58,3 +58,6 @@ History
 - 2026-09-15: Initial version using the window classification model
   `20260914_monocrop_classifier/olmoearth_v1_2_base_classify_pool` from
   rslearn_projects (`data/forest_loss_driver/monocrop_classifier/model_classify_pool.yaml`).
+- 2026-11-22: No longer run by the forest loss driver deploy pipeline, since the new
+  driver model (see `../forest_loss_driver/README.md`) predicts agriculture types
+  itself. `deploy/monocrop.py` is kept but unused.

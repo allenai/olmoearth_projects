@@ -12,18 +12,26 @@ model:
               encoder:
                 class_path: rslearn.models.olmoearth_pretrain.model.OlmoEarth
                 init_args:
-                  model_id: OLMOEARTH_V1_BASE
+                  model_id: OLMOEARTH_V1_2_BASE
                   patch_size: 4
-              image_channels: 48
+                  # Some windows have duplicated Sentinel-2 timestamps (e.g. adjacent
+                  # tiles from the same pass), which the real-timestamp path rejects.
+                  use_legacy_timestamps: true
+              # 4 pre images in one forward pass, 4 post images in another.
+              num_timesteps_per_forward_pass: 4
               image_key: "sentinel2_l2a"
               groups: [[0], [1]]
         decoder:
           - class_path: rslearn.models.pooling_decoder.PoolingDecoder
             init_args:
               in_channels: 1536
-              out_channels: 10
+              # One output per leaf of the label hierarchy.
+              out_channels: 22
               num_conv_layers: 1
               num_fc_layers: 2
+          # The model was trained with HierarchicalClassificationHead from
+          # rslearn_projects (a marginal likelihood loss over the allowed leaves). It
+          # is a softmax with no weights, so ClassificationHead gives the same outputs.
           - class_path: rslearn.train.tasks.classification.ClassificationHead
     scheduler:
       class_path: rslearn.train.scheduler.PlateauScheduler
@@ -33,9 +41,13 @@ model:
         min_lr: 0
         cooldown: 10
     optimizer:
-      class_path: rslearn.train.optimizer.AdamW
+      class_path: rslearn.models.olmoearth_pretrain.optimizer.LayerDecayAdamW
       init_args:
         lr: 0.0001
+        layer_decay_rate: 0.65
+        num_layers: 12
+        # Path to the OlmoEarth module (nested inside SimpleTimeSeries).
+        encoder_prefix: model.encoder.0.encoder
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
@@ -52,19 +64,37 @@ data:
         layers: ["label"]
         is_target: true
     task:
+      # Training used HierarchicalForestLossTask from rslearn_projects, which reads
+      # sets of allowed leaves. For prediction, a plain ClassificationTask over the
+      # leaves writes the top leaf (driver) and the leaf probabilities (probs); the
+      # pipeline derives the Level 1/2 and legacy categories from the probabilities.
       class_path: rslearn.train.tasks.classification.ClassificationTask
       init_args:
-        property_name: "new_label"
-        classes: ["agriculture", "mining", "airstrip", "road", "logging", "burned", "landslide", "hurricane", "river", "none"]
+        property_name: "driver"
+        classes: ["agriculture_small_scale", "agriculture_pasture", "agriculture_soybean", "agriculture_oil_palm", "agriculture_rice", "agriculture_other", "mining_terrace", "mining_riverine", "airstrip", "road", "infrastructure_other", "logging_road", "selective_logging", "burned_area", "human_other", "landslide", "blowdown", "river_dynamics", "flooding", "natural_other", "no_change", "already_altered"]
         allow_invalid: true
-        metric_kwargs:
-          average: "micro"
         prob_property: "probs"
-        skip_unknown_categories: true
-        enable_confusion_matrix: true
     batch_size: 8
     num_workers: ${NUM_WORKERS}
     default_config:
+      transforms:
+        - class_path: rslearn.train.transforms.pad.Pad
+          init_args:
+            mode: "center"
+            size: 64
+            image_selectors:
+              - sentinel2_l2a
+        - class_path: rslearn.models.olmoearth_pretrain.norm.OlmoEarthNormalize
+          init_args:
+            band_names:
+              sentinel2_l2a: ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"]
+        # To support visualization via image key.
+        - class_path: rslearn.train.transforms.concatenate.Concatenate
+          init_args:
+            selections:
+              sentinel2_l2a: [2, 1, 0]
+            output_selector: image
+    train_config:
       transforms:
         - class_path: rslearn.train.transforms.pad.Pad
           init_args:
@@ -80,13 +110,11 @@ data:
           init_args:
             image_selectors:
               - sentinel2_l2a
-        # To support visualization via image key.
         - class_path: rslearn.train.transforms.concatenate.Concatenate
           init_args:
             selections:
               sentinel2_l2a: [2, 1, 0]
             output_selector: image
-    train_config:
       tags:
         split: train
     val_config:
@@ -109,11 +137,6 @@ trainer:
     - class_path: lightning.pytorch.callbacks.LearningRateMonitor
       init_args:
         logging_interval: "epoch"
-    - class_path: rslearn.train.callbacks.freeze_unfreeze.FreezeUnfreeze
-      init_args:
-        module_selector: ["model", "encoder", 0, "encoder", "model"]
-        unfreeze_at_epoch: 20
-        unfreeze_lr_factor: 10
     - class_path: rslearn.train.callbacks.checkpointing.BestLastCheckpoint
       init_args:
         dirpath: ${TRAINER_DATA_PATH}
@@ -123,6 +146,6 @@ trainer:
       init_args:
         path: ${DATASET_PATH}
         output_layer: ${PREDICTION_OUTPUT_LAYER}
-# project_name: 20260401_forest_loss_driver_peru_phase2
-# run_name: config.yaml_airstripfix_02
+# project_name: 20261120_forest_loss_driver_hierarchy
+# run_name: config.yaml_00
 # Not used: ${EXTRA_FILES_PATH}
