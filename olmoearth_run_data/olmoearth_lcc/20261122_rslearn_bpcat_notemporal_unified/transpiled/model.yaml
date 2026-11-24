@@ -80,7 +80,7 @@ model:
           - class_path: rslearn.models.conv.Conv
             init_args:
               in_channels: 128
-              out_channels: 11
+              out_channels: 8
               kernel_size: 1
               activation:
                 class_path: torch.nn.Identity
@@ -115,7 +115,7 @@ model:
           - class_path: rslearn.models.conv.Conv
             init_args:
               in_channels: 128
-              out_channels: 15
+              out_channels: 20
               kernel_size: 1
               activation:
                 class_path: torch.nn.Identity
@@ -150,7 +150,7 @@ model:
           - class_path: rslearn.models.conv.Conv
             init_args:
               in_channels: 128
-              out_channels: 13
+              out_channels: 11
               kernel_size: 1
               activation:
                 class_path: torch.nn.Identity
@@ -185,7 +185,7 @@ model:
           - class_path: rslearn.models.conv.Conv
             init_args:
               in_channels: 128
-              out_channels: 13
+              out_channels: 11
               kernel_size: 1
               activation:
                 class_path: torch.nn.Identity
@@ -214,6 +214,7 @@ model:
             init_args:
               input_key: sentinel2_l2a
               mode: AFTER
+              fallback_to_closest_timestep_if_no_match: true
 data:
   class_path: rslearn.train.data_module.RslearnDataModule
   init_args:
@@ -275,22 +276,22 @@ data:
           pre_change:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
-              num_classes: 11
+              num_classes: 8
               nodata_value: 255
           post_change:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
-              num_classes: 15
+              num_classes: 20
               nodata_value: 255
           src:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
-              num_classes: 13
+              num_classes: 11
               nodata_value: 255
           dst:
             class_path: rslearn.train.tasks.segmentation.SegmentationTask
             init_args:
-              num_classes: 13
+              num_classes: 11
               nodata_value: 255
           ts_start:
             class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask

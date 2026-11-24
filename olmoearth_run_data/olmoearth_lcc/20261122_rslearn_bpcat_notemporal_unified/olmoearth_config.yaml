@@ -52,14 +52,14 @@ data:
         label: none
         color: *id001
       - value: 2
-        label: deforestation
+        label: forest_loss
         color:
         - 139
         - 69
         - 19
         - 255
       - value: 3
-        label: urban_erosion
+        label: removed_building
         color:
         - 112
         - 128
@@ -73,7 +73,7 @@ data:
         - 170
         - 255
       - value: 5
-        label: water_contract
+        label: water_to_land
         color:
         - 70
         - 130
@@ -87,32 +87,11 @@ data:
         - 32
         - 255
       - value: 7
-        label: agricultural_activity
+        label: mangrove_loss
         color:
-        - 184
-        - 134
-        - 11
-        - 255
-      - value: 8
-        label: wildfire
-        color:
-        - 226
-        - 88
-        - 34
-        - 255
-      - value: 9
-        label: ice_motion
-        color:
-        - 127
-        - 219
-        - 255
-        - 255
-      - value: 10
-        label: flooding
-        color:
-        - 0
-        - 31
-        - 63
+        - 85
+        - 107
+        - 47
         - 255
     - name: post_change
       field_type: segmentation
@@ -152,7 +131,7 @@ data:
         - 27
         - 255
       - value: 6
-        label: new_crop_field
+        label: new_agriculture
         color:
         - 154
         - 205
@@ -173,14 +152,14 @@ data:
         - 140
         - 255
       - value: 9
-        label: water_expand
+        label: land_to_water
         color:
         - 0
         - 116
         - 217
         - 255
       - value: 10
-        label: mining
+        label: new_mining_or_quarry
         color:
         - 177
         - 13
@@ -214,6 +193,41 @@ data:
         - 18
         - 190
         - 255
+      - value: 15
+        label: agricultural_activity
+        color:
+        - 184
+        - 134
+        - 11
+        - 255
+      - value: 16
+        label: burned
+        color:
+        - 226
+        - 88
+        - 34
+        - 255
+      - value: 17
+        label: flooding
+        color:
+        - 0
+        - 31
+        - 63
+        - 255
+      - value: 18
+        label: storm_damage
+        color:
+        - 106
+        - 90
+        - 205
+        - 255
+      - value: 19
+        label: vegetation_dieback
+        color:
+        - 160
+        - 82
+        - 45
+        - 255
     - name: src
       field_type: segmentation
       allowed_values:
@@ -228,81 +242,67 @@ data:
         - 180
         - 255
       - value: 2
-        label: burnt
-        color:
-        - 139
-        - 0
-        - 0
-        - 255
-      - value: 3
-        label: crops
+        label: agriculture
         color:
         - 240
         - 150
         - 255
         - 255
-      - value: 4
-        label: fallow/shifting cultivation
-        color:
-        - 209
-        - 163
-        - 61
-        - 255
-      - value: 5
+      - value: 3
         label: grassland
         color:
         - 255
         - 255
         - 76
         - 255
-      - value: 6
-        label: Lichen and moss
-        color:
-        - 250
-        - 230
-        - 160
-        - 255
-      - value: 7
+      - value: 4
         label: shrub
         color:
         - 255
         - 187
         - 34
         - 255
-      - value: 8
-        label: snow and ice
+      - value: 5
+        label: snow/ice
         color:
         - 240
         - 240
         - 240
         - 255
-      - value: 9
+      - value: 6
         label: tree
         color:
         - 0
         - 100
         - 0
         - 255
-      - value: 10
+      - value: 7
         label: urban/built-up
         color:
         - 250
         - 0
         - 0
         - 255
-      - value: 11
+      - value: 8
         label: water
         color:
         - 0
         - 100
         - 200
         - 255
-      - value: 12
-        label: wetland (herbaceous)
+      - value: 9
+        label: wetland
         color:
         - 0
         - 150
         - 160
+        - 255
+      - value: 10
+        label: mangrove
+        color:
+        - 46
+        - 139
+        - 87
         - 255
     - name: dst
       field_type: segmentation
@@ -318,81 +318,67 @@ data:
         - 180
         - 255
       - value: 2
-        label: burnt
-        color:
-        - 139
-        - 0
-        - 0
-        - 255
-      - value: 3
-        label: crops
+        label: agriculture
         color:
         - 240
         - 150
         - 255
         - 255
-      - value: 4
-        label: fallow/shifting cultivation
-        color:
-        - 209
-        - 163
-        - 61
-        - 255
-      - value: 5
+      - value: 3
         label: grassland
         color:
         - 255
         - 255
         - 76
         - 255
-      - value: 6
-        label: Lichen and moss
-        color:
-        - 250
-        - 230
-        - 160
-        - 255
-      - value: 7
+      - value: 4
         label: shrub
         color:
         - 255
         - 187
         - 34
         - 255
-      - value: 8
-        label: snow and ice
+      - value: 5
+        label: snow/ice
         color:
         - 240
         - 240
         - 240
         - 255
-      - value: 9
+      - value: 6
         label: tree
         color:
         - 0
         - 100
         - 0
         - 255
-      - value: 10
+      - value: 7
         label: urban/built-up
         color:
         - 250
         - 0
         - 0
         - 255
-      - value: 11
+      - value: 8
         label: water
         color:
         - 0
         - 100
         - 200
         - 255
-      - value: 12
-        label: wetland (herbaceous)
+      - value: 9
+        label: wetland
         color:
         - 0
         - 150
         - 160
+        - 255
+      - value: 10
+        label: mangrove
+        color:
+        - 46
+        - 139
+        - 87
         - 255
     - name: ts_start
       field_type: per_pixel_date
@@ -483,7 +469,7 @@ model:
       - class_path: rslearn.models.conv.Conv
         init_args:
           in_channels: 128
-          out_channels: 11
+          out_channels: 8
           kernel_size: 1
           activation:
             class_path: torch.nn.Identity
@@ -491,7 +477,7 @@ model:
       task:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
-          num_classes: 11
+          num_classes: 8
           nodata_value: 255
     post_change:
       name: manual
@@ -525,7 +511,7 @@ model:
       - class_path: rslearn.models.conv.Conv
         init_args:
           in_channels: 128
-          out_channels: 15
+          out_channels: 20
           kernel_size: 1
           activation:
             class_path: torch.nn.Identity
@@ -533,7 +519,7 @@ model:
       task:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
-          num_classes: 15
+          num_classes: 20
           nodata_value: 255
     src:
       name: manual
@@ -567,7 +553,7 @@ model:
       - class_path: rslearn.models.conv.Conv
         init_args:
           in_channels: 128
-          out_channels: 13
+          out_channels: 11
           kernel_size: 1
           activation:
             class_path: torch.nn.Identity
@@ -575,7 +561,7 @@ model:
       task:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
-          num_classes: 13
+          num_classes: 11
           nodata_value: 255
     dst:
       name: manual
@@ -609,7 +595,7 @@ model:
       - class_path: rslearn.models.conv.Conv
         init_args:
           in_channels: 128
-          out_channels: 13
+          out_channels: 11
           kernel_size: 1
           activation:
             class_path: torch.nn.Identity
@@ -617,7 +603,7 @@ model:
       task:
         class_path: rslearn.train.tasks.segmentation.SegmentationTask
         init_args:
-          num_classes: 13
+          num_classes: 11
           nodata_value: 255
     ts_start:
       name: manual
@@ -651,6 +637,7 @@ model:
         init_args:
           input_key: sentinel2_l2a
           mode: AFTER
+          fallback_to_closest_timestep_if_no_match: true
       task:
         class_path: rslearn.train.tasks.per_pixel_timestep.PerPixelTimestepTask
         init_args:
